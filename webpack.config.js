@@ -5,9 +5,7 @@ const UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
 const env = process.env.WEBPACK_ENV;
 
 const libraryName = 'Wall';
-let plugins = [
-  new webpack.optimize.ModuleConcatenationPlugin()
-],
+let plugins = [],
   outputFile;
 
 if (env === 'build') {
@@ -36,7 +34,7 @@ module.exports = {
       ],
       loader: 'babel-loader',
       options: {
-        presets: ['es2015']
+        presets: ['es2015', 'stage-2']
       }
     }]
   },

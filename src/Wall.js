@@ -1,6 +1,4 @@
-import * as utils from './utils';
-
-console.log(utils.transformProp);
+import { rAF, cAF, toArray, throwNewError, merge, getScreenHeight, getScreenWidth, transformProp } from './utils';
 
 const defaultOptions = {
   animationDirection: 'top'
@@ -10,41 +8,48 @@ const body = document.getElementsByTagName('body')[0];
 
 class Wall {
 
-  constructor(wrapper = utils.throwNewError`wrapper`, options = defaultOptions) {
+  constructor(wrapper = throwNewError`wrapper`, options = defaultOptions) {
     // get wrapper which contains sections
     this.wrapper = typeof wrapper === 'string' ? document.querySelector(wrapper) : wrapper;
     // get child sections, if no section contains, throw a new error
-    this.sections = this.wrapper.children.length ? [...this.wrapper.children] : utils.throwNewError`sections`;
+    this.sections = this.wrapper.children.length ? toArray(this.wrapper.children) : throwNewError`sections`;
     // get first of array as current section, and others as rest sections
     [this.currentSection, ...this.restSections] = this.sections;
+    this.currentSectionPosition = 0;
     // init section as an empty object, all configs about section will set inside the object
     this.sectionConfig = {};
     // init screen size, X presents width, Y presents height
     this.size = { X: 0, Y: 0 };
     // merge default options and custom options
-    this.options = utils.merge(defaultOptions, options);
+    this.options = merge(defaultOptions, options);
     // animation time stamp
     this.lastTime = null;
+    this.requestId = null;
+    this.isAnimating = false;
 
     this._init();
   }
 
   _init() {
-    this._refresh();
+    this._refresh(true);
 
     window.addEventListener('resize', () => { this._setupSize()._cssWrapper(); });
   }
 
-  _refresh() {
-    this
-      ._setupSize()._setupSections()
-      ._css()
-      ._queueSections();
+  _refresh(force) {
+    if (force)
+      this._setupSize()._setupSections()
+        ._css()
+        ._queueSections();
+    this.isAnimating = false;
+    this.currentSectionPosition = 0;
+    cAF(this.requestId);
+    return this;
   }
 
   _setupSize() {
-    this.size.X = utils.getScreenWidth();
-    this.size.Y = utils.getScreenHeight();
+    this.size.X = getScreenWidth();
+    this.size.Y = getScreenHeight();
     return this;
   }
 
@@ -93,15 +98,22 @@ class Wall {
     return this;
   }
 
-  _updateSection() {
-    this.currentSection.style[utils.transformProp] = 'translateX(-10px)';
-  }
-
   _animate() {
 
+    this._updateSectionPosition()._renderSectionPosition();
 
+    if (this.currentSectionPosition === 100) this._refresh()._queueSections();
 
-    utils.rAF(this._animate.bind(this));
+    if (this.isAnimating) return this.requestId = rAF(this._animate.bind(this));
+  }
+
+  _updateSectionPosition() {
+    this.currentSectionPosition++;
+    return this;
+  }
+
+  _renderSectionPosition() {
+    this.currentSection.style[transformProp] = `translate(0, -${this.currentSectionPosition}%)`;
   }
 
   prev() {
@@ -112,7 +124,8 @@ class Wall {
 
   next() {
     this.sections = [...this.restSections, this.currentSection];
-    this._queueSections();
+    this.isAnimating = true;
+    this._animate();
   }
 
 }
