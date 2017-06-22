@@ -2,7 +2,7 @@ import { rAF, cAF, toArray, throwNewError, merge, getScreenHeight, getScreenWidt
 import { easeInOutExpo } from './easing';
 
 const defaultOptions = {
-  animationDirection: 'top',
+  animationDirection: 'toTop',
   easeFunction: easeInOutExpo,
   speed: 1.2
 };
@@ -31,6 +31,7 @@ class Wall {
     this.requestId = null;
     // is animating flag
     this.isAnimating = false;
+    this.isToBack = false;
 
     this._init();
   }
@@ -94,7 +95,7 @@ class Wall {
   }
 
   _resetSectionPosition(section) {
-    section.style[transformProp] = 'translate(0px, 0px)';
+    section.style[transformProp] = `translate(0px, 0px)`;
   }
 
   _queueSections() {
@@ -113,7 +114,7 @@ class Wall {
 
     this._updateSectionPosition(delta)._renderSectionPosition();
 
-    if (this.currentSectionPosition >= 100) this._refresh()._queueSections();
+    if (this.currentSectionPosition >= 100 || this.currentSectionPosition <= 0) this._refresh()._queueSections();
 
     if (this.isAnimating) return this.requestId = rAF(this._animate.bind(this));
   }
@@ -129,16 +130,27 @@ class Wall {
   }
 
   prev() {
-    [this.currentSection, ...this.restSections] = this.sections.reverse();
-    this.sections = [this.currentSection, ...this.restSections.reverse()];
-    this._queueSections();
+    if (!this.isAnimating) {
+      [this.currentSection, ...this.restSections] = this.sections.reverse();
+      this.sections = [this.currentSection, ...this.restSections.reverse()];
+
+      this.isToBack = true;
+      this.isAnimating = true;
+      this.lastTime = Date.now();
+
+      this._animate();
+
+    }
   }
 
   next() {
     if (!this.isAnimating) {
       this.sections = [...this.restSections, this.currentSection];
+
+      this.isToBack = false;
       this.isAnimating = true;
       this.lastTime = Date.now();
+
       this._animate();
     }
   }

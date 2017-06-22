@@ -98,7 +98,7 @@ function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defi
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var defaultOptions = {
-  animationDirection: 'top',
+  animationDirection: 'toTop',
   easeFunction: _easing.easeInOutExpo,
   speed: 1.2
 };
@@ -136,6 +136,7 @@ var Wall = function () {
     this.requestId = null;
     // is animating flag
     this.isAnimating = false;
+    this.isToBack = false;
 
     this._init();
   }
@@ -240,7 +241,7 @@ var Wall = function () {
 
       this._updateSectionPosition(delta)._renderSectionPosition();
 
-      if (this.currentSectionPosition >= 100) this._refresh()._queueSections();
+      if (this.currentSectionPosition >= 100 || this.currentSectionPosition <= 0) this._refresh()._queueSections();
 
       if (this.isAnimating) return this.requestId = (0, _utils.rAF)(this._animate.bind(this));
     }
@@ -259,23 +260,33 @@ var Wall = function () {
   }, {
     key: 'prev',
     value: function prev() {
-      var _sections$reverse = this.sections.reverse();
+      if (!this.isAnimating) {
+        var _sections$reverse = this.sections.reverse();
 
-      var _sections$reverse2 = _toArray(_sections$reverse);
+        var _sections$reverse2 = _toArray(_sections$reverse);
 
-      this.currentSection = _sections$reverse2[0];
-      this.restSections = _sections$reverse2.slice(1);
+        this.currentSection = _sections$reverse2[0];
+        this.restSections = _sections$reverse2.slice(1);
 
-      this.sections = [this.currentSection].concat(_toConsumableArray(this.restSections.reverse()));
-      this._queueSections();
+        this.sections = [this.currentSection].concat(_toConsumableArray(this.restSections.reverse()));
+
+        this.isToBack = true;
+        this.isAnimating = true;
+        this.lastTime = Date.now();
+
+        this._animate();
+      }
     }
   }, {
     key: 'next',
     value: function next() {
       if (!this.isAnimating) {
         this.sections = [].concat(_toConsumableArray(this.restSections), [this.currentSection]);
+
+        this.isToBack = false;
         this.isAnimating = true;
         this.lastTime = Date.now();
+
         this._animate();
       }
     }
