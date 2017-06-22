@@ -9,9 +9,18 @@ export const throwNewError = p => { throw new Error(`${p} is required`); };
 
 export const toArray = o => Array.prototype.slice.call(o);
 
-export const transformElement = (el, transform) => {
-  el.style.WebkitTransform = transform;
-  el.style.MozTransform = transform;
-  el.style.msTransform = transform;
-  el.style.transform = transform;
+export const getScreenWidth = () => {
+  return window.innerWidth && document.documentElement.clientWidth ?
+    Math.min(window.innerWidth, document.documentElement.clientWidth) :
+    window.innerWidth ||
+    document.documentElement.clientWidth ||
+    document.body.clientWidth;
+};
+
+export const getScreenHeight = () => {
+  return window.innerHeight && document.documentElement.clientHeight ?
+    Math.min(window.innerHeight, document.documentElement.clientHeight) :
+    window.innerHeight ||
+    document.documentElement.clientHeight ||
+    document.body.clientHeight;
 };

@@ -95,7 +95,11 @@ function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defi
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var defaultOptions = {};
+var defaultOptions = {
+  wrapperClassName: 'wall-wrapper'
+};
+
+var body = document.getElementsByTagName('body')[0];
 
 var Wall = function () {
   function Wall() {
@@ -107,9 +111,11 @@ var Wall = function () {
     // get wrapper which contains sections
     this.wrapper = typeof wrapper === 'string' ? document.querySelector(wrapper) : wrapper;
     // get child sections, if no section contains, throw a new error
-    this.sections = this.wrapper.children.length ? utils.toArray(this.wrapper.children) : utils.throwNewError(_templateObject2);
+    this.sections = this.wrapper.children.length ? utils.toArray(this.wrapper.children).reverse() : utils.throwNewError(_templateObject2);
     // init section as an empty object, all configs about section will set inside the object
     this.section = {};
+    // init screen size, X presents width, Y presents height
+    this.size = { X: 0, Y: 0 };
 
     this._init();
   }
@@ -119,31 +125,58 @@ var Wall = function () {
     value: function _init() {
       var _this = this;
 
-      this._getScreeSize()._cssWrapper()._cssSections();
+      this._refresh();
 
       window.addEventListener('resize', function () {
-        _this._getScreeSize();
+        _this._setupSize()._cssWrapper();
       });
     }
   }, {
-    key: '_getScreeSize',
-    value: function _getScreeSize() {
-      this.X = document.documentElement.clientWidth || window.innerWidth;
-      this.Y = document.documentElement.clientHeight || window.innerHeight;
+    key: '_refresh',
+    value: function _refresh() {
+      this._setupSize()._css();
+    }
+  }, {
+    key: '_setupSize',
+    value: function _setupSize() {
+      this.size.X = utils.getScreenWidth();
+      this.size.Y = utils.getScreenHeight();
+      return this;
+    }
+  }, {
+    key: '_css',
+    value: function _css() {
+      this._cssBody()._cssWrapper()._cssSections();
+      return this;
+    }
+  }, {
+    key: '_cssBody',
+    value: function _cssBody() {
+      body.style.margin = 0;
+      body.style.overflow = 'hidden';
       return this;
     }
   }, {
     key: '_cssWrapper',
     value: function _cssWrapper() {
-      this.wrapper.style.height = this.Y + 'px';
+      this.wrapper.style.width = this.size.X + 'px';
+      this.wrapper.style.height = this.size.Y + 'px';
+      this.wrapper.style.overflow = 'hidden';
+      this.wrapper.style.position = 'relative';
       return this;
     }
   }, {
     key: '_cssSections',
     value: function _cssSections() {
-      this.sections.forEach(function (section) {
-        section.style.height = '100%';
+      this.sections.forEach(function (section, index) {
+        section.style.position = 'absolute';
+        section.style.top = 0;
+        section.style.right = 0;
+        section.style.bottom = 0;
+        section.style.left = 0;
+        section.style.zIndex = index + 1;
       });
+      return this;
     }
   }]);
 
@@ -174,14 +207,15 @@ var toArray = exports.toArray = function toArray(o) {
   return Array.prototype.slice.call(o);
 };
 
-var transformElement = exports.transformElement = function transformElement(el, transform) {
-  el.style.WebkitTransform = transform;
-  el.style.MozTransform = transform;
-  el.style.msTransform = transform;
-  el.style.transform = transform;
+var getScreenWidth = exports.getScreenWidth = function getScreenWidth() {
+  return window.innerWidth && document.documentElement.clientWidth ? Math.min(window.innerWidth, document.documentElement.clientWidth) : window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+};
+
+var getScreenHeight = exports.getScreenHeight = function getScreenHeight() {
+  return window.innerHeight && document.documentElement.clientHeight ? Math.min(window.innerHeight, document.documentElement.clientHeight) : window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 };
 
 /***/ })
 /******/ ]);
 });
-//# sourceMappingURL=Wall.js.map
+//# sourceMappingURL=wall.js.map

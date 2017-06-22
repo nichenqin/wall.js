@@ -5,17 +5,20 @@ const UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
 const env = process.env.WEBPACK_ENV;
 
 const libraryName = 'Wall';
-let plugins = [], outputFile;
+let plugins = [
+  new webpack.optimize.ModuleConcatenationPlugin()
+],
+  outputFile;
 
 if (env === 'build') {
   plugins.push(new UglifyJsPlugin({ minimize: true }));
-  outputFile = libraryName + '.min.js';
+  outputFile = 'wall.min.js';
 } else {
-  outputFile = libraryName + '.js';
+  outputFile = 'wall.js';
 };
 
 module.exports = {
-  entry: './src/Wall.js',
+  entry: './src/wall.js',
   output: {
     filename: outputFile,
     path: path.resolve(__dirname, 'dist'),
