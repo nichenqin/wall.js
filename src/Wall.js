@@ -88,7 +88,7 @@ class Wall {
       section.style.zIndex = index + 1;
     });
     this.sections.reverse();
-    [this.currentSection] = this.sections;
+    [this.currentSection, ...this.restSections] = this.sections;
     return this;
   }
 

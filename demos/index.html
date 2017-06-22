@@ -6,32 +6,79 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Demo</title>
+  <link href="https://fonts.googleapis.com/css?family=Spectral" rel="stylesheet">
   <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.6/css/bootstrap.min.css'
   />
+  <style>
+    html,
+    body {
+      font-family: 'Spectral', serif;
+    }
+
+    section>div {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 100px;
+    }
+
+    .section-1 {
+      background-color: #ab47bc;
+      color: #fff;
+    }
+
+    .section-2 {
+      background-color: #1a237e;
+      color: #fff;
+    }
+
+    .section-3 {
+      background-color: #ffee58
+    }
+
+    .section-4 {
+      background-color: #ff7043
+    }
+
+    .section-5 {
+      background-color: #00e676
+    }
+
+    #next {
+      position: absolute;
+      right: 100px;
+      bottom: 50px;
+      z-index: 1000;
+      cursor: pointer;
+    }
+  </style>
 </head>
 
 <body>
   <div class="wrapper">
-    <section>
-      <button type="button" name="" id="button1" class="btn btn-success">1-Next</button>
+    <section class="section-1">
+      <div>First Screen</div>
     </section>
-    <section>
-      <button type="button" name="" id="button2" class="btn btn-success">2-Next</button>
+    <section class="section-2">
+      <div>Second Screen</div>
     </section>
-    <section>{3}</section>
-    <section>{4}</section>
-    <section>{5}</section>
-    <section>{6}</section>
-    <section>{7}</section>
-    <section>{8}</section>
-    <section>{9}</section>
-    <section>{10}</section>
+    <section class="section-3">
+      <div>Third Screen</div>
+    </section>
+    <section class="section-4">
+      <div>Fourth Screen</div>
+    </section>
+    <section class="section-5">
+      <div>Fifth Screen</div>
+    </section>
   </div>
+  <button id="next" class="btn btn-primary">next</button>
   <script src="../dist/wall.js"></script>
   <script>
     var wall = new Wall('.wrapper');
     console.log(wall);
-    document.getElementById('button1')
+    document.getElementById('next')
       .addEventListener('click', function () {
         wall.next();
       })
