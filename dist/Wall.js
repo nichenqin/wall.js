@@ -99,8 +99,10 @@ function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defi
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+console.log(utils.transformProp);
+
 var defaultOptions = {
-  wrapperClassName: 'wall-wrapper'
+  animationDirection: 'top'
 };
 
 var body = document.getElementsByTagName('body')[0];
@@ -184,7 +186,6 @@ var Wall = function () {
       this.wrapper.style.height = this.size.Y + 'px';
       this.wrapper.style.overflow = 'hidden';
       this.wrapper.style.position = 'relative';
-      this.wrapper.classList.add(this.options.wrapperClassName);
       return this;
     }
   }, {
@@ -215,8 +216,16 @@ var Wall = function () {
       return this;
     }
   }, {
+    key: '_updateSection',
+    value: function _updateSection() {
+      this.currentSection.style[utils.transformProp] = 'translateX(-10px)';
+    }
+  }, {
     key: '_animate',
-    value: function _animate() {}
+    value: function _animate() {
+
+      utils.rAF(this._animate.bind(this));
+    }
   }, {
     key: 'prev',
     value: function prev() {
@@ -262,7 +271,7 @@ var cAF = exports.cAF = window.cancelAnimationFrame || window.webkitCancelAnimat
 };
 
 var throwNewError = exports.throwNewError = function throwNewError(p) {
-  throw new Error(p + " is required");
+  throw new Error(p + ' is required');
 };
 
 var merge = exports.merge = function merge(targetObj, obj) {
@@ -271,6 +280,22 @@ var merge = exports.merge = function merge(targetObj, obj) {
   });
   return targetObj;
 };
+
+var transformProp = exports.transformProp = function () {
+  var testElement = document.createElement('div');
+
+  if (!('transform' in testElement.style)) {
+    var vendors = ['Webkit', 'Moz', 'ms'];
+    for (var vendor in vendors) {
+      console.log(vendors[vendor]);
+      if (vendors[vendor] + 'Transform' in testElement.style) {
+        return vendors[vendor] + 'Transform';
+      }
+    }
+  }
+
+  return 'transform';
+}();
 
 var getScreenWidth = exports.getScreenWidth = function getScreenWidth() {
   return window.innerWidth && document.documentElement.clientWidth ? Math.min(window.innerWidth, document.documentElement.clientWidth) : window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;

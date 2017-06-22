@@ -21,6 +21,22 @@ export const merge = (targetObj, obj) => {
   return targetObj;
 };
 
+export const transformProp = (() => {
+  const testElement = document.createElement('div');
+
+  if (!('transform' in testElement.style)) {
+    const vendors = ['Webkit', 'Moz', 'ms'];
+    for (let vendor in vendors) {
+      console.log(vendors[vendor]);
+      if (vendors[vendor] + 'Transform' in testElement.style) {
+        return vendors[vendor] + 'Transform';
+      }
+    }
+  }
+
+  return 'transform';
+})();
+
 export const getScreenWidth = () => {
   return window.innerWidth && document.documentElement.clientWidth ?
     Math.min(window.innerWidth, document.documentElement.clientWidth) :

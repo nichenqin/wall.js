@@ -1,7 +1,9 @@
 import * as utils from './utils';
 
+console.log(utils.transformProp);
+
 const defaultOptions = {
-  wrapperClassName: 'wall-wrapper'
+  animationDirection: 'top'
 };
 
 const body = document.getElementsByTagName('body')[0];
@@ -68,7 +70,6 @@ class Wall {
     this.wrapper.style.height = this.size.Y + 'px';
     this.wrapper.style.overflow = 'hidden';
     this.wrapper.style.position = 'relative';
-    this.wrapper.classList.add(this.options.wrapperClassName);
     return this;
   }
 
@@ -92,8 +93,15 @@ class Wall {
     return this;
   }
 
+  _updateSection() {
+    this.currentSection.style[utils.transformProp] = 'translateX(-10px)';
+  }
+
   _animate() {
 
+
+
+    utils.rAF(this._animate.bind(this));
   }
 
   prev() {
