@@ -4,7 +4,7 @@ import { easeInOutExpo } from './easing';
 const defaultOptions = {
   animationDirection: 'top',
   easeFunction: easeInOutExpo,
-  speed: 2
+  speed: 1.2
 };
 
 const body = document.getElementsByTagName('body')[0];
@@ -76,7 +76,6 @@ class Wall {
   }
 
   _cssWrapper() {
-    this.wrapper.style.width = this.size.X + 'px';
     this.wrapper.style.height = this.size.Y + 'px';
     this.wrapper.style.overflow = 'hidden';
     this.wrapper.style.position = 'relative';
@@ -120,7 +119,8 @@ class Wall {
   }
 
   _updateSectionPosition(delta) {
-    this.currentSectionPosition = this.options.easeFunction(delta, this.currentSectionPosition, 100 - this.currentSectionPosition, this.options.speed);
+    const speed = this.currentSection.getAttribute('data-speed') || this.options.speed;
+    this.currentSectionPosition = this.options.easeFunction(delta, this.currentSectionPosition, 100 - this.currentSectionPosition, speed);
     return this;
   }
 

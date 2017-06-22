@@ -100,7 +100,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var defaultOptions = {
   animationDirection: 'top',
   easeFunction: _easing.easeInOutExpo,
-  speed: 2
+  speed: 1.2
 };
 
 var body = document.getElementsByTagName('body')[0];
@@ -190,7 +190,6 @@ var Wall = function () {
   }, {
     key: '_cssWrapper',
     value: function _cssWrapper() {
-      this.wrapper.style.width = this.size.X + 'px';
       this.wrapper.style.height = this.size.Y + 'px';
       this.wrapper.style.overflow = 'hidden';
       this.wrapper.style.position = 'relative';
@@ -248,7 +247,8 @@ var Wall = function () {
   }, {
     key: '_updateSectionPosition',
     value: function _updateSectionPosition(delta) {
-      this.currentSectionPosition = this.options.easeFunction(delta, this.currentSectionPosition, 100 - this.currentSectionPosition, this.options.speed);
+      var speed = this.currentSection.getAttribute('data-speed') || this.options.speed;
+      this.currentSectionPosition = this.options.easeFunction(delta, this.currentSectionPosition, 100 - this.currentSectionPosition, speed);
       return this;
     }
   }, {
