@@ -13,14 +13,16 @@ class Wall {
     this.wrapper = typeof wrapper === 'string' ? document.querySelector(wrapper) : wrapper;
     // get child sections, if no section contains, throw a new error
     this.sections = this.wrapper.children.length ? utils.toArray(this.wrapper.children) : utils.throwNewError`sections`;
-    // get first of array as currentSection
-    [this.currentSection] = this.sections;
+    // get first of array as current section, and others as rest sections
+    [this.currentSection, ...this.restSections] = this.sections;
     // init section as an empty object, all configs about section will set inside the object
-    this.section = {};
+    this.sectionConfig = {};
     // init screen size, X presents width, Y presents height
     this.size = { X: 0, Y: 0 };
-
+    // merge default options and custom options
     this.options = utils.merge(defaultOptions, options);
+    // animation time stamp
+    this.lastTime = null;
 
     this._init();
   }
@@ -85,9 +87,19 @@ class Wall {
     this.sections.reverse().forEach((section, index) => {
       section.style.zIndex = index + 1;
     });
+    this.sections.reverse();
+    [this.currentSection] = this.sections;
     return this;
   }
 
+  _animate() {
+
+  }
+
+  next() {
+    this.sections = [...this.restSections, this.currentSection];
+    this._queueSections();
+  }
 
 }
 

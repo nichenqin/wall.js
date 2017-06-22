@@ -5,20 +5,36 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Document</title>
+  <title>Demo</title>
+  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.6/css/bootstrap.min.css'
+  />
 </head>
 
 <body>
   <div class="wrapper">
-    <section>1</section>
-    <section>2</section>
-    <section>3</section>
-    <section>4</section>
+    <section>
+      <button type="button" name="" id="button1" class="btn btn-success">1-Next</button>
+    </section>
+    <section>
+      <button type="button" name="" id="button2" class="btn btn-success">2-Next</button>
+    </section>
+    <section>{3}</section>
+    <section>{4}</section>
+    <section>{5}</section>
+    <section>{6}</section>
+    <section>{7}</section>
+    <section>{8}</section>
+    <section>{9}</section>
+    <section>{10}</section>
   </div>
   <script src="../dist/wall.js"></script>
   <script>
     var wall = new Wall('.wrapper');
     console.log(wall);
+    document.getElementById('button1')
+      .addEventListener('click', function () {
+        wall.next();
+      })
   </script>
 </body>
 
