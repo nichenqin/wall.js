@@ -80,6 +80,8 @@ return /******/ (function(modules) { // webpackBootstrap
 "use strict";
 
 
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _templateObject = _taggedTemplateLiteral(['wrapper'], ['wrapper']),
@@ -111,11 +113,18 @@ var Wall = function () {
     // get wrapper which contains sections
     this.wrapper = typeof wrapper === 'string' ? document.querySelector(wrapper) : wrapper;
     // get child sections, if no section contains, throw a new error
-    this.sections = this.wrapper.children.length ? utils.toArray(this.wrapper.children).reverse() : utils.throwNewError(_templateObject2);
+    this.sections = this.wrapper.children.length ? utils.toArray(this.wrapper.children) : utils.throwNewError(_templateObject2);
+    // get first of array as currentSection
+
     // init section as an empty object, all configs about section will set inside the object
+    var _sections = _slicedToArray(this.sections, 1);
+
+    this.currentSection = _sections[0];
     this.section = {};
     // init screen size, X presents width, Y presents height
     this.size = { X: 0, Y: 0 };
+
+    this.options = utils.merge(defaultOptions, options);
 
     this._init();
   }
@@ -134,7 +143,7 @@ var Wall = function () {
   }, {
     key: '_refresh',
     value: function _refresh() {
-      this._setupSize()._setupSection()._css()._queueSections();
+      this._setupSize()._setupSections()._css()._queueSections();
     }
   }, {
     key: '_setupSize',
@@ -144,8 +153,8 @@ var Wall = function () {
       return this;
     }
   }, {
-    key: '_setupSection',
-    value: function _setupSection() {
+    key: '_setupSections',
+    value: function _setupSections() {
       this.sections.forEach(function (section, index) {
         section.setAttribute('data-section-index', index + 1);
       });
@@ -170,6 +179,7 @@ var Wall = function () {
       this.wrapper.style.height = this.size.Y + 'px';
       this.wrapper.style.overflow = 'hidden';
       this.wrapper.style.position = 'relative';
+      this.wrapper.classList.add(this.options.wrapperClassName);
       return this;
     }
   }, {
@@ -187,8 +197,8 @@ var Wall = function () {
   }, {
     key: '_queueSections',
     value: function _queueSections() {
-      this.sections.forEach(function (section) {
-        section.style.zIndex = section.getAttribute('data-section-index');
+      this.sections.reverse().forEach(function (section, index) {
+        section.style.zIndex = index + 1;
       });
       return this;
     }
@@ -219,6 +229,13 @@ var throwNewError = exports.throwNewError = function throwNewError(p) {
 
 var toArray = exports.toArray = function toArray(o) {
   return Array.prototype.slice.call(o);
+};
+
+var merge = exports.merge = function merge(targetObj, obj) {
+  Object.keys(obj).forEach(function (key) {
+    targetObj[key] = obj[key];
+  });
+  return targetObj;
 };
 
 var getScreenWidth = exports.getScreenWidth = function getScreenWidth() {

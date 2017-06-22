@@ -12,11 +12,15 @@ class Wall {
     // get wrapper which contains sections
     this.wrapper = typeof wrapper === 'string' ? document.querySelector(wrapper) : wrapper;
     // get child sections, if no section contains, throw a new error
-    this.sections = this.wrapper.children.length ? utils.toArray(this.wrapper.children).reverse() : utils.throwNewError`sections`;
+    this.sections = this.wrapper.children.length ? utils.toArray(this.wrapper.children) : utils.throwNewError`sections`;
+    // get first of array as currentSection
+    [this.currentSection] = this.sections;
     // init section as an empty object, all configs about section will set inside the object
     this.section = {};
     // init screen size, X presents width, Y presents height
     this.size = { X: 0, Y: 0 };
+
+    this.options = utils.merge(defaultOptions, options);
 
     this._init();
   }
@@ -29,7 +33,7 @@ class Wall {
 
   _refresh() {
     this
-      ._setupSize()._setupSection()
+      ._setupSize()._setupSections()
       ._css()
       ._queueSections();
   }
@@ -40,7 +44,7 @@ class Wall {
     return this;
   }
 
-  _setupSection() {
+  _setupSections() {
     this.sections.forEach((section, index) => {
       section.setAttribute('data-section-index', index + 1);
     });
@@ -62,6 +66,7 @@ class Wall {
     this.wrapper.style.height = this.size.Y + 'px';
     this.wrapper.style.overflow = 'hidden';
     this.wrapper.style.position = 'relative';
+    this.wrapper.classList.add(this.options.wrapperClassName);
     return this;
   }
 
@@ -77,8 +82,8 @@ class Wall {
   }
 
   _queueSections() {
-    this.sections.forEach(section => {
-      section.style.zIndex = section.getAttribute('data-section-index');
+    this.sections.reverse().forEach((section, index) => {
+      section.style.zIndex = index + 1;
     });
     return this;
   }
