@@ -91,9 +91,9 @@ var utils = _interopRequireWildcard(_utils);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
 function _toArray(arr) { return Array.isArray(arr) ? arr : Array.from(arr); }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
 
@@ -115,7 +115,7 @@ var Wall = function () {
     // get wrapper which contains sections
     this.wrapper = typeof wrapper === 'string' ? document.querySelector(wrapper) : wrapper;
     // get child sections, if no section contains, throw a new error
-    this.sections = this.wrapper.children.length ? utils.toArray(this.wrapper.children) : utils.throwNewError(_templateObject2);
+    this.sections = this.wrapper.children.length ? [].concat(_toConsumableArray(this.wrapper.children)) : utils.throwNewError(_templateObject2);
     // get first of array as current section, and others as rest sections
 
     // init section as an empty object, all configs about section will set inside the object
@@ -218,6 +218,19 @@ var Wall = function () {
     key: '_animate',
     value: function _animate() {}
   }, {
+    key: 'prev',
+    value: function prev() {
+      var _sections$reverse = this.sections.reverse();
+
+      var _sections$reverse2 = _toArray(_sections$reverse);
+
+      this.currentSection = _sections$reverse2[0];
+      this.restSections = _sections$reverse2.slice(1);
+
+      this.sections = [this.currentSection].concat(_toConsumableArray(this.restSections.reverse()));
+      this._queueSections();
+    }
+  }, {
     key: 'next',
     value: function next() {
       this.sections = [].concat(_toConsumableArray(this.restSections), [this.currentSection]);
@@ -250,10 +263,6 @@ var cAF = exports.cAF = window.cancelAnimationFrame || window.webkitCancelAnimat
 
 var throwNewError = exports.throwNewError = function throwNewError(p) {
   throw new Error(p + " is required");
-};
-
-var toArray = exports.toArray = function toArray(o) {
-  return Array.prototype.slice.call(o);
 };
 
 var merge = exports.merge = function merge(targetObj, obj) {

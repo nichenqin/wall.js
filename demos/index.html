@@ -20,6 +20,8 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+      width: 100%;
+      text-align: center;
       font-size: 100px;
     }
 
@@ -45,8 +47,18 @@
       background-color: #00e676
     }
 
+    #prev {
+      position: absolute;
+      font-size: 20px;
+      left: 100px;
+      bottom: 50px;
+      z-index: 1000;
+      cursor: pointer;
+    }
+
     #next {
       position: absolute;
+      font-size: 20px;
       right: 100px;
       bottom: 50px;
       z-index: 1000;
@@ -73,11 +85,18 @@
       <div>Fifth Screen</div>
     </section>
   </div>
-  <button id="next" class="btn btn-primary">next</button>
+  <div id="prev" class="btn btn-secondary">prev</div>
+  <div id="next" class="btn btn-primary">next</div>
   <script src="../dist/wall.js"></script>
   <script>
     var wall = new Wall('.wrapper');
     console.log(wall);
+
+    document.getElementById('prev')
+      .addEventListener('click', function () {
+        wall.prev();
+      })
+
     document.getElementById('next')
       .addEventListener('click', function () {
         wall.next();

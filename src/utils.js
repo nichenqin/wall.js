@@ -14,8 +14,6 @@ export const cAF = window.cancelAnimationFrame ||
 
 export const throwNewError = p => { throw new Error(`${p} is required`); };
 
-export const toArray = o => Array.prototype.slice.call(o);
-
 export const merge = (targetObj, obj) => {
   Object.keys(obj).forEach(key => {
     targetObj[key] = obj[key];

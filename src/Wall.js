@@ -12,7 +12,7 @@ class Wall {
     // get wrapper which contains sections
     this.wrapper = typeof wrapper === 'string' ? document.querySelector(wrapper) : wrapper;
     // get child sections, if no section contains, throw a new error
-    this.sections = this.wrapper.children.length ? utils.toArray(this.wrapper.children) : utils.throwNewError`sections`;
+    this.sections = this.wrapper.children.length ? [...this.wrapper.children] : utils.throwNewError`sections`;
     // get first of array as current section, and others as rest sections
     [this.currentSection, ...this.restSections] = this.sections;
     // init section as an empty object, all configs about section will set inside the object
@@ -94,6 +94,12 @@ class Wall {
 
   _animate() {
 
+  }
+
+  prev() {
+    [this.currentSection, ...this.restSections] = this.sections.reverse();
+    this.sections = [this.currentSection, ...this.restSections.reverse()];
+    this._queueSections();
   }
 
   next() {
