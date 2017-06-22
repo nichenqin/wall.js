@@ -1,7 +1,10 @@
 import { rAF, cAF, toArray, throwNewError, merge, getScreenHeight, getScreenWidth, transformProp } from './utils';
+import { easeInOutExpo } from './easing';
 
 const defaultOptions = {
-  animationDirection: 'top'
+  animationDirection: 'top',
+  easeFunction: easeInOutExpo,
+  speed: 2
 };
 
 const body = document.getElementsByTagName('body')[0];
@@ -24,7 +27,9 @@ class Wall {
     this.options = merge(defaultOptions, options);
     // animation time stamp
     this.lastTime = null;
+    // requestAnimationFrame id
     this.requestId = null;
+    // is animating flag
     this.isAnimating = false;
 
     this._init();
@@ -89,29 +94,33 @@ class Wall {
     return this;
   }
 
+  _resetSectionPosition(section) {
+    section.style[transformProp] = 'translate(0px, 0px)';
+  }
+
   _queueSections() {
     this.sections.reverse().forEach((section, index) => {
       section.style.zIndex = index + 1;
     });
     this.sections.reverse();
     [this.currentSection, ...this.restSections] = this.sections;
-    this.restSections.forEach(section => {
-      section.style[transformProp] = 'translate(0px, 0px)';
-    });
+    this.restSections.forEach(section => { this._resetSectionPosition(section); });
     return this;
   }
 
   _animate() {
+    const now = Date.now();
+    const delta = (now - this.lastTime) / 1000;
 
-    this._updateSectionPosition()._renderSectionPosition();
+    this._updateSectionPosition(delta)._renderSectionPosition();
 
-    if (this.currentSectionPosition === 100) this._refresh()._queueSections();
+    if (this.currentSectionPosition >= 100) this._refresh()._queueSections();
 
     if (this.isAnimating) return this.requestId = rAF(this._animate.bind(this));
   }
 
-  _updateSectionPosition() {
-    this.currentSectionPosition++;
+  _updateSectionPosition(delta) {
+    this.currentSectionPosition = this.options.easeFunction(delta, this.currentSectionPosition, 100 - this.currentSectionPosition, this.options.speed);
     return this;
   }
 
@@ -126,9 +135,12 @@ class Wall {
   }
 
   next() {
-    this.sections = [...this.restSections, this.currentSection];
-    this.isAnimating = true;
-    this._animate();
+    if (!this.isAnimating) {
+      this.sections = [...this.restSections, this.currentSection];
+      this.isAnimating = true;
+      this.lastTime = Date.now();
+      this._animate();
+    }
   }
 
 }

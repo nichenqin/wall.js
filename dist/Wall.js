@@ -87,6 +87,8 @@ var _templateObject = _taggedTemplateLiteral(['wrapper'], ['wrapper']),
 
 var _utils = __webpack_require__(1);
 
+var _easing = __webpack_require__(2);
+
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _toArray(arr) { return Array.isArray(arr) ? arr : Array.from(arr); }
@@ -96,7 +98,9 @@ function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defi
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var defaultOptions = {
-  animationDirection: 'top'
+  animationDirection: 'top',
+  easeFunction: _easing.easeInOutExpo,
+  speed: 2
 };
 
 var body = document.getElementsByTagName('body')[0];
@@ -128,7 +132,9 @@ var Wall = function () {
     this.options = (0, _utils.merge)(defaultOptions, options);
     // animation time stamp
     this.lastTime = null;
+    // requestAnimationFrame id
     this.requestId = null;
+    // is animating flag
     this.isAnimating = false;
 
     this._init();
@@ -203,8 +209,15 @@ var Wall = function () {
       return this;
     }
   }, {
+    key: '_resetSectionPosition',
+    value: function _resetSectionPosition(section) {
+      section.style[_utils.transformProp] = 'translate(0px, 0px)';
+    }
+  }, {
     key: '_queueSections',
     value: function _queueSections() {
+      var _this2 = this;
+
       this.sections.reverse().forEach(function (section, index) {
         section.style.zIndex = index + 1;
       });
@@ -216,24 +229,26 @@ var Wall = function () {
       this.restSections = _sections2.slice(1);
 
       this.restSections.forEach(function (section) {
-        section.style[_utils.transformProp] = 'translate(0px, 0px)';
+        _this2._resetSectionPosition(section);
       });
       return this;
     }
   }, {
     key: '_animate',
     value: function _animate() {
+      var now = Date.now();
+      var delta = (now - this.lastTime) / 1000;
 
-      this._updateSectionPosition()._renderSectionPosition();
+      this._updateSectionPosition(delta)._renderSectionPosition();
 
-      if (this.currentSectionPosition === 100) this._refresh()._queueSections();
+      if (this.currentSectionPosition >= 100) this._refresh()._queueSections();
 
       if (this.isAnimating) return this.requestId = (0, _utils.rAF)(this._animate.bind(this));
     }
   }, {
     key: '_updateSectionPosition',
-    value: function _updateSectionPosition() {
-      this.currentSectionPosition++;
+    value: function _updateSectionPosition(delta) {
+      this.currentSectionPosition = this.options.easeFunction(delta, this.currentSectionPosition, 100 - this.currentSectionPosition, this.options.speed);
       return this;
     }
   }, {
@@ -257,9 +272,12 @@ var Wall = function () {
   }, {
     key: 'next',
     value: function next() {
-      this.sections = [].concat(_toConsumableArray(this.restSections), [this.currentSection]);
-      this.isAnimating = true;
-      this._animate();
+      if (!this.isAnimating) {
+        this.sections = [].concat(_toConsumableArray(this.restSections), [this.currentSection]);
+        this.isAnimating = true;
+        this.lastTime = Date.now();
+        this._animate();
+      }
     }
   }]);
 
@@ -323,6 +341,23 @@ var getScreenWidth = exports.getScreenWidth = function getScreenWidth() {
 
 var getScreenHeight = exports.getScreenHeight = function getScreenHeight() {
   return window.innerHeight && document.documentElement.clientHeight ? Math.min(window.innerHeight, document.documentElement.clientHeight) : window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+};
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var easeInOutExpo = exports.easeInOutExpo = function easeInOutExpo(t, b, c, d) {
+  t /= d / 2;
+  if (t < 1) return c / 2 * Math.pow(2, 10 * (t - 1)) + b;
+  t--;
+  return c / 2 * (-Math.pow(2, -10 * t) + 2) + b;
 };
 
 /***/ })
