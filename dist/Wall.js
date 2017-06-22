@@ -134,7 +134,7 @@ var Wall = function () {
   }, {
     key: '_refresh',
     value: function _refresh() {
-      this._setupSize()._css();
+      this._setupSize()._setupSection()._css()._queueSections();
     }
   }, {
     key: '_setupSize',
@@ -144,10 +144,17 @@ var Wall = function () {
       return this;
     }
   }, {
+    key: '_setupSection',
+    value: function _setupSection() {
+      this.sections.forEach(function (section, index) {
+        section.setAttribute('data-section-index', index + 1);
+      });
+      return this;
+    }
+  }, {
     key: '_css',
     value: function _css() {
-      this._cssBody()._cssWrapper()._cssSections();
-      return this;
+      return this._cssBody()._cssWrapper()._cssSections();
     }
   }, {
     key: '_cssBody',
@@ -168,13 +175,20 @@ var Wall = function () {
   }, {
     key: '_cssSections',
     value: function _cssSections() {
-      this.sections.forEach(function (section, index) {
+      this.sections.forEach(function (section) {
         section.style.position = 'absolute';
         section.style.top = 0;
         section.style.right = 0;
         section.style.bottom = 0;
         section.style.left = 0;
-        section.style.zIndex = index + 1;
+      });
+      return this;
+    }
+  }, {
+    key: '_queueSections',
+    value: function _queueSections() {
+      this.sections.forEach(function (section) {
+        section.style.zIndex = section.getAttribute('data-section-index');
       });
       return this;
     }

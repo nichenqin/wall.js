@@ -28,7 +28,10 @@ class Wall {
   }
 
   _refresh() {
-    this._setupSize()._css();
+    this
+      ._setupSize()._setupSection()
+      ._css()
+      ._queueSections();
   }
 
   _setupSize() {
@@ -37,9 +40,15 @@ class Wall {
     return this;
   }
 
-  _css() {
-    this._cssBody()._cssWrapper()._cssSections();
+  _setupSection() {
+    this.sections.forEach((section, index) => {
+      section.setAttribute('data-section-index', index + 1);
+    });
     return this;
+  }
+
+  _css() {
+    return this._cssBody()._cssWrapper()._cssSections();
   }
 
   _cssBody() {
@@ -57,16 +66,23 @@ class Wall {
   }
 
   _cssSections() {
-    this.sections.forEach((section, index) => {
+    this.sections.forEach(section => {
       section.style.position = 'absolute';
       section.style.top = 0;
       section.style.right = 0;
       section.style.bottom = 0;
       section.style.left = 0;
-      section.style.zIndex = index + 1;
     });
     return this;
   }
+
+  _queueSections() {
+    this.sections.forEach(section => {
+      section.style.zIndex = section.getAttribute('data-section-index');
+    });
+    return this;
+  }
+
 
 }
 
