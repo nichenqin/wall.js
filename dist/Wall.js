@@ -215,6 +215,9 @@ var Wall = function () {
       this.currentSection = _sections2[0];
       this.restSections = _sections2.slice(1);
 
+      this.restSections.forEach(function (section) {
+        section.style[_utils.transformProp] = 'translate(0px, 0px)';
+      });
       return this;
     }
   }, {

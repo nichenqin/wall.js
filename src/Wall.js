@@ -95,6 +95,9 @@ class Wall {
     });
     this.sections.reverse();
     [this.currentSection, ...this.restSections] = this.sections;
+    this.restSections.forEach(section => {
+      section.style[transformProp] = 'translate(0px, 0px)';
+    });
     return this;
   }
 
