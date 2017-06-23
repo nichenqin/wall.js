@@ -395,8 +395,6 @@ var Wall = function () {
 
       this.sections = [targetSection].concat(_toConsumableArray(nextSections), _toConsumableArray(prevSections));
 
-      this.currentSection = targetSection;
-      this._queueSections();
       this._renderSectionPosition(this.currentSection, this.currentSectionPosition);
 
       this._animate();

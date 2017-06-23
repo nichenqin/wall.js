@@ -245,8 +245,6 @@ class Wall {
 
     this.sections = [targetSection, ...nextSections, ...prevSections];
 
-    this.currentSection = targetSection;
-    this._queueSections();
     this._renderSectionPosition(this.currentSection, this.currentSectionPosition);
 
     this._animate();
