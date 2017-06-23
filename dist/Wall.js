@@ -103,9 +103,9 @@ var defaultOptions = {
   wrapperZIndex: 1,
   animateDirection: 'top',
   easeFunction: _easing.easeInOutExpo,
-  animateSpeed: 1.2,
+  animateDuration: 1,
   navElement: '.wall-nav',
-  navActiveClass: 'active'
+  navItemActiveClass: 'active'
 };
 
 var body = document.getElementsByTagName('body')[0];
@@ -169,34 +169,47 @@ var Wall = function () {
       this.isToBack = false;
       this.isAnimating = false;
       this.currentSectionPosition = 0;
-      (0, _utils.cAF)(this.requestId);
+      (0, _dom.cAF)(this.requestId);
+
+      var _sections2 = _toArray(this.sections);
+
+      this.currentSection = _sections2[0];
+      this.restSections = _sections2.slice(1);
+
+
+      this._renderNav();
 
       return this;
     }
   }, {
     key: '_setupSize',
     value: function _setupSize() {
-      this.size.X = (0, _utils.getScreenWidth)();
-      this.size.Y = (0, _utils.getScreenHeight)();
+      this.size.X = (0, _dom.getScreenWidth)();
+      this.size.Y = (0, _dom.getScreenHeight)();
       return this;
     }
   }, {
     key: '_setupSections',
     value: function _setupSections() {
       this.sections.forEach(function (section, index) {
-        section.setAttribute('data-section-index', index + 1);
+        section.setAttribute('data-wall-section-index', index + 1);
       });
       return this;
     }
   }, {
     key: '_setupNav',
     value: function _setupNav() {
+      var _this2 = this;
+
       if (this.navElement) {
         this.navElement.style.zIndex = this.options.wrapperZIndex + 1;
         this.navElement.style.position = 'absolute';
 
         this.navItems.forEach(function (item, index) {
           item.setAttribute('data-wall-nav-index', index + 1);
+          item.addEventListener('click', function () {
+            _this2.goTo(item.getAttribute('data-wall-nav-index'));
+          });
         });
       }
 
@@ -239,20 +252,20 @@ var Wall = function () {
   }, {
     key: '_queueSections',
     value: function _queueSections() {
-      var _this2 = this;
+      var _this3 = this;
 
       this.sections.reverse().forEach(function (section, index) {
         section.style.zIndex = index + 1;
       });
       this.sections.reverse();
 
-      var _sections2 = _toArray(this.sections);
+      var _sections3 = _toArray(this.sections);
 
-      this.currentSection = _sections2[0];
-      this.restSections = _sections2.slice(1);
+      this.currentSection = _sections3[0];
+      this.restSections = _sections3.slice(1);
 
       this.sections.forEach(function (section) {
-        return _this2._renderSectionPosition(section, 0);
+        return _this3._renderSectionPosition(section, 0);
       });
 
       return this;
@@ -263,6 +276,8 @@ var Wall = function () {
       var now = Date.now();
       var delta = (now - this.lastTime) / 1000;
 
+      console.log('animating');
+
       this._updateSectionPosition(delta)._renderSectionPosition(this.currentSection, this.currentSectionPosition);
 
       if (this.currentSectionPosition >= 100 || this.currentSectionPosition < 0.1 && this.isToBack) {
@@ -270,39 +285,56 @@ var Wall = function () {
       };
 
       if (this.isAnimating) {
-        return this.requestId = (0, _utils.rAF)(this._animate.bind(this));
+        return this.requestId = (0, _dom.rAF)(this._animate.bind(this));
       };
     }
   }, {
     key: '_updateSectionPosition',
     value: function _updateSectionPosition(delta) {
-      var speed = this.currentSection.getAttribute('data-animate-speed') || this.options.animateSpeed;
+      var duration = this.currentSection.getAttribute('data-wall-animate-duration') || this.options.animateDuration;
       var target = this.isToBack ? 0 : 100;
 
-      this.currentSectionPosition = this.options.easeFunction(delta, this.currentSectionPosition, target - this.currentSectionPosition, speed);
+      this.currentSectionPosition = this.options.easeFunction(delta, this.currentSectionPosition, target - this.currentSectionPosition, duration);
 
       return this;
     }
   }, {
     key: '_renderSectionPosition',
     value: function _renderSectionPosition(section, pos) {
-      switch (this.currentSection.getAttribute('data-animate-direction') || this.options.animateDirection) {
+      switch (this.currentSection.getAttribute('data-wall-animate-direction') || this.options.animateDirection) {
         case 'top':
-          section.style[_utils.transformProp] = 'translate(0, -' + pos + '%) ' + this.translateZ;
+          section.style[_dom.transformProp] = 'translate(0, -' + pos + '%) ' + this.translateZ;
           break;
         case 'bottom':
-          section.style[_utils.transformProp] = 'translate(0, ' + pos + '%) ' + this.translateZ;
+          section.style[_dom.transformProp] = 'translate(0, ' + pos + '%) ' + this.translateZ;
           break;
         case 'left':
-          section.style[_utils.transformProp] = 'translate(-' + pos + '%, 0) ' + this.translateZ;
+          section.style[_dom.transformProp] = 'translate(-' + pos + '%, 0) ' + this.translateZ;
           break;
         case 'right':
-          section.style[_utils.transformProp] = 'translate(' + pos + '%, 0) ' + this.translateZ;
+          section.style[_dom.transformProp] = 'translate(' + pos + '%, 0) ' + this.translateZ;
           break;
 
         default:
-          section.style[_utils.transformProp] = 'translate(0, -' + pos + '%) ' + this.translateZ;
+          section.style[_dom.transformProp] = 'translate(0, -' + pos + '%) ' + this.translateZ;
           break;
+      }
+    }
+  }, {
+    key: '_renderNav',
+    value: function _renderNav() {
+      var _this4 = this;
+
+      if (this.navElement) {
+        this.navItems.forEach(function (item) {
+          (0, _utils.removeClass)(item, _this4.options.navItemActiveClass);
+        });
+        var currentNav = this.navItems.find(function (item) {
+          return item.getAttribute('data-wall-nav-index') === _this4.currentSection.getAttribute('data-wall-section-index');
+        });
+        console.log(this.currentSection);
+        console.log(currentNav);
+        (0, _utils.addClass)(currentNav, this.options.navItemActiveClass);
       }
     }
   }, {
@@ -341,6 +373,11 @@ var Wall = function () {
         this._animate();
       }
     }
+  }, {
+    key: 'goTo',
+    value: function goTo(num) {
+      console.log(num);
+    }
   }]);
 
   return Wall;
@@ -358,14 +395,6 @@ module.exports = Wall;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-var rAF = exports.rAF = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.msRequestAnimationFrame || window.oRequestAnimationFrame || function (callback) {
-  setTimeout(callback, 1000 / 60);
-};
-
-var cAF = exports.cAF = window.cancelAnimationFrame || window.webkitCancelAnimationFrame || window.mozCancelAnimationFrame || window.oCancelAnimationFrame || window.msCancelAnimationFrame || function (id) {
-  clearTimeout(id);
-};
-
 var throwNewError = exports.throwNewError = function throwNewError(p) {
   throw new Error(p + ' is required');
 };
@@ -381,28 +410,19 @@ var merge = exports.merge = function merge(targetObj, obj) {
   return targetObj;
 };
 
-var transformProp = exports.transformProp = function () {
-  var testElement = document.createElement('div');
-
-  if (!('transform' in testElement.style)) {
-    var vendors = ['Webkit', 'Moz', 'ms'];
-    for (var vendor in vendors) {
-      console.log(vendors[vendor]);
-      if (vendors[vendor] + 'Transform' in testElement.style) {
-        return vendors[vendor] + 'Transform';
-      }
-    }
-  }
-
-  return 'transform';
-}();
-
-var getScreenWidth = exports.getScreenWidth = function getScreenWidth() {
-  return window.innerWidth && document.documentElement.clientWidth ? Math.min(window.innerWidth, document.documentElement.clientWidth) : window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+var hasClass = function hasClass(el, className) {
+  if (el.classList) return el.classList.contains(className);else return !!el.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
 };
 
-var getScreenHeight = exports.getScreenHeight = function getScreenHeight() {
-  return window.innerHeight && document.documentElement.clientHeight ? Math.min(window.innerHeight, document.documentElement.clientHeight) : window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+var addClass = exports.addClass = function addClass(el, className) {
+  if (el.classList) el.classList.add(className);else if (!hasClass(el, className)) el.className += " " + className;
+};
+
+var removeClass = exports.removeClass = function removeClass(el, className) {
+  if (el.classList) el.classList.remove(className);else if (hasClass(el, className)) {
+    var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
+    el.className = el.className.replace(reg, ' ');
+  }
 };
 
 /***/ }),
@@ -439,6 +459,36 @@ Object.defineProperty(exports, "__esModule", {
 var testElement = document.createElement('div');
 
 var hasTransform3d = exports.hasTransform3d = 'WebkitPerspective' in testElement.style || 'MozPerspective' in testElement.style || 'msPerspective' in testElement.style || 'OPerspective' in testElement.style || 'perspective' in testElement.style;
+
+var transformProp = exports.transformProp = function () {
+  if (!('transform' in testElement.style)) {
+    var vendors = ['Webkit', 'Moz', 'ms'];
+    for (var vendor in vendors) {
+      console.log(vendors[vendor]);
+      if (vendors[vendor] + 'Transform' in testElement.style) {
+        return vendors[vendor] + 'Transform';
+      }
+    }
+  }
+
+  return 'transform';
+}();
+
+var rAF = exports.rAF = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.msRequestAnimationFrame || window.oRequestAnimationFrame || function (callback) {
+  setTimeout(callback, 1000 / 60);
+};
+
+var cAF = exports.cAF = window.cancelAnimationFrame || window.webkitCancelAnimationFrame || window.mozCancelAnimationFrame || window.oCancelAnimationFrame || window.msCancelAnimationFrame || function (id) {
+  clearTimeout(id);
+};
+
+var getScreenWidth = exports.getScreenWidth = function getScreenWidth() {
+  return window.innerWidth && document.documentElement.clientWidth ? Math.min(window.innerWidth, document.documentElement.clientWidth) : window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+};
+
+var getScreenHeight = exports.getScreenHeight = function getScreenHeight() {
+  return window.innerHeight && document.documentElement.clientHeight ? Math.min(window.innerHeight, document.documentElement.clientHeight) : window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+};
 
 /***/ })
 /******/ ]);

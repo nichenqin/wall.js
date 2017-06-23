@@ -1,14 +1,14 @@
-import { rAF, cAF, toArray, throwNewError, merge, getScreenHeight, getScreenWidth, transformProp } from './utils';
+import { toArray, throwNewError, merge, addClass, removeClass } from './utils';
 import { easeInOutExpo } from './easing';
-import { hasTransform3d } from './dom';
+import { rAF, cAF, hasTransform3d, transformProp, getScreenHeight, getScreenWidth } from './dom';
 
 const defaultOptions = {
   wrapperZIndex: 1,
   animateDirection: 'top',
   easeFunction: easeInOutExpo,
-  animateSpeed: 1.2,
+  animateDuration: 1,
   navElement: '.wall-nav',
-  navActiveClass: 'active'
+  navItemActiveClass: 'active'
 };
 
 const body = document.getElementsByTagName('body')[0];
@@ -63,6 +63,10 @@ class Wall {
     this.currentSectionPosition = 0;
     cAF(this.requestId);
 
+    [this.currentSection, ...this.restSections] = this.sections;
+
+    this._renderNav();
+
     return this;
   }
 
@@ -74,7 +78,7 @@ class Wall {
 
   _setupSections() {
     this.sections.forEach((section, index) => {
-      section.setAttribute('data-section-index', index + 1);
+      section.setAttribute('data-wall-section-index', index + 1);
     });
     return this;
   }
@@ -86,6 +90,9 @@ class Wall {
 
       this.navItems.forEach((item, index) => {
         item.setAttribute('data-wall-nav-index', index + 1);
+        item.addEventListener('click', () => {
+          this.goTo(item.getAttribute('data-wall-nav-index'));
+        });
       });
     }
 
@@ -136,6 +143,8 @@ class Wall {
     const now = Date.now();
     const delta = (now - this.lastTime) / 1000;
 
+    console.log('animating');
+
     this
       ._updateSectionPosition(delta)
       ._renderSectionPosition(this.currentSection, this.currentSectionPosition);
@@ -150,16 +159,16 @@ class Wall {
   }
 
   _updateSectionPosition(delta) {
-    const speed = this.currentSection.getAttribute('data-animate-speed') || this.options.animateSpeed;
+    const duration = this.currentSection.getAttribute('data-wall-animate-duration') || this.options.animateDuration;
     const target = this.isToBack ? 0 : 100;
 
-    this.currentSectionPosition = this.options.easeFunction(delta, this.currentSectionPosition, target - this.currentSectionPosition, speed);
+    this.currentSectionPosition = this.options.easeFunction(delta, this.currentSectionPosition, target - this.currentSectionPosition, duration);
 
     return this;
   }
 
   _renderSectionPosition(section, pos) {
-    switch (this.currentSection.getAttribute('data-animate-direction') || this.options.animateDirection) {
+    switch (this.currentSection.getAttribute('data-wall-animate-direction') || this.options.animateDirection) {
       case 'top':
         section.style[transformProp] = `translate(0, -${pos}%) ${this.translateZ}`;
         break;
@@ -178,6 +187,16 @@ class Wall {
         break;
     }
 
+  }
+
+  _renderNav() {
+    if (this.navElement) {
+      this.navItems.forEach(item => { removeClass(item, this.options.navItemActiveClass); });
+      const currentNav = this.navItems.find(item => item.getAttribute('data-wall-nav-index') === this.currentSection.getAttribute('data-wall-section-index'));
+      console.log(this.currentSection);
+      console.log(currentNav);
+      addClass(currentNav, this.options.navItemActiveClass);
+    }
   }
 
   prev() {
@@ -208,6 +227,10 @@ class Wall {
 
       this._animate();
     }
+  }
+
+  goTo(num) {
+    console.log(num);
   }
 
 }
