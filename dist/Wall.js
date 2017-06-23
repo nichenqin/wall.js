@@ -224,7 +224,7 @@ var Wall = function () {
       this.currentSection = _sections2[0];
       this.restSections = _sections2.slice(1);
 
-      this.restSections.forEach(function (section) {
+      this.sections.forEach(function (section) {
         _this2._renderSectionPosition(section, 0, 0);
       });
       return this;
@@ -237,13 +237,11 @@ var Wall = function () {
 
       this._updateSectionPosition(delta)._renderSectionPosition(this.currentSection, 0, this.currentSectionPosition);
 
-      if (this.currentSectionPosition >= 100 || this.currentSectionPosition <= 0) {
-        console.log('stop');
+      if (this.currentSectionPosition >= 100 || this.currentSectionPosition < 0.1 && this.isToBack) {
         return this._refresh()._queueSections();
       };
 
       if (this.isAnimating) {
-        console.log('animate');
         return this.requestId = (0, _utils.rAF)(this._animate.bind(this));
       };
     }
@@ -252,7 +250,8 @@ var Wall = function () {
     value: function _updateSectionPosition(delta) {
       var speed = this.currentSection.getAttribute('data-speed') || this.options.speed;
       var target = this.isToBack ? 0 : 100;
-      this.isToBack ? this.currentSectionPosition-- : this.currentSectionPosition++;
+      this.currentSectionPosition = this.options.easeFunction(delta, this.currentSectionPosition, target - this.currentSectionPosition, speed);
+
       return this;
     }
   }, {
@@ -376,6 +375,10 @@ var easeInOutExpo = exports.easeInOutExpo = function easeInOutExpo(t, b, c, d) {
   if (t < 1) return c / 2 * Math.pow(2, 10 * (t - 1)) + b;
   t--;
   return c / 2 * (-Math.pow(2, -10 * t) + 2) + b;
+};
+
+var easeInOutSine = exports.easeInOutSine = function easeInOutSine(t, b, c, d) {
+  return -c / 2 * (Math.cos(Math.PI * t / d) - 1) + b;
 };
 
 /***/ })

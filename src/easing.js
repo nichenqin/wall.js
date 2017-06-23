@@ -4,3 +4,7 @@ export const easeInOutExpo = (t, b, c, d) => {
   t--;
   return c / 2 * (-Math.pow(2, -10 * t) + 2) + b;
 };
+
+export const easeInOutSine = (t, b, c, d) => {
+  return -c / 2 * (Math.cos(Math.PI * t / d) - 1) + b;
+};

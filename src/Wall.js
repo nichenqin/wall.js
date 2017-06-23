@@ -1,5 +1,5 @@
 import { rAF, cAF, toArray, throwNewError, merge, getScreenHeight, getScreenWidth, transformProp } from './utils';
-import { easeInOutExpo } from './easing';
+import { easeInOutExpo, easeInOutSine } from './easing';
 
 const defaultOptions = {
   animationDirection: 'toTop',
@@ -101,7 +101,7 @@ class Wall {
     });
     this.sections.reverse();
     [this.currentSection, ...this.restSections] = this.sections;
-    this.restSections.forEach(section => { this._renderSectionPosition(section, 0, 0); });
+    this.sections.forEach(section => { this._renderSectionPosition(section, 0, 0); });
     return this;
   }
 
@@ -113,13 +113,11 @@ class Wall {
       ._updateSectionPosition(delta)
       ._renderSectionPosition(this.currentSection, 0, this.currentSectionPosition);
 
-    if (this.currentSectionPosition >= 100 || this.currentSectionPosition <= 0) {
-      console.log('stop');
+    if (this.currentSectionPosition >= 100 || (this.currentSectionPosition < 0.1 && this.isToBack)) {
       return this._refresh()._queueSections();
     };
 
     if (this.isAnimating) {
-      console.log('animate');
       return this.requestId = rAF(this._animate.bind(this));
     };
   }
@@ -127,9 +125,8 @@ class Wall {
   _updateSectionPosition(delta) {
     const speed = this.currentSection.getAttribute('data-speed') || this.options.speed;
     const target = this.isToBack ? 0 : 100;
-    this.isToBack
-      ? this.currentSectionPosition--
-      : this.currentSectionPosition++;
+    this.currentSectionPosition = this.options.easeFunction(delta, this.currentSectionPosition, target - this.currentSectionPosition, speed);
+
     return this;
   }
 
