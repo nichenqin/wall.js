@@ -100,7 +100,8 @@ function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defi
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var defaultOptions = {
-  animationDirection: 'toTop',
+  wrapperZIndex: 1,
+  animateDirection: 'top',
   easeFunction: _easing.easeInOutExpo,
   speed: 1.2
 };
@@ -120,24 +121,25 @@ var Wall = function () {
     this.sections = this.wrapper.children.length ? (0, _utils.toArray)(this.wrapper.children) : (0, _utils.throwNewError)(_templateObject2);
     // get first of array as current section, and others as rest sections
 
+    // the position of current section
     var _sections = _toArray(this.sections);
 
     this.currentSection = _sections[0];
     this.restSections = _sections.slice(1);
-
     this.currentSectionPosition = 0;
+    // mark if use transform 3d for smooth animation
     this.translateZ = _dom.hasTransform3d ? 'translateZ(0)' : '';
     // init screen size, X presents width, Y presents height
     this.size = { X: 0, Y: 0 };
     // merge default options and custom options
     this.options = (0, _utils.merge)(defaultOptions, options);
-    // animation time stamp
+    // animation time stamp, control speed
     this.lastTime = null;
     // requestAnimationFrame id
     this.requestId = null;
     // is animating flag
     this.isAnimating = false;
-    // set flag if the screen is ready to back
+    // mark if the screen is ready to back
     this.isToBack = false;
 
     this._init();
@@ -194,7 +196,9 @@ var Wall = function () {
   }, {
     key: '_cssWrapper',
     value: function _cssWrapper() {
+      this.wrapper.style.zIndex = this.options.wrapperZIndex;
       this.wrapper.style.height = this.size.Y + 'px';
+      this.wrapper.style.width = '100%';
       this.wrapper.style.overflow = 'hidden';
       this.wrapper.style.position = 'relative';
       return this;
@@ -227,7 +231,7 @@ var Wall = function () {
       this.restSections = _sections2.slice(1);
 
       this.sections.forEach(function (section) {
-        _this2._renderSectionPosition(section, 0, 0);
+        _this2._renderSectionPosition(section, 0);
       });
       return this;
     }
@@ -237,7 +241,7 @@ var Wall = function () {
       var now = Date.now();
       var delta = (now - this.lastTime) / 1000;
 
-      this._updateSectionPosition(delta)._renderSectionPosition(this.currentSection, 0, this.currentSectionPosition);
+      this._updateSectionPosition(delta)._renderSectionPosition(this.currentSection, this.currentSectionPosition);
 
       if (this.currentSectionPosition >= 100 || this.currentSectionPosition < 0.1 && this.isToBack) {
         return this._refresh()._queueSections();
@@ -258,8 +262,24 @@ var Wall = function () {
     }
   }, {
     key: '_renderSectionPosition',
-    value: function _renderSectionPosition(section, x, y) {
-      section.style[_utils.transformProp] = 'translate(' + x + '%, -' + y + '%) ' + this.translateZ;
+    value: function _renderSectionPosition(section, pos) {
+      switch (this.options.animateDirection) {
+        case 'top':
+          section.style[_utils.transformProp] = 'translate(0, -' + pos + '%) ' + this.translateZ;
+          break;
+        case 'bottom':
+          section.style[_utils.transformProp] = 'translate(0, ' + pos + '%) ' + this.translateZ;
+          break;
+        case 'left':
+          section.style[_utils.transformProp] = 'translate(-' + pos + '%, 0) ' + this.translateZ;
+          break;
+        case 'right':
+          section.style[_utils.transformProp] = 'translate(' + pos + '%, 0) ' + this.translateZ;
+          break;
+
+        default:
+          break;
+      }
     }
   }, {
     key: 'prev',
@@ -274,7 +294,7 @@ var Wall = function () {
 
         this.sections = [this.currentSection].concat(_toConsumableArray(this.restSections.reverse()));
 
-        this._renderSectionPosition(this.currentSection, 0, 100);
+        this._renderSectionPosition(this.currentSection, 100);
         this._queueSections();
         this.currentSectionPosition = 100;
 

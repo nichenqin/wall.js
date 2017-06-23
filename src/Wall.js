@@ -3,7 +3,8 @@ import { easeInOutExpo } from './easing';
 import { hasTransform3d } from './dom';
 
 const defaultOptions = {
-  animationDirection: 'toTop',
+  wrapperZIndex: 1,
+  animateDirection: 'top',
   easeFunction: easeInOutExpo,
   speed: 1.2
 };
@@ -19,19 +20,21 @@ class Wall {
     this.sections = this.wrapper.children.length ? toArray(this.wrapper.children) : throwNewError`sections`;
     // get first of array as current section, and others as rest sections
     [this.currentSection, ...this.restSections] = this.sections;
+    // the position of current section
     this.currentSectionPosition = 0;
+    // mark if use transform 3d for smooth animation
     this.translateZ = hasTransform3d ? 'translateZ(0)' : '';
     // init screen size, X presents width, Y presents height
     this.size = { X: 0, Y: 0 };
     // merge default options and custom options
     this.options = merge(defaultOptions, options);
-    // animation time stamp
+    // animation time stamp, control speed
     this.lastTime = null;
     // requestAnimationFrame id
     this.requestId = null;
     // is animating flag
     this.isAnimating = false;
-    // set flag if the screen is ready to back
+    // mark if the screen is ready to back
     this.isToBack = false;
 
     this._init();
@@ -79,7 +82,9 @@ class Wall {
   }
 
   _cssWrapper() {
+    this.wrapper.style.zIndex = this.options.wrapperZIndex;
     this.wrapper.style.height = this.size.Y + 'px';
+    this.wrapper.style.width = '100%';
     this.wrapper.style.overflow = 'hidden';
     this.wrapper.style.position = 'relative';
     return this;
@@ -102,7 +107,7 @@ class Wall {
     });
     this.sections.reverse();
     [this.currentSection, ...this.restSections] = this.sections;
-    this.sections.forEach(section => { this._renderSectionPosition(section, 0, 0); });
+    this.sections.forEach(section => { this._renderSectionPosition(section, 0); });
     return this;
   }
 
@@ -112,7 +117,7 @@ class Wall {
 
     this
       ._updateSectionPosition(delta)
-      ._renderSectionPosition(this.currentSection, 0, this.currentSectionPosition);
+      ._renderSectionPosition(this.currentSection, this.currentSectionPosition);
 
     if (this.currentSectionPosition >= 100 || (this.currentSectionPosition < 0.1 && this.isToBack)) {
       return this._refresh()._queueSections();
@@ -131,8 +136,25 @@ class Wall {
     return this;
   }
 
-  _renderSectionPosition(section, x, y) {
-    section.style[transformProp] = `translate(${x}%, -${y}%) ${this.translateZ}`;
+  _renderSectionPosition(section, pos) {
+    switch (this.options.animateDirection) {
+      case 'top':
+        section.style[transformProp] = `translate(0, -${pos}%) ${this.translateZ}`;
+        break;
+      case 'bottom':
+        section.style[transformProp] = `translate(0, ${pos}%) ${this.translateZ}`;
+        break;
+      case 'left':
+        section.style[transformProp] = `translate(-${pos}%, 0) ${this.translateZ}`;
+        break;
+      case 'right':
+        section.style[transformProp] = `translate(${pos}%, 0) ${this.translateZ}`;
+        break;
+
+      default:
+        break;
+    }
+
   }
 
   prev() {
@@ -140,7 +162,7 @@ class Wall {
       [this.currentSection, ...this.restSections] = this.sections.reverse();
       this.sections = [this.currentSection, ...this.restSections.reverse()];
 
-      this._renderSectionPosition(this.currentSection, 0, 100);
+      this._renderSectionPosition(this.currentSection, 100);
       this._queueSections();
       this.currentSectionPosition = 100;
 

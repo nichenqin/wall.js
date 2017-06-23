@@ -52,7 +52,7 @@
       font-size: 20px;
       left: 100px;
       bottom: 50px;
-      z-index: 1000;
+      z-index: 2;
       cursor: pointer;
     }
 
@@ -61,7 +61,7 @@
       font-size: 20px;
       right: 100px;
       bottom: 50px;
-      z-index: 1000;
+      z-index: 2;
       cursor: pointer;
     }
   </style>
@@ -89,7 +89,7 @@
   <div id="next" class="btn btn-primary">next</div>
   <script src="../dist/wall.js"></script>
   <script>
-    var wall = new Wall('.wrapper');
+    var wall = new Wall('.wrapper', { animateDirection: 'right' });
     console.log(wall);
 
     document.getElementById('prev')
