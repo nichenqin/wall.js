@@ -47,6 +47,7 @@ class Wall {
       this._setupSize()._setupSections()
         ._css()
         ._queueSections();
+    this.isToBack = false;
     this.isAnimating = false;
     this.currentSectionPosition = 0;
     cAF(this.requestId);
@@ -94,17 +95,13 @@ class Wall {
     return this;
   }
 
-  _resetSectionPosition(section) {
-    section.style[transformProp] = `translate(0px, 0px)`;
-  }
-
   _queueSections() {
     this.sections.reverse().forEach((section, index) => {
       section.style.zIndex = index + 1;
     });
     this.sections.reverse();
     [this.currentSection, ...this.restSections] = this.sections;
-    this.restSections.forEach(section => { this._resetSectionPosition(section); });
+    this.restSections.forEach(section => { this._renderSectionPosition(section, 0, 0); });
     return this;
   }
 
@@ -112,27 +109,42 @@ class Wall {
     const now = Date.now();
     const delta = (now - this.lastTime) / 1000;
 
-    this._updateSectionPosition(delta)._renderSectionPosition();
+    this
+      ._updateSectionPosition(delta)
+      ._renderSectionPosition(this.currentSection, 0, this.currentSectionPosition);
 
-    if (this.currentSectionPosition >= 100 || this.currentSectionPosition <= 0) this._refresh()._queueSections();
+    if (this.currentSectionPosition >= 100 || this.currentSectionPosition <= 0) {
+      console.log('stop');
+      return this._refresh()._queueSections();
+    };
 
-    if (this.isAnimating) return this.requestId = rAF(this._animate.bind(this));
+    if (this.isAnimating) {
+      console.log('animate');
+      return this.requestId = rAF(this._animate.bind(this));
+    };
   }
 
   _updateSectionPosition(delta) {
     const speed = this.currentSection.getAttribute('data-speed') || this.options.speed;
-    this.currentSectionPosition = this.options.easeFunction(delta, this.currentSectionPosition, 100 - this.currentSectionPosition, speed);
+    const target = this.isToBack ? 0 : 100;
+    this.isToBack
+      ? this.currentSectionPosition--
+      : this.currentSectionPosition++;
     return this;
   }
 
-  _renderSectionPosition() {
-    this.currentSection.style[transformProp] = `translate(0, -${this.currentSectionPosition}%)`;
+  _renderSectionPosition(section, x, y) {
+    section.style[transformProp] = `translate(${x}%, -${y}%)`;
   }
 
   prev() {
     if (!this.isAnimating) {
       [this.currentSection, ...this.restSections] = this.sections.reverse();
       this.sections = [this.currentSection, ...this.restSections.reverse()];
+
+      this._renderSectionPosition(this.currentSection, 0, 100);
+      this._queueSections();
+      this.currentSectionPosition = 100;
 
       this.isToBack = true;
       this.isAnimating = true;

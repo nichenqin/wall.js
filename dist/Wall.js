@@ -156,6 +156,7 @@ var Wall = function () {
     key: '_refresh',
     value: function _refresh(force) {
       if (force) this._setupSize()._setupSections()._css()._queueSections();
+      this.isToBack = false;
       this.isAnimating = false;
       this.currentSectionPosition = 0;
       (0, _utils.cAF)(this.requestId);
@@ -209,11 +210,6 @@ var Wall = function () {
       return this;
     }
   }, {
-    key: '_resetSectionPosition',
-    value: function _resetSectionPosition(section) {
-      section.style[_utils.transformProp] = 'translate(0px, 0px)';
-    }
-  }, {
     key: '_queueSections',
     value: function _queueSections() {
       var _this2 = this;
@@ -229,7 +225,7 @@ var Wall = function () {
       this.restSections = _sections2.slice(1);
 
       this.restSections.forEach(function (section) {
-        _this2._resetSectionPosition(section);
+        _this2._renderSectionPosition(section, 0, 0);
       });
       return this;
     }
@@ -239,23 +235,30 @@ var Wall = function () {
       var now = Date.now();
       var delta = (now - this.lastTime) / 1000;
 
-      this._updateSectionPosition(delta)._renderSectionPosition();
+      this._updateSectionPosition(delta)._renderSectionPosition(this.currentSection, 0, this.currentSectionPosition);
 
-      if (this.currentSectionPosition >= 100 || this.currentSectionPosition <= 0) this._refresh()._queueSections();
+      if (this.currentSectionPosition >= 100 || this.currentSectionPosition <= 0) {
+        console.log('stop');
+        return this._refresh()._queueSections();
+      };
 
-      if (this.isAnimating) return this.requestId = (0, _utils.rAF)(this._animate.bind(this));
+      if (this.isAnimating) {
+        console.log('animate');
+        return this.requestId = (0, _utils.rAF)(this._animate.bind(this));
+      };
     }
   }, {
     key: '_updateSectionPosition',
     value: function _updateSectionPosition(delta) {
       var speed = this.currentSection.getAttribute('data-speed') || this.options.speed;
-      this.currentSectionPosition = this.options.easeFunction(delta, this.currentSectionPosition, 100 - this.currentSectionPosition, speed);
+      var target = this.isToBack ? 0 : 100;
+      this.isToBack ? this.currentSectionPosition-- : this.currentSectionPosition++;
       return this;
     }
   }, {
     key: '_renderSectionPosition',
-    value: function _renderSectionPosition() {
-      this.currentSection.style[_utils.transformProp] = 'translate(0, -' + this.currentSectionPosition + '%)';
+    value: function _renderSectionPosition(section, x, y) {
+      section.style[_utils.transformProp] = 'translate(' + x + '%, -' + y + '%)';
     }
   }, {
     key: 'prev',
@@ -269,6 +272,10 @@ var Wall = function () {
         this.restSections = _sections$reverse2.slice(1);
 
         this.sections = [this.currentSection].concat(_toConsumableArray(this.restSections.reverse()));
+
+        this._renderSectionPosition(this.currentSection, 0, 100);
+        this._queueSections();
+        this.currentSectionPosition = 100;
 
         this.isToBack = true;
         this.isAnimating = true;
