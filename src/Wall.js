@@ -65,7 +65,7 @@ class Wall {
 
     [this.currentSection, ...this.restSections] = this.sections;
 
-    this._renderNav();
+    this._renderNavElement();
 
     return this;
   }
@@ -143,8 +143,6 @@ class Wall {
     const now = Date.now();
     const delta = (now - this.lastTime) / 1000;
 
-    console.log('animating');
-
     this
       ._updateSectionPosition(delta)
       ._renderSectionPosition(this.currentSection, this.currentSectionPosition);
@@ -189,18 +187,19 @@ class Wall {
 
   }
 
-  _renderNav() {
+  _renderNavElement() {
     if (this.navElement) {
-      this.navItems.forEach(item => { removeClass(item, this.options.navItemActiveClass); });
+      const { navItemActiveClass } = this.options;
+      this.navItems.forEach(item => { removeClass(item, navItemActiveClass); });
+
       const currentNav = this.navItems.find(item => item.getAttribute('data-wall-nav-index') === this.currentSection.getAttribute('data-wall-section-index'));
-      console.log(this.currentSection);
-      console.log(currentNav);
-      addClass(currentNav, this.options.navItemActiveClass);
+      addClass(currentNav, navItemActiveClass);
     }
   }
 
   prev() {
     if (!this.isAnimating) {
+      // reverse the sections array and set the last section to be the current section
       [this.currentSection, ...this.restSections] = this.sections.reverse();
       this.sections = [this.currentSection, ...this.restSections.reverse()];
 
@@ -219,6 +218,7 @@ class Wall {
 
   next() {
     if (!this.isAnimating) {
+      // move current section to last of the queue
       this.sections = [...this.restSections, this.currentSection];
 
       this.isToBack = false;
@@ -229,8 +229,27 @@ class Wall {
     }
   }
 
-  goTo(num) {
-    console.log(num);
+  goTo(index) {
+    const targetSection = this.sections.find(section => section.getAttribute('data-wall-section-index') === index);
+    if (targetSection == this.currentSection) return;
+
+    this.sections = toArray(this.wrapper.children);
+
+    this.isToBack = targetSection.getAttribute('data-wall-section-index') < this.currentSection.getAttribute('data-wall-section-index');
+    this.currentSectionPosition = this.isToBack ? 100 : 0;
+    this.isAnimating = true;
+    this.lastTime = Date.now();
+
+    const prevSections = this.sections.slice(0, index - 1);
+    const nextSections = this.sections.slice(index);
+
+    this.sections = [targetSection, ...nextSections, ...prevSections];
+
+    this.currentSection = targetSection;
+    this._queueSections();
+    this._renderSectionPosition(this.currentSection, this.currentSectionPosition);
+
+    this._animate();
   }
 
 }

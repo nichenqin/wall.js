@@ -177,7 +177,7 @@ var Wall = function () {
       this.restSections = _sections2.slice(1);
 
 
-      this._renderNav();
+      this._renderNavElement();
 
       return this;
     }
@@ -276,8 +276,6 @@ var Wall = function () {
       var now = Date.now();
       var delta = (now - this.lastTime) / 1000;
 
-      console.log('animating');
-
       this._updateSectionPosition(delta)._renderSectionPosition(this.currentSection, this.currentSectionPosition);
 
       if (this.currentSectionPosition >= 100 || this.currentSectionPosition < 0.1 && this.isToBack) {
@@ -321,20 +319,21 @@ var Wall = function () {
       }
     }
   }, {
-    key: '_renderNav',
-    value: function _renderNav() {
+    key: '_renderNavElement',
+    value: function _renderNavElement() {
       var _this4 = this;
 
       if (this.navElement) {
+        var navItemActiveClass = this.options.navItemActiveClass;
+
         this.navItems.forEach(function (item) {
-          (0, _utils.removeClass)(item, _this4.options.navItemActiveClass);
+          (0, _utils.removeClass)(item, navItemActiveClass);
         });
+
         var currentNav = this.navItems.find(function (item) {
           return item.getAttribute('data-wall-nav-index') === _this4.currentSection.getAttribute('data-wall-section-index');
         });
-        console.log(this.currentSection);
-        console.log(currentNav);
-        (0, _utils.addClass)(currentNav, this.options.navItemActiveClass);
+        (0, _utils.addClass)(currentNav, navItemActiveClass);
       }
     }
   }, {
@@ -342,6 +341,8 @@ var Wall = function () {
     value: function prev() {
       if (!this.isAnimating) {
         var _sections$reverse = this.sections.reverse();
+        // reverse the sections array and set the last section to be the current section
+
 
         var _sections$reverse2 = _toArray(_sections$reverse);
 
@@ -364,6 +365,7 @@ var Wall = function () {
     key: 'next',
     value: function next() {
       if (!this.isAnimating) {
+        // move current section to last of the queue
         this.sections = [].concat(_toConsumableArray(this.restSections), [this.currentSection]);
 
         this.isToBack = false;
@@ -375,8 +377,29 @@ var Wall = function () {
     }
   }, {
     key: 'goTo',
-    value: function goTo(num) {
-      console.log(num);
+    value: function goTo(index) {
+      var targetSection = this.sections.find(function (section) {
+        return section.getAttribute('data-wall-section-index') === index;
+      });
+      if (targetSection == this.currentSection) return;
+
+      this.sections = (0, _utils.toArray)(this.wrapper.children);
+
+      this.isToBack = targetSection.getAttribute('data-wall-section-index') < this.currentSection.getAttribute('data-wall-section-index');
+      this.currentSectionPosition = this.isToBack ? 100 : 0;
+      this.isAnimating = true;
+      this.lastTime = Date.now();
+
+      var prevSections = this.sections.slice(0, index - 1);
+      var nextSections = this.sections.slice(index);
+
+      this.sections = [targetSection].concat(_toConsumableArray(nextSections), _toConsumableArray(prevSections));
+
+      this.currentSection = targetSection;
+      this._queueSections();
+      this._renderSectionPosition(this.currentSection, this.currentSectionPosition);
+
+      this._animate();
     }
   }]);
 
