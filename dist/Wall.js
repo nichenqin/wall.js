@@ -89,6 +89,8 @@ var _utils = __webpack_require__(1);
 
 var _easing = __webpack_require__(2);
 
+var _dom = __webpack_require__(3);
+
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _toArray(arr) { return Array.isArray(arr) ? arr : Array.from(arr); }
@@ -124,8 +126,7 @@ var Wall = function () {
     this.restSections = _sections.slice(1);
 
     this.currentSectionPosition = 0;
-    // init section as an empty object, all configs about section will set inside the object
-    this.sectionConfig = {};
+    this.translateZ = _dom.hasTransform3d ? 'translateZ(0)' : '';
     // init screen size, X presents width, Y presents height
     this.size = { X: 0, Y: 0 };
     // merge default options and custom options
@@ -136,6 +137,7 @@ var Wall = function () {
     this.requestId = null;
     // is animating flag
     this.isAnimating = false;
+    // set flag if the screen is ready to back
     this.isToBack = false;
 
     this._init();
@@ -257,7 +259,7 @@ var Wall = function () {
   }, {
     key: '_renderSectionPosition',
     value: function _renderSectionPosition(section, x, y) {
-      section.style[_utils.transformProp] = 'translate(' + x + '%, -' + y + '%)';
+      section.style[_utils.transformProp] = 'translate(' + x + '%, -' + y + '%) ' + this.translateZ;
     }
   }, {
     key: 'prev',
@@ -380,6 +382,20 @@ var easeInOutExpo = exports.easeInOutExpo = function easeInOutExpo(t, b, c, d) {
 var easeInOutSine = exports.easeInOutSine = function easeInOutSine(t, b, c, d) {
   return -c / 2 * (Math.cos(Math.PI * t / d) - 1) + b;
 };
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var testElement = document.createElement('div');
+
+var hasTransform3d = exports.hasTransform3d = 'WebkitPerspective' in testElement.style || 'MozPerspective' in testElement.style || 'msPerspective' in testElement.style || 'OPerspective' in testElement.style || 'perspective' in testElement.style;
 
 /***/ })
 /******/ ]);

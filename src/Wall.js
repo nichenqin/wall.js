@@ -1,5 +1,6 @@
 import { rAF, cAF, toArray, throwNewError, merge, getScreenHeight, getScreenWidth, transformProp } from './utils';
-import { easeInOutExpo, easeInOutSine } from './easing';
+import { easeInOutExpo } from './easing';
+import { hasTransform3d } from './dom';
 
 const defaultOptions = {
   animationDirection: 'toTop',
@@ -19,8 +20,7 @@ class Wall {
     // get first of array as current section, and others as rest sections
     [this.currentSection, ...this.restSections] = this.sections;
     this.currentSectionPosition = 0;
-    // init section as an empty object, all configs about section will set inside the object
-    this.sectionConfig = {};
+    this.translateZ = hasTransform3d ? 'translateZ(0)' : '';
     // init screen size, X presents width, Y presents height
     this.size = { X: 0, Y: 0 };
     // merge default options and custom options
@@ -31,6 +31,7 @@ class Wall {
     this.requestId = null;
     // is animating flag
     this.isAnimating = false;
+    // set flag if the screen is ready to back
     this.isToBack = false;
 
     this._init();
@@ -131,7 +132,7 @@ class Wall {
   }
 
   _renderSectionPosition(section, x, y) {
-    section.style[transformProp] = `translate(${x}%, -${y}%)`;
+    section.style[transformProp] = `translate(${x}%, -${y}%) ${this.translateZ}`;
   }
 
   prev() {
