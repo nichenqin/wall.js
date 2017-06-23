@@ -103,7 +103,9 @@ var defaultOptions = {
   wrapperZIndex: 1,
   animateDirection: 'top',
   easeFunction: _easing.easeInOutExpo,
-  speed: 1.2
+  animateSpeed: 1.2,
+  navElement: '.wall-nav',
+  navActiveClass: 'active'
 };
 
 var body = document.getElementsByTagName('body')[0];
@@ -121,7 +123,7 @@ var Wall = function () {
     this.sections = this.wrapper.children.length ? (0, _utils.toArray)(this.wrapper.children) : (0, _utils.throwNewError)(_templateObject2);
     // get first of array as current section, and others as rest sections
 
-    // the position of current section
+    // the position of current section, used to move currentSection
     var _sections = _toArray(this.sections);
 
     this.currentSection = _sections[0];
@@ -131,8 +133,11 @@ var Wall = function () {
     this.translateZ = _dom.hasTransform3d ? 'translateZ(0)' : '';
     // init screen size, X presents width, Y presents height
     this.size = { X: 0, Y: 0 };
+
     // merge default options and custom options
     this.options = (0, _utils.merge)(defaultOptions, options);
+    this.navElement = typeof this.options.navElement === 'string' ? document.querySelector(this.options.navElement) : this.options.navElement;
+    this.navItems = this.navElement && (0, _utils.toArray)(this.navElement.children);
     // animation time stamp, control speed
     this.lastTime = null;
     // requestAnimationFrame id
@@ -159,11 +164,13 @@ var Wall = function () {
   }, {
     key: '_refresh',
     value: function _refresh(force) {
-      if (force) this._setupSize()._setupSections()._css()._queueSections();
+      if (force) this._setupSize()._css()._setupSections()._setupNav()._queueSections();
+
       this.isToBack = false;
       this.isAnimating = false;
       this.currentSectionPosition = 0;
       (0, _utils.cAF)(this.requestId);
+
       return this;
     }
   }, {
@@ -179,6 +186,20 @@ var Wall = function () {
       this.sections.forEach(function (section, index) {
         section.setAttribute('data-section-index', index + 1);
       });
+      return this;
+    }
+  }, {
+    key: '_setupNav',
+    value: function _setupNav() {
+      if (this.navElement) {
+        this.navElement.style.zIndex = this.options.wrapperZIndex + 1;
+        this.navElement.style.position = 'absolute';
+
+        this.navItems.forEach(function (item, index) {
+          item.setAttribute('data-wall-nav-index', index + 1);
+        });
+      }
+
       return this;
     }
   }, {
@@ -231,8 +252,9 @@ var Wall = function () {
       this.restSections = _sections2.slice(1);
 
       this.sections.forEach(function (section) {
-        _this2._renderSectionPosition(section, 0);
+        return _this2._renderSectionPosition(section, 0);
       });
+
       return this;
     }
   }, {
@@ -254,8 +276,9 @@ var Wall = function () {
   }, {
     key: '_updateSectionPosition',
     value: function _updateSectionPosition(delta) {
-      var speed = this.currentSection.getAttribute('data-speed') || this.options.speed;
+      var speed = this.currentSection.getAttribute('data-animate-speed') || this.options.animateSpeed;
       var target = this.isToBack ? 0 : 100;
+
       this.currentSectionPosition = this.options.easeFunction(delta, this.currentSectionPosition, target - this.currentSectionPosition, speed);
 
       return this;
@@ -263,7 +286,7 @@ var Wall = function () {
   }, {
     key: '_renderSectionPosition',
     value: function _renderSectionPosition(section, pos) {
-      switch (this.options.animateDirection) {
+      switch (this.currentSection.getAttribute('data-animate-direction') || this.options.animateDirection) {
         case 'top':
           section.style[_utils.transformProp] = 'translate(0, -' + pos + '%) ' + this.translateZ;
           break;
@@ -278,6 +301,7 @@ var Wall = function () {
           break;
 
         default:
+          section.style[_utils.transformProp] = 'translate(0, -' + pos + '%) ' + this.translateZ;
           break;
       }
     }
@@ -294,10 +318,9 @@ var Wall = function () {
 
         this.sections = [this.currentSection].concat(_toConsumableArray(this.restSections.reverse()));
 
-        this._renderSectionPosition(this.currentSection, 100);
-        this._queueSections();
-        this.currentSectionPosition = 100;
+        this._queueSections()._renderSectionPosition(this.currentSection, 100);
 
+        this.currentSectionPosition = 100;
         this.isToBack = true;
         this.isAnimating = true;
         this.lastTime = Date.now();

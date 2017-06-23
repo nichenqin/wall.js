@@ -52,7 +52,7 @@
       font-size: 20px;
       left: 100px;
       bottom: 50px;
-      z-index: 2;
+      z-index: 3;
       cursor: pointer;
     }
 
@@ -61,8 +61,34 @@
       font-size: 20px;
       right: 100px;
       bottom: 50px;
-      z-index: 2;
+      z-index: 3;
       cursor: pointer;
+    }
+
+    .wall-nav {
+      left: 0;
+      right: 0;
+      bottom: 50px;
+      text-align: center;
+      padding: 0;
+      margin: 0;
+    }
+
+    .wall-nav>li {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #fff;
+      border-radius: 50%;
+      background-color: transparent;
+      box-sizing: border-box;
+      list-style: none;
+      cursor: pointer;
+    }
+
+    .wall-nav>li.active,
+    .wall-nav>li:hover {
+      background-color: #fff;
     }
   </style>
 </head>
@@ -72,24 +98,31 @@
     <section class="section-1">
       <div>First Screen</div>
     </section>
-    <section class="section-2">
+    <section class="section-2" data-animate-direction="right">
       <div>Second Screen</div>
     </section>
-    <section class="section-3" data-speed=3>
+    <section class="section-3" data-animate-speed=3>
       <div>Third Screen</div>
     </section>
-    <section class="section-4">
+    <section class="section-4" data-animate-direction="left">
       <div>Fourth Screen</div>
     </section>
-    <section class="section-5">
+    <section class="section-5" data-animate-speed=0.5>
       <div>Fifth Screen</div>
     </section>
   </div>
   <div id="prev" class="btn btn-secondary">prev</div>
   <div id="next" class="btn btn-primary">next</div>
+  <ul class="wall-nav">
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+  </ul>
   <script src="../dist/wall.js"></script>
   <script>
-    var wall = new Wall('.wrapper', { animateDirection: 'right' });
+    var wall = new Wall('.wrapper');
     console.log(wall);
 
     document.getElementById('prev')

@@ -6,7 +6,9 @@ const defaultOptions = {
   wrapperZIndex: 1,
   animateDirection: 'top',
   easeFunction: easeInOutExpo,
-  speed: 1.2
+  animateSpeed: 1.2,
+  navElement: '.wall-nav',
+  navActiveClass: 'active'
 };
 
 const body = document.getElementsByTagName('body')[0];
@@ -20,14 +22,17 @@ class Wall {
     this.sections = this.wrapper.children.length ? toArray(this.wrapper.children) : throwNewError`sections`;
     // get first of array as current section, and others as rest sections
     [this.currentSection, ...this.restSections] = this.sections;
-    // the position of current section
+    // the position of current section, used to move currentSection
     this.currentSectionPosition = 0;
     // mark if use transform 3d for smooth animation
     this.translateZ = hasTransform3d ? 'translateZ(0)' : '';
     // init screen size, X presents width, Y presents height
     this.size = { X: 0, Y: 0 };
+
     // merge default options and custom options
     this.options = merge(defaultOptions, options);
+    this.navElement = typeof this.options.navElement === 'string' ? document.querySelector(this.options.navElement) : this.options.navElement;
+    this.navItems = this.navElement && toArray(this.navElement.children);
     // animation time stamp, control speed
     this.lastTime = null;
     // requestAnimationFrame id
@@ -48,13 +53,16 @@ class Wall {
 
   _refresh(force) {
     if (force)
-      this._setupSize()._setupSections()
-        ._css()
+      this
+        ._setupSize()._css()
+        ._setupSections()._setupNav()
         ._queueSections();
+
     this.isToBack = false;
     this.isAnimating = false;
     this.currentSectionPosition = 0;
     cAF(this.requestId);
+
     return this;
   }
 
@@ -68,6 +76,19 @@ class Wall {
     this.sections.forEach((section, index) => {
       section.setAttribute('data-section-index', index + 1);
     });
+    return this;
+  }
+
+  _setupNav() {
+    if (this.navElement) {
+      this.navElement.style.zIndex = this.options.wrapperZIndex + 1;
+      this.navElement.style.position = 'absolute';
+
+      this.navItems.forEach((item, index) => {
+        item.setAttribute('data-wall-nav-index', index + 1);
+      });
+    }
+
     return this;
   }
 
@@ -102,12 +123,12 @@ class Wall {
   }
 
   _queueSections() {
-    this.sections.reverse().forEach((section, index) => {
-      section.style.zIndex = index + 1;
-    });
+    this.sections.reverse().forEach((section, index) => { section.style.zIndex = index + 1; });
     this.sections.reverse();
+
     [this.currentSection, ...this.restSections] = this.sections;
-    this.sections.forEach(section => { this._renderSectionPosition(section, 0); });
+    this.sections.forEach(section => this._renderSectionPosition(section, 0));
+
     return this;
   }
 
@@ -129,15 +150,16 @@ class Wall {
   }
 
   _updateSectionPosition(delta) {
-    const speed = this.currentSection.getAttribute('data-speed') || this.options.speed;
+    const speed = this.currentSection.getAttribute('data-animate-speed') || this.options.animateSpeed;
     const target = this.isToBack ? 0 : 100;
+
     this.currentSectionPosition = this.options.easeFunction(delta, this.currentSectionPosition, target - this.currentSectionPosition, speed);
 
     return this;
   }
 
   _renderSectionPosition(section, pos) {
-    switch (this.options.animateDirection) {
+    switch (this.currentSection.getAttribute('data-animate-direction') || this.options.animateDirection) {
       case 'top':
         section.style[transformProp] = `translate(0, -${pos}%) ${this.translateZ}`;
         break;
@@ -152,6 +174,7 @@ class Wall {
         break;
 
       default:
+        section.style[transformProp] = `translate(0, -${pos}%) ${this.translateZ}`;
         break;
     }
 
@@ -162,16 +185,16 @@ class Wall {
       [this.currentSection, ...this.restSections] = this.sections.reverse();
       this.sections = [this.currentSection, ...this.restSections.reverse()];
 
-      this._renderSectionPosition(this.currentSection, 100);
-      this._queueSections();
-      this.currentSectionPosition = 100;
+      this
+        ._queueSections()
+        ._renderSectionPosition(this.currentSection, 100);
 
+      this.currentSectionPosition = 100;
       this.isToBack = true;
       this.isAnimating = true;
       this.lastTime = Date.now();
 
       this._animate();
-
     }
   }
 
