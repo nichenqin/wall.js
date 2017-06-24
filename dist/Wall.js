@@ -166,10 +166,8 @@ var Wall = function () {
     value: function _refresh(force) {
       if (force) this._setupSize()._css()._setupSections()._setupNav()._queueSections();
 
-      this.isToBack = false;
-      this.isAnimating = false;
-      this.currentSectionPosition = 0;
       (0, _dom.cAF)(this.requestId);
+      this.isAnimating = false;
 
       var _sections2 = _toArray(this.sections);
 
@@ -268,11 +266,12 @@ var Wall = function () {
   }, {
     key: '_animateCurrentSection',
     value: function _animateCurrentSection() {
-      // this._queueSections();
+
       var now = Date.now();
       var delta = (now - this.lastTime) / 1000;
 
       this.currentSection.style.zIndex = this.sections.length + 1;
+
       this._updateSectionPosition(delta)._renderSectionPosition(this.currentSection, this.currentSectionPosition);
 
       if (this.currentSectionPosition >= 100 || this.currentSectionPosition < 0.1 && this.isToBack) {
@@ -386,7 +385,6 @@ var Wall = function () {
       if (targetSection == this.currentSection) return;
 
       this.isToBack = index < this._getCurrentSectionIndex();
-      this.currentSectionPosition = this.isToBack ? 100 : 0;
       this.isAnimating = true;
       this.lastTime = Date.now();
 
@@ -395,7 +393,12 @@ var Wall = function () {
 
       this.sections = [targetSection].concat(_toConsumableArray(nextSections), _toConsumableArray(prevSections));
 
-      this._queueSections();
+      if (this.isToBack) {
+        this.currentSectionPosition = 100;
+        this.currentSection = targetSection;
+      } else {
+        this._queueSections();
+      }
 
       this._animateCurrentSection();
     }

@@ -58,10 +58,8 @@ class Wall {
         ._setupSections()._setupNav()
         ._queueSections();
 
-    this.isToBack = false;
-    this.isAnimating = false;
-    this.currentSectionPosition = 0;
     cAF(this.requestId);
+    this.isAnimating = false;
 
     [this.currentSection, ...this.restSections] = this.sections;
 
@@ -139,11 +137,12 @@ class Wall {
   }
 
   _animateCurrentSection() {
-    // this._queueSections();
+
     const now = Date.now();
     const delta = (now - this.lastTime) / 1000;
 
     this.currentSection.style.zIndex = this.sections.length + 1;
+
     this
       ._updateSectionPosition(delta)
       ._renderSectionPosition(this.currentSection, this.currentSectionPosition);
@@ -237,7 +236,6 @@ class Wall {
     if (targetSection == this.currentSection) return;
 
     this.isToBack = index < this._getCurrentSectionIndex();
-    this.currentSectionPosition = this.isToBack ? 100 : 0;
     this.isAnimating = true;
     this.lastTime = Date.now();
 
@@ -246,10 +244,14 @@ class Wall {
 
     this.sections = [targetSection, ...nextSections, ...prevSections];
 
-    this._queueSections();
+    if (this.isToBack) {
+      this.currentSectionPosition = 100;
+      this.currentSection = targetSection;
+    } else {
+      this._queueSections();
+    }
 
     this._animateCurrentSection();
-
   }
 
 }
