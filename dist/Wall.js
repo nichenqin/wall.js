@@ -129,6 +129,7 @@ var Wall = function () {
     this.currentSection = _sections[0];
     this.restSections = _sections.slice(1);
     this.currentSectionPosition = 0;
+
     // mark if use transform 3d for smooth animation
     this.translateZ = _dom.hasTransform3d ? 'translateZ(0)' : '';
     // init screen size, X presents width, Y presents height
@@ -136,8 +137,11 @@ var Wall = function () {
 
     // merge default options and custom options
     this.options = (0, _utils.merge)(defaultOptions, options);
+    // set up nav element
     this.navElement = typeof this.options.navElement === 'string' ? document.querySelector(this.options.navElement) : this.options.navElement;
+    // if nav element exists, set nav items
     this.navItems = this.navElement && (0, _utils.toArray)(this.navElement.children);
+
     // animation time stamp, control speed
     this.lastTime = null;
     // requestAnimationFrame id
@@ -160,6 +164,29 @@ var Wall = function () {
       window.addEventListener('resize', function () {
         _this._setupSize()._cssWrapper();
       });
+      document.addEventListener('keydown', this._handleKeyDown.bind(this));
+    }
+  }, {
+    key: '_handleKeyDown',
+    value: function _handleKeyDown(e) {
+      switch (e.keyCode) {
+        case 34:case 39:case 40:
+          this.next();
+          break;
+
+        case 33:case 37:case 38:
+          this.prev();
+          break;
+
+        case 36:
+          this.goTo(1);
+
+        case 36:
+          this.goTo(this.sections.length);
+
+        default:
+          break;
+      }
     }
   }, {
     key: '_refresh',
