@@ -264,6 +264,16 @@ var Wall = function () {
       return this;
     }
   }, {
+    key: '_refreshAnimateStatus',
+    value: function _refreshAnimateStatus(isToBack) {
+      this.isToBack = isToBack;
+      (0, _dom.cAF)(this.requestId);
+      this.currentSectionPosition = this.isToBack ? 100 : 0;
+      this.isAnimating = true;
+      this.lastTime = Date.now();
+      return this;
+    }
+  }, {
     key: '_animateCurrentSection',
     value: function _animateCurrentSection() {
 
@@ -352,12 +362,7 @@ var Wall = function () {
 
         this.sections = [this.currentSection].concat(_toConsumableArray(this.restSections.reverse()));
 
-        this.isToBack = true;
-        this.currentSectionPosition = 100;
-        this.isAnimating = true;
-        this.lastTime = Date.now();
-
-        this._animateCurrentSection();
+        this._refreshAnimateStatus(true)._animateCurrentSection();
       }
     }
   }, {
@@ -367,44 +372,35 @@ var Wall = function () {
         // move current section to last of the queue
         this.sections = [].concat(_toConsumableArray(this.restSections), [this.currentSection]);
 
-        this.isToBack = false;
-        this.currentSectionPosition = 0;
-        this.isAnimating = true;
-        this.lastTime = Date.now();
-
-        this._animateCurrentSection();
+        this._refreshAnimateStatus(false)._animateCurrentSection();
       }
     }
   }, {
     key: 'goTo',
     value: function goTo(index) {
-      this.sections = (0, _utils.toArray)(this.wrapper.children);
-      var targetSection = this.sections.find(function (section) {
-        return section.getAttribute('data-wall-section-index') === index;
-      });
+      if (!this.isAnimating) {
+        this.sections = (0, _utils.toArray)(this.wrapper.children);
+        var targetSection = this.sections.find(function (section) {
+          return section.getAttribute('data-wall-section-index') === index;
+        });
 
-      if (targetSection == this.currentSection) return;
+        if (targetSection == this.currentSection) return;
 
-      this.isToBack = index < this._getCurrentSectionIndex();
-      this.currentSectionPosition = 0;
-      this.isAnimating = true;
-      this.lastTime = Date.now();
+        var prevSections = this.sections.slice(0, index - 1);
+        var nextSections = this.sections.slice(index);
 
-      var prevSections = this.sections.slice(0, index - 1);
-      var nextSections = this.sections.slice(index);
+        this.sections = [targetSection].concat(_toConsumableArray(nextSections), _toConsumableArray(prevSections));
 
-      this.sections = [targetSection].concat(_toConsumableArray(nextSections), _toConsumableArray(prevSections));
+        this._refreshAnimateStatus(index < this._getCurrentSectionIndex());
 
-      console.log(this.currentSectionPosition);
+        if (this.isToBack) {
+          this.currentSection = targetSection;
+        } else {
+          this._queueSections();
+        }
 
-      if (this.isToBack) {
-        this.currentSectionPosition = 100;
-        this.currentSection = targetSection;
-      } else {
-        this._queueSections();
+        this._animateCurrentSection();
       }
-
-      this._animateCurrentSection();
     }
   }]);
 

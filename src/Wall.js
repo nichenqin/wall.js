@@ -136,6 +136,15 @@ class Wall {
     return this;
   }
 
+  _refreshAnimateStatus(isToBack) {
+    this.isToBack = isToBack;
+    cAF(this.requestId);
+    this.currentSectionPosition = this.isToBack ? 100 : 0;
+    this.isAnimating = true;
+    this.lastTime = Date.now();
+    return this;
+  }
+
   _animateCurrentSection() {
 
     const now = Date.now();
@@ -207,12 +216,9 @@ class Wall {
       [this.currentSection, ...this.restSections] = this.sections.reverse();
       this.sections = [this.currentSection, ...this.restSections.reverse()];
 
-      this.isToBack = true;
-      this.currentSectionPosition = 100;
-      this.isAnimating = true;
-      this.lastTime = Date.now();
-
-      this._animateCurrentSection();
+      this
+        ._refreshAnimateStatus(true)
+        ._animateCurrentSection();
     }
   }
 
@@ -221,41 +227,34 @@ class Wall {
       // move current section to last of the queue
       this.sections = [...this.restSections, this.currentSection];
 
-      this.isToBack = false;
-      this.currentSectionPosition = 0;
-      this.isAnimating = true;
-      this.lastTime = Date.now();
-
-      this._animateCurrentSection();
+      this
+        ._refreshAnimateStatus(false)
+        ._animateCurrentSection();
     }
   }
 
   goTo(index) {
-    this.sections = toArray(this.wrapper.children);
-    const targetSection = this.sections.find(section => section.getAttribute('data-wall-section-index') === index);
+    if (!this.isAnimating) {
+      this.sections = toArray(this.wrapper.children);
+      const targetSection = this.sections.find(section => section.getAttribute('data-wall-section-index') === index);
 
-    if (targetSection == this.currentSection) return;
+      if (targetSection == this.currentSection) return;
 
-    this.isToBack = index < this._getCurrentSectionIndex();
-    this.currentSectionPosition = 0;
-    this.isAnimating = true;
-    this.lastTime = Date.now();
+      const prevSections = this.sections.slice(0, index - 1);
+      const nextSections = this.sections.slice(index);
 
-    const prevSections = this.sections.slice(0, index - 1);
-    const nextSections = this.sections.slice(index);
+      this.sections = [targetSection, ...nextSections, ...prevSections];
 
-    this.sections = [targetSection, ...nextSections, ...prevSections];
+      this._refreshAnimateStatus(index < this._getCurrentSectionIndex());
 
-    console.log(this.currentSectionPosition);
+      if (this.isToBack) {
+        this.currentSection = targetSection;
+      } else {
+        this._queueSections();
+      }
 
-    if (this.isToBack) {
-      this.currentSectionPosition = 100;
-      this.currentSection = targetSection;
-    } else {
-      this._queueSections();
+      this._animateCurrentSection();
     }
-
-    this._animateCurrentSection();
   }
 
 }
