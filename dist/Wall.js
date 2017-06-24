@@ -272,7 +272,7 @@ var Wall = function () {
 
       this.currentSection.style.zIndex = this.sections.length + 1;
 
-      this._updateSectionPosition(delta)._renderSectionPosition(this.currentSection, this.currentSectionPosition);
+      this._updateCurrentSectionPosition(delta)._renderSectionPosition(this.currentSection, this.currentSectionPosition);
 
       if (this.currentSectionPosition >= 100 || this.currentSectionPosition < 0.1 && this.isToBack) {
         return this._refresh()._queueSections();
@@ -283,8 +283,8 @@ var Wall = function () {
       };
     }
   }, {
-    key: '_updateSectionPosition',
-    value: function _updateSectionPosition(delta) {
+    key: '_updateCurrentSectionPosition',
+    value: function _updateCurrentSectionPosition(delta) {
       var duration = this.currentSection.getAttribute('data-wall-animate-duration') || this.options.animateDuration;
       var target = this.isToBack ? 0 : 100;
 
@@ -315,6 +315,11 @@ var Wall = function () {
       }
     }
   }, {
+    key: '_getCurrentSectionIndex',
+    value: function _getCurrentSectionIndex() {
+      return this.currentSection.getAttribute('data-wall-section-index');
+    }
+  }, {
     key: '_renderNavElement',
     value: function _renderNavElement() {
       var _this4 = this;
@@ -331,11 +336,6 @@ var Wall = function () {
         });
         (0, _utils.addClass)(currentNav, navItemActiveClass);
       }
-    }
-  }, {
-    key: '_getCurrentSectionIndex',
-    value: function _getCurrentSectionIndex() {
-      return this.currentSection.getAttribute('data-wall-section-index');
     }
   }, {
     key: 'prev',
@@ -368,6 +368,7 @@ var Wall = function () {
         this.sections = [].concat(_toConsumableArray(this.restSections), [this.currentSection]);
 
         this.isToBack = false;
+        this.currentSectionPosition = 0;
         this.isAnimating = true;
         this.lastTime = Date.now();
 
@@ -385,6 +386,7 @@ var Wall = function () {
       if (targetSection == this.currentSection) return;
 
       this.isToBack = index < this._getCurrentSectionIndex();
+      this.currentSectionPosition = 0;
       this.isAnimating = true;
       this.lastTime = Date.now();
 
@@ -392,6 +394,8 @@ var Wall = function () {
       var nextSections = this.sections.slice(index);
 
       this.sections = [targetSection].concat(_toConsumableArray(nextSections), _toConsumableArray(prevSections));
+
+      console.log(this.currentSectionPosition);
 
       if (this.isToBack) {
         this.currentSectionPosition = 100;

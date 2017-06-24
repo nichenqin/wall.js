@@ -144,7 +144,7 @@ class Wall {
     this.currentSection.style.zIndex = this.sections.length + 1;
 
     this
-      ._updateSectionPosition(delta)
+      ._updateCurrentSectionPosition(delta)
       ._renderSectionPosition(this.currentSection, this.currentSectionPosition);
 
     if (this.currentSectionPosition >= 100 || (this.currentSectionPosition < 0.1 && this.isToBack)) {
@@ -156,7 +156,7 @@ class Wall {
     };
   }
 
-  _updateSectionPosition(delta) {
+  _updateCurrentSectionPosition(delta) {
     const duration = this.currentSection.getAttribute('data-wall-animate-duration') || this.options.animateDuration;
     const target = this.isToBack ? 0 : 100;
 
@@ -187,6 +187,10 @@ class Wall {
 
   }
 
+  _getCurrentSectionIndex() {
+    return this.currentSection.getAttribute('data-wall-section-index');
+  }
+
   _renderNavElement() {
     if (this.navElement) {
       const { navItemActiveClass } = this.options;
@@ -195,10 +199,6 @@ class Wall {
       const currentNav = this.navItems.find(item => item.getAttribute('data-wall-nav-index') === this._getCurrentSectionIndex());
       addClass(currentNav, navItemActiveClass);
     }
-  }
-
-  _getCurrentSectionIndex() {
-    return this.currentSection.getAttribute('data-wall-section-index');
   }
 
   prev() {
@@ -222,6 +222,7 @@ class Wall {
       this.sections = [...this.restSections, this.currentSection];
 
       this.isToBack = false;
+      this.currentSectionPosition = 0;
       this.isAnimating = true;
       this.lastTime = Date.now();
 
@@ -236,6 +237,7 @@ class Wall {
     if (targetSection == this.currentSection) return;
 
     this.isToBack = index < this._getCurrentSectionIndex();
+    this.currentSectionPosition = 0;
     this.isAnimating = true;
     this.lastTime = Date.now();
 
@@ -243,6 +245,8 @@ class Wall {
     const nextSections = this.sections.slice(index);
 
     this.sections = [targetSection, ...nextSections, ...prevSections];
+
+    console.log(this.currentSectionPosition);
 
     if (this.isToBack) {
       this.currentSectionPosition = 100;
