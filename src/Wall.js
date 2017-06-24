@@ -133,16 +133,17 @@ class Wall {
     this.sections.reverse().forEach((section, index) => { section.style.zIndex = index + 1; });
     this.sections.reverse();
 
-    [this.currentSection, ...this.restSections] = this.sections;
     this.sections.forEach(section => this._renderSectionPosition(section, 0));
 
     return this;
   }
 
-  _animate() {
+  _animateCurrentSection() {
+    // this._queueSections();
     const now = Date.now();
     const delta = (now - this.lastTime) / 1000;
 
+    this.currentSection.style.zIndex = this.sections.length + 1;
     this
       ._updateSectionPosition(delta)
       ._renderSectionPosition(this.currentSection, this.currentSectionPosition);
@@ -152,7 +153,7 @@ class Wall {
     };
 
     if (this.isAnimating) {
-      return this.requestId = rAF(this._animate.bind(this));
+      return this.requestId = rAF(this._animateCurrentSection.bind(this));
     };
   }
 
@@ -192,9 +193,13 @@ class Wall {
       const { navItemActiveClass } = this.options;
       this.navItems.forEach(item => { removeClass(item, navItemActiveClass); });
 
-      const currentNav = this.navItems.find(item => item.getAttribute('data-wall-nav-index') === this.currentSection.getAttribute('data-wall-section-index'));
+      const currentNav = this.navItems.find(item => item.getAttribute('data-wall-nav-index') === this._getCurrentSectionIndex());
       addClass(currentNav, navItemActiveClass);
     }
+  }
+
+  _getCurrentSectionIndex() {
+    return this.currentSection.getAttribute('data-wall-section-index');
   }
 
   prev() {
@@ -203,16 +208,12 @@ class Wall {
       [this.currentSection, ...this.restSections] = this.sections.reverse();
       this.sections = [this.currentSection, ...this.restSections.reverse()];
 
-      this
-        ._queueSections()
-        ._renderSectionPosition(this.currentSection, 100);
-
-      this.currentSectionPosition = 100;
       this.isToBack = true;
+      this.currentSectionPosition = 100;
       this.isAnimating = true;
       this.lastTime = Date.now();
 
-      this._animate();
+      this._animateCurrentSection();
     }
   }
 
@@ -225,17 +226,17 @@ class Wall {
       this.isAnimating = true;
       this.lastTime = Date.now();
 
-      this._animate();
+      this._animateCurrentSection();
     }
   }
 
   goTo(index) {
+    this.sections = toArray(this.wrapper.children);
     const targetSection = this.sections.find(section => section.getAttribute('data-wall-section-index') === index);
+
     if (targetSection == this.currentSection) return;
 
-    this.sections = toArray(this.wrapper.children);
-
-    this.isToBack = targetSection.getAttribute('data-wall-section-index') < this.currentSection.getAttribute('data-wall-section-index');
+    this.isToBack = index < this._getCurrentSectionIndex();
     this.currentSectionPosition = this.isToBack ? 100 : 0;
     this.isAnimating = true;
     this.lastTime = Date.now();
@@ -245,9 +246,10 @@ class Wall {
 
     this.sections = [targetSection, ...nextSections, ...prevSections];
 
-    this._renderSectionPosition(this.currentSection, this.currentSectionPosition);
+    this._queueSections();
 
-    this._animate();
+    this._animateCurrentSection();
+
   }
 
 }

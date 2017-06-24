@@ -259,11 +259,6 @@ var Wall = function () {
       });
       this.sections.reverse();
 
-      var _sections3 = _toArray(this.sections);
-
-      this.currentSection = _sections3[0];
-      this.restSections = _sections3.slice(1);
-
       this.sections.forEach(function (section) {
         return _this3._renderSectionPosition(section, 0);
       });
@@ -271,11 +266,13 @@ var Wall = function () {
       return this;
     }
   }, {
-    key: '_animate',
-    value: function _animate() {
+    key: '_animateCurrentSection',
+    value: function _animateCurrentSection() {
+      // this._queueSections();
       var now = Date.now();
       var delta = (now - this.lastTime) / 1000;
 
+      this.currentSection.style.zIndex = this.sections.length + 1;
       this._updateSectionPosition(delta)._renderSectionPosition(this.currentSection, this.currentSectionPosition);
 
       if (this.currentSectionPosition >= 100 || this.currentSectionPosition < 0.1 && this.isToBack) {
@@ -283,7 +280,7 @@ var Wall = function () {
       };
 
       if (this.isAnimating) {
-        return this.requestId = (0, _dom.rAF)(this._animate.bind(this));
+        return this.requestId = (0, _dom.rAF)(this._animateCurrentSection.bind(this));
       };
     }
   }, {
@@ -331,10 +328,15 @@ var Wall = function () {
         });
 
         var currentNav = this.navItems.find(function (item) {
-          return item.getAttribute('data-wall-nav-index') === _this4.currentSection.getAttribute('data-wall-section-index');
+          return item.getAttribute('data-wall-nav-index') === _this4._getCurrentSectionIndex();
         });
         (0, _utils.addClass)(currentNav, navItemActiveClass);
       }
+    }
+  }, {
+    key: '_getCurrentSectionIndex',
+    value: function _getCurrentSectionIndex() {
+      return this.currentSection.getAttribute('data-wall-section-index');
     }
   }, {
     key: 'prev',
@@ -351,14 +353,12 @@ var Wall = function () {
 
         this.sections = [this.currentSection].concat(_toConsumableArray(this.restSections.reverse()));
 
-        this._queueSections()._renderSectionPosition(this.currentSection, 100);
-
-        this.currentSectionPosition = 100;
         this.isToBack = true;
+        this.currentSectionPosition = 100;
         this.isAnimating = true;
         this.lastTime = Date.now();
 
-        this._animate();
+        this._animateCurrentSection();
       }
     }
   }, {
@@ -372,20 +372,20 @@ var Wall = function () {
         this.isAnimating = true;
         this.lastTime = Date.now();
 
-        this._animate();
+        this._animateCurrentSection();
       }
     }
   }, {
     key: 'goTo',
     value: function goTo(index) {
+      this.sections = (0, _utils.toArray)(this.wrapper.children);
       var targetSection = this.sections.find(function (section) {
         return section.getAttribute('data-wall-section-index') === index;
       });
+
       if (targetSection == this.currentSection) return;
 
-      this.sections = (0, _utils.toArray)(this.wrapper.children);
-
-      this.isToBack = targetSection.getAttribute('data-wall-section-index') < this.currentSection.getAttribute('data-wall-section-index');
+      this.isToBack = index < this._getCurrentSectionIndex();
       this.currentSectionPosition = this.isToBack ? 100 : 0;
       this.isAnimating = true;
       this.lastTime = Date.now();
@@ -395,9 +395,9 @@ var Wall = function () {
 
       this.sections = [targetSection].concat(_toConsumableArray(nextSections), _toConsumableArray(prevSections));
 
-      this._renderSectionPosition(this.currentSection, this.currentSectionPosition);
+      this._queueSections();
 
-      this._animate();
+      this._animateCurrentSection();
     }
   }]);
 
