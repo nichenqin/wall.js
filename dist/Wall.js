@@ -189,15 +189,26 @@ var Wall = function () {
   }, {
     key: '_setupSections',
     value: function _setupSections() {
+      var _this2 = this;
+
       this.sections.forEach(function (section, index) {
         section.setAttribute('data-wall-section-index', index + 1);
+        section.addEventListener(_dom.mousewheelEvent, _this2._handleWheelEvent.bind(_this2));
       });
+      return this;
+    }
+  }, {
+    key: '_handleWheelEvent',
+    value: function _handleWheelEvent(e) {
+      var delta = Math.max(-1, Math.min(1, e.wheelDelta || -e.detail));
+      if (delta === 1) this.prev();
+      if (delta === -1) this.next();
       return this;
     }
   }, {
     key: '_setupNav',
     value: function _setupNav() {
-      var _this2 = this;
+      var _this3 = this;
 
       if (this.navElement) {
         this.navElement.style.zIndex = this.options.wrapperZIndex + 1;
@@ -206,7 +217,7 @@ var Wall = function () {
         this.navItems.forEach(function (item, index) {
           item.setAttribute('data-wall-nav-index', index + 1);
           item.addEventListener('click', function () {
-            _this2.goTo(item.getAttribute('data-wall-nav-index'));
+            _this3.goTo(item.getAttribute('data-wall-nav-index'));
           });
         });
       }
@@ -250,7 +261,7 @@ var Wall = function () {
   }, {
     key: '_queueSections',
     value: function _queueSections() {
-      var _this3 = this;
+      var _this4 = this;
 
       this.sections.reverse().forEach(function (section, index) {
         section.style.zIndex = index + 1;
@@ -258,7 +269,7 @@ var Wall = function () {
       this.sections.reverse();
 
       this.sections.forEach(function (section) {
-        return _this3._renderSectionPosition(section, 0);
+        return _this4._renderSectionPosition(section, 0);
       });
 
       return this;
@@ -332,7 +343,7 @@ var Wall = function () {
   }, {
     key: '_renderNavElement',
     value: function _renderNavElement() {
-      var _this4 = this;
+      var _this5 = this;
 
       if (this.navElement) {
         var navItemActiveClass = this.options.navItemActiveClass;
@@ -342,7 +353,7 @@ var Wall = function () {
         });
 
         var currentNav = this.navItems.find(function (item) {
-          return item.getAttribute('data-wall-nav-index') === _this4._getCurrentSectionIndex();
+          return item.getAttribute('data-wall-nav-index') === _this5._getCurrentSectionIndex();
         });
         (0, _utils.addClass)(currentNav, navItemActiveClass);
       }
@@ -497,6 +508,8 @@ var transformProp = exports.transformProp = function () {
 
   return 'transform';
 }();
+
+var mousewheelEvent = exports.mousewheelEvent = 'onmousewheel' in document ? 'mousewheel' : 'DOMMouseScroll';
 
 var rAF = exports.rAF = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.msRequestAnimationFrame || window.oRequestAnimationFrame || function (callback) {
   setTimeout(callback, 1000 / 60);

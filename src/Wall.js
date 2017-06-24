@@ -1,6 +1,6 @@
 import { toArray, throwNewError, merge, addClass, removeClass } from './utils';
 import { easeInOutExpo } from './easing';
-import { rAF, cAF, hasTransform3d, transformProp, getScreenHeight, getScreenWidth } from './dom';
+import { rAF, cAF, hasTransform3d, transformProp, mousewheelEvent, getScreenHeight, getScreenWidth } from './dom';
 
 const defaultOptions = {
   wrapperZIndex: 1,
@@ -77,7 +77,15 @@ class Wall {
   _setupSections() {
     this.sections.forEach((section, index) => {
       section.setAttribute('data-wall-section-index', index + 1);
+      section.addEventListener(mousewheelEvent, this._handleWheelEvent.bind(this));
     });
+    return this;
+  }
+
+  _handleWheelEvent(e) {
+    const delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
+    if (delta === 1) this.prev();
+    if (delta === -1) this.next();
     return this;
   }
 

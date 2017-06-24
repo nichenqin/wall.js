@@ -21,6 +21,8 @@ export const transformProp = (() => {
   return 'transform';
 })();
 
+export const mousewheelEvent = 'onmousewheel' in document ? 'mousewheel' : 'DOMMouseScroll';
+
 export const rAF = window.requestAnimationFrame ||
   window.webkitRequestAnimationFrame ||
   window.mozRequestAnimationFrame ||
