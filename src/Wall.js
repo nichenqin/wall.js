@@ -9,7 +9,7 @@ const defaultOptions = {
   loopToBottom: false,
   loopToTop: false,
   navElement: '.wall-nav',
-  navItemActiveClass: 'active'
+  navItemActiveClass: 'active',
 };
 
 const body = document.getElementsByTagName('body')[0];
@@ -142,7 +142,8 @@ class Wall {
   _setupSlides() {
     this.sections.forEach(section => {
       const slides = toArray(section.querySelectorAll('[data-wall-slide]'));
-      if (slides) {
+      const arrows = toArray(section.querySelectorAll('[data-wall-slide-arrow]'));
+      if (slides.length) {
         slides.forEach(slide => {
           slide.style.position = 'absolute';
           slide.style.top = 0;
@@ -152,7 +153,12 @@ class Wall {
           slide.style.bottom = 0;
           slide.style.left = 0;
         });
+
         slides.reverse().forEach((slide, index) => slide.style.zIndex = index + 1);
+
+        if (arrows.length) {
+          arrows.forEach(arrow => arrow.style.zIndex = slides.length + 1);
+        }
       }
     });
     return this;
@@ -302,6 +308,14 @@ class Wall {
 
       this._animateScreen(this.currentSection, this.sections);
     }
+  }
+
+  prevSlide() {
+
+  }
+
+  nextSlide() {
+
   }
 
 }

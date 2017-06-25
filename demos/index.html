@@ -99,6 +99,21 @@
     .wall-nav>li:hover {
       background-color: #fff;
     }
+
+    .prev-slide,
+    .next-slide {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .prev-slide {
+      left: 20px;
+    }
+
+    .next-slide {
+      right: 20px;
+    }
   </style>
 </head>
 
@@ -111,6 +126,8 @@
       <div style="background-color: #ffecb3" data-wall-slide>
         <h1>First Screen Slide 2</h1>
       </div>
+      <button data-wall-slide-arrow class="prev-slide btn btn-secondary">Prev Slide</button>
+      <button data-wall-slide-arrow class="next-slide btn btn-success">Next Slide</button>
     </section>
     <section class="section-2">
       <div style="background-color: #e1f5fe" data-wall-slide>

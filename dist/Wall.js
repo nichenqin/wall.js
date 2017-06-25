@@ -272,7 +272,8 @@ var Wall = function () {
     value: function _setupSlides() {
       this.sections.forEach(function (section) {
         var slides = (0, _utils.toArray)(section.querySelectorAll('[data-wall-slide]'));
-        if (slides) {
+        var arrows = (0, _utils.toArray)(section.querySelectorAll('[data-wall-slide-arrow]'));
+        if (slides.length) {
           slides.forEach(function (slide) {
             slide.style.position = 'absolute';
             slide.style.top = 0;
@@ -282,9 +283,16 @@ var Wall = function () {
             slide.style.bottom = 0;
             slide.style.left = 0;
           });
+
           slides.reverse().forEach(function (slide, index) {
             return slide.style.zIndex = index + 1;
           });
+
+          if (arrows.length) {
+            arrows.forEach(function (arrow) {
+              return arrow.style.zIndex = slides.length + 1;
+            });
+          }
         }
       });
       return this;
@@ -468,6 +476,12 @@ var Wall = function () {
         this._animateScreen(this.currentSection, this.sections);
       }
     }
+  }, {
+    key: 'prevSlide',
+    value: function prevSlide() {}
+  }, {
+    key: 'nextSlide',
+    value: function nextSlide() {}
   }]);
 
   return Wall;
