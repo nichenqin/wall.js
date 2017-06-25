@@ -60,11 +60,9 @@ class Wall {
   _handleKeyDown(e) {
     switch (e.keyCode) {
       case 34: case 39: case 40:
-        this.next();
         break;
 
       case 33: case 37: case 38:
-        this.prev();
         break;
 
       case 36:
@@ -111,9 +109,8 @@ class Wall {
 
   _handleWheelEvent(e) {
     const delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
-    const { scrollHeight, scrollTop, clientHeight } = this.currentSection;
-    if (scrollHeight - scrollTop === clientHeight && delta === -1) this.next();
-    if (scrollTop === 0 && delta === 1) this.prev();
+    if (delta === -1) this.next();
+    if (delta === 1) this.prev();
 
     return this;
   }
@@ -231,7 +228,7 @@ class Wall {
   }
 
   prev() {
-    if (!this.options.loopToBottom && this.getCurrentSectionIndex() == 1) return;
+    if (!(this.currentSection.scrollTop === 0) || !this.options.loopToBottom && this.getCurrentSectionIndex() == 1) return;
 
     if (!this.isAnimating) {
       // reverse the sections array and set the last section to be the current section
@@ -245,7 +242,9 @@ class Wall {
   }
 
   next() {
-    if (!this.options.loopToTop && this.getCurrentSectionIndex() == this.sections.length) return;
+    const { scrollHeight, scrollTop, clientHeight } = this.currentSection;
+
+    if (!(scrollHeight - scrollTop === clientHeight) || !this.options.loopToTop && this.getCurrentSectionIndex() == this.sections.length) return;
 
     if (!this.isAnimating) {
       // move current section to last of the queue

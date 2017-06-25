@@ -172,11 +172,9 @@ var Wall = function () {
     value: function _handleKeyDown(e) {
       switch (e.keyCode) {
         case 34:case 39:case 40:
-          this.next();
           break;
 
         case 33:case 37:case 38:
-          this.prev();
           break;
 
         case 36:
@@ -229,13 +227,8 @@ var Wall = function () {
     key: '_handleWheelEvent',
     value: function _handleWheelEvent(e) {
       var delta = Math.max(-1, Math.min(1, e.wheelDelta || -e.detail));
-      var _currentSection = this.currentSection,
-          scrollHeight = _currentSection.scrollHeight,
-          scrollTop = _currentSection.scrollTop,
-          clientHeight = _currentSection.clientHeight;
-
-      if (scrollHeight - scrollTop === clientHeight && delta === -1) this.next();
-      if (scrollTop === 0 && delta === 1) this.prev();
+      if (delta === -1) this.next();
+      if (delta === 1) this.prev();
 
       return this;
     }
@@ -379,7 +372,7 @@ var Wall = function () {
   }, {
     key: 'prev',
     value: function prev() {
-      if (!this.options.loopToBottom && this.getCurrentSectionIndex() == 1) return;
+      if (!(this.currentSection.scrollTop === 0) || !this.options.loopToBottom && this.getCurrentSectionIndex() == 1) return;
 
       if (!this.isAnimating) {
         var _sections$reverse = this.sections.reverse();
@@ -399,7 +392,13 @@ var Wall = function () {
   }, {
     key: 'next',
     value: function next() {
-      if (!this.options.loopToTop && this.getCurrentSectionIndex() == this.sections.length) return;
+      var _currentSection = this.currentSection,
+          scrollHeight = _currentSection.scrollHeight,
+          scrollTop = _currentSection.scrollTop,
+          clientHeight = _currentSection.clientHeight;
+
+
+      if (!(scrollHeight - scrollTop === clientHeight) || !this.options.loopToTop && this.getCurrentSectionIndex() == this.sections.length) return;
 
       if (!this.isAnimating) {
         // move current section to last of the queue
