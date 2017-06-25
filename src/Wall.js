@@ -4,8 +4,7 @@ import { rAF, cAF, hasTransform3d, transformProp, mousewheelEvent, getScreenHeig
 
 const defaultOptions = {
   wrapperZIndex: 1,
-  animateDirection: 'top',
-  animateDuration: 1,
+  sectionAnimateDuration: 1,
   easeFunction: easeInOutExpo,
   loopToBottom: false,
   loopToTop: false,
@@ -112,15 +111,16 @@ class Wall {
 
   _handleWheelEvent(e) {
     const delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
-    if (delta === 1) this.prev();
-    if (delta === -1) this.next();
+    const { scrollHeight, scrollTop, clientHeight } = this.currentSection;
+    if (scrollHeight - scrollTop === clientHeight && delta === -1) this.next();
+    if (scrollTop === 0 && delta === 1) this.prev();
+
     return this;
   }
 
   _setupNav() {
     if (this.navElement) {
       this.navElement.style.zIndex = this.options.wrapperZIndex + 1;
-      this.navElement.style.position = 'absolute';
 
       this.navItems.forEach((item, index) => {
         item.setAttribute('data-wall-nav-index', index + 1);
@@ -156,6 +156,8 @@ class Wall {
     this.sections.forEach(section => {
       section.style.position = 'absolute';
       section.style.top = 0;
+      section.style.overflowX = 'hidden';
+      section.style.overflowY = 'auto';
       section.style.right = 0;
       section.style.bottom = 0;
       section.style.left = 0;
@@ -202,7 +204,7 @@ class Wall {
   }
 
   _updateCurrentSectionPosition(delta) {
-    const duration = this.currentSection.getAttribute('data-wall-animate-duration') || this.options.animateDuration;
+    const duration = this.currentSection.getAttribute('data-wall-animate-duration') || this.options.sectionAnimateDuration;
     const target = this.isToBack ? 0 : 100;
 
     this.currentSectionPosition = this.options.easeFunction(delta, this.currentSectionPosition, target - this.currentSectionPosition, duration);
@@ -211,28 +213,10 @@ class Wall {
   }
 
   _renderSectionPosition(section, pos) {
-    switch (this.currentSection.getAttribute('data-wall-animate-direction') || this.options.animateDirection) {
-      case 'top':
-        section.style[transformProp] = `translate(0, -${pos}%) ${this.translateZ}`;
-        break;
-      case 'bottom':
-        section.style[transformProp] = `translate(0, ${pos}%) ${this.translateZ}`;
-        break;
-      case 'left':
-        section.style[transformProp] = `translate(-${pos}%, 0) ${this.translateZ}`;
-        break;
-      case 'right':
-        section.style[transformProp] = `translate(${pos}%, 0) ${this.translateZ}`;
-        break;
-
-      default:
-        section.style[transformProp] = `translate(0, -${pos}%) ${this.translateZ}`;
-        break;
-    }
-
+    section.style[transformProp] = `translate(0, -${pos}%) ${this.translateZ}`;
   }
 
-  _getCurrentSectionIndex() {
+  getCurrentSectionIndex() {
     return this.currentSection.getAttribute('data-wall-section-index');
   }
 
@@ -241,13 +225,13 @@ class Wall {
       const { navItemActiveClass } = this.options;
       this.navItems.forEach(item => { removeClass(item, navItemActiveClass); });
 
-      const currentNav = this.navItems.find(item => item.getAttribute('data-wall-nav-index') === this._getCurrentSectionIndex());
+      const currentNav = this.navItems.find(item => item.getAttribute('data-wall-nav-index') === this.getCurrentSectionIndex());
       addClass(currentNav, navItemActiveClass);
     }
   }
 
   prev() {
-    if (!this.options.loopToBottom && this._getCurrentSectionIndex() == 1) return;
+    if (!this.options.loopToBottom && this.getCurrentSectionIndex() == 1) return;
 
     if (!this.isAnimating) {
       // reverse the sections array and set the last section to be the current section
@@ -261,7 +245,7 @@ class Wall {
   }
 
   next() {
-    if (!this.options.loopToTop && this._getCurrentSectionIndex() == this.sections.length) return;
+    if (!this.options.loopToTop && this.getCurrentSectionIndex() == this.sections.length) return;
 
     if (!this.isAnimating) {
       // move current section to last of the queue
@@ -275,7 +259,7 @@ class Wall {
 
   goTo(index) {
 
-    if (index === this._getCurrentSectionIndex()) return;
+    if (index === this.getCurrentSectionIndex()) return;
 
     if (!this.isAnimating) {
       this.sections = toArray(this.wrapper.children);
@@ -286,7 +270,7 @@ class Wall {
 
       this.sections = [targetSection, ...nextSections, ...prevSections];
 
-      this._refreshAnimateStatus(index < this._getCurrentSectionIndex());
+      this._refreshAnimateStatus(index < this.getCurrentSectionIndex());
 
       if (this.isToBack) {
         this.currentSection = targetSection;

@@ -101,8 +101,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var defaultOptions = {
   wrapperZIndex: 1,
-  animateDirection: 'top',
-  animateDuration: 1,
+  sectionAnimateDuration: 1,
   easeFunction: _easing.easeInOutExpo,
   loopToBottom: false,
   loopToTop: false,
@@ -230,8 +229,14 @@ var Wall = function () {
     key: '_handleWheelEvent',
     value: function _handleWheelEvent(e) {
       var delta = Math.max(-1, Math.min(1, e.wheelDelta || -e.detail));
-      if (delta === 1) this.prev();
-      if (delta === -1) this.next();
+      var _currentSection = this.currentSection,
+          scrollHeight = _currentSection.scrollHeight,
+          scrollTop = _currentSection.scrollTop,
+          clientHeight = _currentSection.clientHeight;
+
+      if (scrollHeight - scrollTop === clientHeight && delta === -1) this.next();
+      if (scrollTop === 0 && delta === 1) this.prev();
+
       return this;
     }
   }, {
@@ -241,7 +246,6 @@ var Wall = function () {
 
       if (this.navElement) {
         this.navElement.style.zIndex = this.options.wrapperZIndex + 1;
-        this.navElement.style.position = 'absolute';
 
         this.navItems.forEach(function (item, index) {
           item.setAttribute('data-wall-nav-index', index + 1);
@@ -281,6 +285,8 @@ var Wall = function () {
       this.sections.forEach(function (section) {
         section.style.position = 'absolute';
         section.style.top = 0;
+        section.style.overflowX = 'hidden';
+        section.style.overflowY = 'auto';
         section.style.right = 0;
         section.style.bottom = 0;
         section.style.left = 0;
@@ -335,7 +341,7 @@ var Wall = function () {
   }, {
     key: '_updateCurrentSectionPosition',
     value: function _updateCurrentSectionPosition(delta) {
-      var duration = this.currentSection.getAttribute('data-wall-animate-duration') || this.options.animateDuration;
+      var duration = this.currentSection.getAttribute('data-wall-animate-duration') || this.options.sectionAnimateDuration;
       var target = this.isToBack ? 0 : 100;
 
       this.currentSectionPosition = this.options.easeFunction(delta, this.currentSectionPosition, target - this.currentSectionPosition, duration);
@@ -345,28 +351,11 @@ var Wall = function () {
   }, {
     key: '_renderSectionPosition',
     value: function _renderSectionPosition(section, pos) {
-      switch (this.currentSection.getAttribute('data-wall-animate-direction') || this.options.animateDirection) {
-        case 'top':
-          section.style[_dom.transformProp] = 'translate(0, -' + pos + '%) ' + this.translateZ;
-          break;
-        case 'bottom':
-          section.style[_dom.transformProp] = 'translate(0, ' + pos + '%) ' + this.translateZ;
-          break;
-        case 'left':
-          section.style[_dom.transformProp] = 'translate(-' + pos + '%, 0) ' + this.translateZ;
-          break;
-        case 'right':
-          section.style[_dom.transformProp] = 'translate(' + pos + '%, 0) ' + this.translateZ;
-          break;
-
-        default:
-          section.style[_dom.transformProp] = 'translate(0, -' + pos + '%) ' + this.translateZ;
-          break;
-      }
+      section.style[_dom.transformProp] = 'translate(0, -' + pos + '%) ' + this.translateZ;
     }
   }, {
-    key: '_getCurrentSectionIndex',
-    value: function _getCurrentSectionIndex() {
+    key: 'getCurrentSectionIndex',
+    value: function getCurrentSectionIndex() {
       return this.currentSection.getAttribute('data-wall-section-index');
     }
   }, {
@@ -382,7 +371,7 @@ var Wall = function () {
         });
 
         var currentNav = this.navItems.find(function (item) {
-          return item.getAttribute('data-wall-nav-index') === _this5._getCurrentSectionIndex();
+          return item.getAttribute('data-wall-nav-index') === _this5.getCurrentSectionIndex();
         });
         (0, _utils.addClass)(currentNav, navItemActiveClass);
       }
@@ -390,7 +379,7 @@ var Wall = function () {
   }, {
     key: 'prev',
     value: function prev() {
-      if (!this.options.loopToBottom && this._getCurrentSectionIndex() == 1) return;
+      if (!this.options.loopToBottom && this.getCurrentSectionIndex() == 1) return;
 
       if (!this.isAnimating) {
         var _sections$reverse = this.sections.reverse();
@@ -410,7 +399,7 @@ var Wall = function () {
   }, {
     key: 'next',
     value: function next() {
-      if (!this.options.loopToTop && this._getCurrentSectionIndex() == this.sections.length) return;
+      if (!this.options.loopToTop && this.getCurrentSectionIndex() == this.sections.length) return;
 
       if (!this.isAnimating) {
         // move current section to last of the queue
@@ -423,7 +412,7 @@ var Wall = function () {
     key: 'goTo',
     value: function goTo(index) {
 
-      if (index === this._getCurrentSectionIndex()) return;
+      if (index === this.getCurrentSectionIndex()) return;
 
       if (!this.isAnimating) {
         this.sections = (0, _utils.toArray)(this.wrapper.children);
@@ -436,7 +425,7 @@ var Wall = function () {
 
         this.sections = [targetSection].concat(_toConsumableArray(nextSections), _toConsumableArray(prevSections));
 
-        this._refreshAnimateStatus(index < this._getCurrentSectionIndex());
+        this._refreshAnimateStatus(index < this.getCurrentSectionIndex());
 
         if (this.isToBack) {
           this.currentSection = targetSection;
