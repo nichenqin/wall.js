@@ -5,8 +5,10 @@ import { rAF, cAF, hasTransform3d, transformProp, mousewheelEvent, getScreenHeig
 const defaultOptions = {
   wrapperZIndex: 1,
   animateDirection: 'top',
-  easeFunction: easeInOutExpo,
   animateDuration: 1,
+  easeFunction: easeInOutExpo,
+  loopToBottom: false,
+  loopToTop: false,
   navElement: '.wall-nav',
   navItemActiveClass: 'active'
 };
@@ -69,7 +71,7 @@ class Wall {
       case 36:
         this.goTo(1);
 
-      case 36:
+      case 35:
         this.goTo(this.sections.length);
 
       default:
@@ -245,6 +247,8 @@ class Wall {
   }
 
   prev() {
+    if (!this.options.loopToBottom && this._getCurrentSectionIndex() == 1) return;
+
     if (!this.isAnimating) {
       // reverse the sections array and set the last section to be the current section
       [this.currentSection, ...this.restSections] = this.sections.reverse();
@@ -257,6 +261,8 @@ class Wall {
   }
 
   next() {
+    if (!this.options.loopToTop && this._getCurrentSectionIndex() == this.sections.length) return;
+
     if (!this.isAnimating) {
       // move current section to last of the queue
       this.sections = [...this.restSections, this.currentSection];
@@ -268,11 +274,12 @@ class Wall {
   }
 
   goTo(index) {
+
+    if (index === this._getCurrentSectionIndex()) return;
+
     if (!this.isAnimating) {
       this.sections = toArray(this.wrapper.children);
-      const targetSection = this.sections.find(section => section.getAttribute('data-wall-section-index') === index);
-
-      if (targetSection == this.currentSection) return;
+      const targetSection = this.sections.find(section => section.getAttribute('data-wall-section-index') == index);
 
       const prevSections = this.sections.slice(0, index - 1);
       const nextSections = this.sections.slice(index);

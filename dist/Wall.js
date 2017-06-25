@@ -102,8 +102,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var defaultOptions = {
   wrapperZIndex: 1,
   animateDirection: 'top',
-  easeFunction: _easing.easeInOutExpo,
   animateDuration: 1,
+  easeFunction: _easing.easeInOutExpo,
+  loopToBottom: false,
+  loopToTop: false,
   navElement: '.wall-nav',
   navItemActiveClass: 'active'
 };
@@ -181,7 +183,7 @@ var Wall = function () {
         case 36:
           this.goTo(1);
 
-        case 36:
+        case 35:
           this.goTo(this.sections.length);
 
         default:
@@ -388,6 +390,8 @@ var Wall = function () {
   }, {
     key: 'prev',
     value: function prev() {
+      if (!this.options.loopToBottom && this._getCurrentSectionIndex() == 1) return;
+
       if (!this.isAnimating) {
         var _sections$reverse = this.sections.reverse();
         // reverse the sections array and set the last section to be the current section
@@ -406,6 +410,8 @@ var Wall = function () {
   }, {
     key: 'next',
     value: function next() {
+      if (!this.options.loopToTop && this._getCurrentSectionIndex() == this.sections.length) return;
+
       if (!this.isAnimating) {
         // move current section to last of the queue
         this.sections = [].concat(_toConsumableArray(this.restSections), [this.currentSection]);
@@ -416,13 +422,14 @@ var Wall = function () {
   }, {
     key: 'goTo',
     value: function goTo(index) {
+
+      if (index === this._getCurrentSectionIndex()) return;
+
       if (!this.isAnimating) {
         this.sections = (0, _utils.toArray)(this.wrapper.children);
         var targetSection = this.sections.find(function (section) {
-          return section.getAttribute('data-wall-section-index') === index;
+          return section.getAttribute('data-wall-section-index') == index;
         });
-
-        if (targetSection == this.currentSection) return;
 
         var prevSections = this.sections.slice(0, index - 1);
         var nextSections = this.sections.slice(index);
