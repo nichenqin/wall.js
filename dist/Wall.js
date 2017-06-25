@@ -127,7 +127,7 @@ var Wall = function () {
     // the position of current section, used to move currentSection
     this.currentSectionPosition = 0;
 
-    this.currentSectionSlides = undefined;
+    this.currentSlides = undefined;
 
     // mark if use transform 3d for smooth animation
     this.translateZ = _dom.hasTransform3d ? 'translateZ(0)' : '';
@@ -168,7 +168,7 @@ var Wall = function () {
   }, {
     key: '_refresh',
     value: function _refresh(force) {
-      if (force) this._setupSize()._cssBody()._cssWrapper()._setupSections()._cssSections()._queueSections()._setupSlides()._cssSlides()._setupNav();
+      if (force) this._setupSize()._cssBody()._cssWrapper()._setupSections()._cssSections()._queue(this.sections)._setupSlides()._setupNav();
 
       (0, _dom.cAF)(this.requestId);
       this.isAnimating = false;
@@ -177,6 +177,13 @@ var Wall = function () {
 
       this.currentSection = _sections[0];
       this.restSections = _sections.slice(1);
+
+      this.currentSlides = (0, _utils.toArray)(this.currentSection.querySelectorAll('[data-wall-slide'));
+
+      var _currentSlides = _toArray(this.currentSlides);
+
+      this.currentSlide = _currentSlides[0];
+      this.restSlides = _currentSlides.slice(1);
 
 
       this._renderNavElement();
@@ -204,11 +211,18 @@ var Wall = function () {
   }, {
     key: '_handleKeyDown',
     value: function _handleKeyDown(e) {
+      var _currentSection = this.currentSection,
+          scrollTop = _currentSection.scrollTop,
+          scrollHeight = _currentSection.scrollHeight,
+          clientHeight = _currentSection.clientHeight;
+
       switch (e.keyCode) {
-        case 34:case 39:case 40:
+        case 34:case 40:
+          if (scrollHeight - scrollTop <= clientHeight) this.nextSection();
           break;
 
-        case 33:case 37:case 38:
+        case 33:case 38:
+          if (scrollTop === 0) this.prevSection();
           break;
 
         case 36:
@@ -224,9 +238,14 @@ var Wall = function () {
   }, {
     key: '_handleWheelEvent',
     value: function _handleWheelEvent(e) {
+      var _currentSection2 = this.currentSection,
+          scrollTop = _currentSection2.scrollTop,
+          scrollHeight = _currentSection2.scrollHeight,
+          clientHeight = _currentSection2.clientHeight;
+
       var delta = Math.max(-1, Math.min(1, e.wheelDelta || -e.detail));
-      if (delta === -1) this.nextSection();
-      if (delta === 1) this.prevSection();
+      if (scrollHeight - scrollTop <= clientHeight && delta === -1) this.nextSection();
+      if (scrollTop === 0 && delta === 1) this.prevSection();
 
       return this;
     }
@@ -253,25 +272,22 @@ var Wall = function () {
     value: function _setupSlides() {
       this.sections.forEach(function (section) {
         var slides = (0, _utils.toArray)(section.querySelectorAll('[data-wall-slide]'));
-        slides.forEach(function (slide) {
-          slide.style.position = 'absolute';
-          slide.style.top = 0;
-          slide.style.overflowX = 'hidden';
-          slide.style.overflowY = 'auto';
-          slide.style.right = 0;
-          slide.style.bottom = 0;
-          slide.style.left = 0;
-        });
-        slides.reverse().forEach(function (slide, index) {
-          return slide.style.zIndex = index;
-        });
+        if (slides) {
+          slides.forEach(function (slide) {
+            slide.style.position = 'absolute';
+            slide.style.top = 0;
+            slide.style.overflowX = 'hidden';
+            slide.style.overflowY = 'auto';
+            slide.style.right = 0;
+            slide.style.bottom = 0;
+            slide.style.left = 0;
+          });
+          slides.reverse().forEach(function (slide, index) {
+            return slide.style.zIndex = index + 1;
+          });
+        }
       });
       return this;
-    }
-  }, {
-    key: '_css',
-    value: function _css() {
-      return this._cssBody()._cssWrapper()._cssSections();
     }
   }, {
     key: '_cssBody',
@@ -283,11 +299,11 @@ var Wall = function () {
   }, {
     key: '_cssWrapper',
     value: function _cssWrapper() {
-      this.wrapper.style.zIndex = this.options.wrapperZIndex;
-      this.wrapper.style.height = this.size.Y + 'px';
-      this.wrapper.style.width = '100%';
-      this.wrapper.style.overflow = 'hidden';
       this.wrapper.style.position = 'relative';
+      this.wrapper.style.overflow = 'hidden';
+      this.wrapper.style.width = '100%';
+      this.wrapper.style.height = this.size.Y + 'px';
+      this.wrapper.style.zIndex = this.options.wrapperZIndex;
       return this;
     }
   }, {
@@ -296,40 +312,25 @@ var Wall = function () {
       this.sections.forEach(function (section) {
         section.style.position = 'absolute';
         section.style.top = 0;
-        section.style.overflowX = 'hidden';
-        section.style.overflowY = 'auto';
         section.style.right = 0;
         section.style.bottom = 0;
         section.style.left = 0;
+        section.style.overflowX = 'hidden';
+        section.style.overflowY = 'auto';
       });
       return this;
     }
   }, {
-    key: '_cssSlides',
-    value: function _cssSlides() {
-      var slides = (0, _utils.toArray)(this.wrapper.querySelectorAll('[data-wall-slide]'));
-      slides.forEach(function (slide) {
-        slide.style.position = 'absolute';
-        slide.style.top = 0;
-        slide.style.overflowX = 'hidden';
-        slide.style.overflowY = 'auto';
-        slide.style.right = 0;
-        slide.style.bottom = 0;
-        slide.style.left = 0;
-      });
-      return this;
-    }
-  }, {
-    key: '_queueSections',
-    value: function _queueSections() {
+    key: '_queue',
+    value: function _queue(screenList) {
       var _this4 = this;
 
-      this.sections.reverse().forEach(function (section, index) {
+      screenList.reverse().forEach(function (section, index) {
         section.style.zIndex = index + 1;
       });
-      this.sections.reverse();
+      screenList.reverse();
 
-      this.sections.forEach(function (section) {
+      screenList.forEach(function (section) {
         return _this4._renderSectionPosition(section, 0);
       });
 
@@ -346,22 +347,21 @@ var Wall = function () {
       return this;
     }
   }, {
-    key: '_animateCurrentSection',
-    value: function _animateCurrentSection() {
-
+    key: '_animateScreen',
+    value: function _animateScreen(currentScreen, screenList) {
       var now = Date.now();
       var delta = (now - this.lastTime) / 1000;
 
-      this.currentSection.style.zIndex = this.sections.length + 1;
+      currentScreen.style.zIndex = screenList.length + 1;
 
-      this._updateCurrentSectionPosition(delta)._renderSectionPosition(this.currentSection, this.currentSectionPosition);
+      this._updateCurrentSectionPosition(delta)._renderSectionPosition(currentScreen, this.currentSectionPosition);
 
       if (this.currentSectionPosition >= 100 || this.currentSectionPosition < 0.1 && this.isToBack) {
-        return this._refresh()._queueSections();
+        return this._refresh()._queue(screenList);
       };
 
       if (this.isAnimating) {
-        return this.requestId = (0, _dom.rAF)(this._animateCurrentSection.bind(this));
+        return this.requestId = (0, _dom.rAF)(this._animateScreen.bind(this, currentScreen, screenList));
       };
     }
   }, {
@@ -419,16 +419,16 @@ var Wall = function () {
 
         this.sections = [this.currentSection].concat(_toConsumableArray(this.restSections.reverse()));
 
-        this._refreshAnimateStatus(true)._animateCurrentSection();
+        this._refreshAnimateStatus(true)._animateScreen(this.currentSection, this.sections);
       }
     }
   }, {
     key: 'nextSection',
     value: function nextSection() {
-      var _currentSection = this.currentSection,
-          scrollHeight = _currentSection.scrollHeight,
-          scrollTop = _currentSection.scrollTop,
-          clientHeight = _currentSection.clientHeight;
+      var _currentSection3 = this.currentSection,
+          scrollHeight = _currentSection3.scrollHeight,
+          scrollTop = _currentSection3.scrollTop,
+          clientHeight = _currentSection3.clientHeight;
 
 
       if (!(scrollHeight - scrollTop === clientHeight) || !this.options.loopToTop && this.getCurrentSectionIndex() == this.sections.length) return;
@@ -437,7 +437,7 @@ var Wall = function () {
         // move current section to last of the queue
         this.sections = [].concat(_toConsumableArray(this.restSections), [this.currentSection]);
 
-        this._refreshAnimateStatus(false)._animateCurrentSection();
+        this._refreshAnimateStatus(false)._animateScreen(this.currentSection, this.sections);
       }
     }
   }, {
@@ -462,10 +462,10 @@ var Wall = function () {
         if (this.isToBack) {
           this.currentSection = targetSection;
         } else {
-          this._queueSections();
+          this._queue(this.sections);
         }
 
-        this._animateCurrentSection();
+        this._animateScreen(this.currentSection, this.sections);
       }
     }
   }]);

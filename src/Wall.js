@@ -26,7 +26,7 @@ class Wall {
     // the position of current section, used to move currentSection
     this.currentSectionPosition = 0;
 
-    this.currentSectionSlides = undefined;
+    this.currentSlides = undefined;
 
     // mark if use transform 3d for smooth animation
     this.translateZ = hasTransform3d ? 'translateZ(0)' : '';
@@ -63,14 +63,16 @@ class Wall {
     if (force)
       this
         ._setupSize()._cssBody()._cssWrapper()
-        ._setupSections()._cssSections()._queueSections()
-        ._setupSlides()._cssSlides()
+        ._setupSections()._cssSections()._queue(this.sections)
+        ._setupSlides()
         ._setupNav();
 
     cAF(this.requestId);
     this.isAnimating = false;
 
     [this.currentSection, ...this.restSections] = this.sections;
+    this.currentSlides = toArray(this.currentSection.querySelectorAll('[data-wall-slide'));
+    [this.currentSlide, ...this.restSlides] = this.currentSlides;
 
     this._renderNavElement();
 
@@ -92,11 +94,14 @@ class Wall {
   }
 
   _handleKeyDown(e) {
+    const { scrollTop, scrollHeight, clientHeight } = this.currentSection;
     switch (e.keyCode) {
-      case 34: case 39: case 40:
+      case 34: case 40:
+        if (scrollHeight - scrollTop <= clientHeight) this.nextSection();
         break;
 
-      case 33: case 37: case 38:
+      case 33: case 38:
+        if (scrollTop === 0) this.prevSection();
         break;
 
       case 36:
@@ -111,9 +116,10 @@ class Wall {
   }
 
   _handleWheelEvent(e) {
+    const { scrollTop, scrollHeight, clientHeight } = this.currentSection;
     const delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
-    if (delta === -1) this.nextSection();
-    if (delta === 1) this.prevSection();
+    if (scrollHeight - scrollTop <= clientHeight && delta === -1) this.nextSection();
+    if (scrollTop === 0 && delta === 1) this.prevSection();
 
     return this;
   }
@@ -136,22 +142,20 @@ class Wall {
   _setupSlides() {
     this.sections.forEach(section => {
       const slides = toArray(section.querySelectorAll('[data-wall-slide]'));
-      slides.forEach(slide => {
-        slide.style.position = 'absolute';
-        slide.style.top = 0;
-        slide.style.overflowX = 'hidden';
-        slide.style.overflowY = 'auto';
-        slide.style.right = 0;
-        slide.style.bottom = 0;
-        slide.style.left = 0;
-      });
-      slides.reverse().forEach((slide, index) => slide.style.zIndex = index);
+      if (slides) {
+        slides.forEach(slide => {
+          slide.style.position = 'absolute';
+          slide.style.top = 0;
+          slide.style.overflowX = 'hidden';
+          slide.style.overflowY = 'auto';
+          slide.style.right = 0;
+          slide.style.bottom = 0;
+          slide.style.left = 0;
+        });
+        slides.reverse().forEach((slide, index) => slide.style.zIndex = index + 1);
+      }
     });
     return this;
-  }
-
-  _css() {
-    return this._cssBody()._cssWrapper()._cssSections();
   }
 
   _cssBody() {
@@ -161,11 +165,11 @@ class Wall {
   }
 
   _cssWrapper() {
-    this.wrapper.style.zIndex = this.options.wrapperZIndex;
-    this.wrapper.style.height = this.size.Y + 'px';
-    this.wrapper.style.width = '100%';
-    this.wrapper.style.overflow = 'hidden';
     this.wrapper.style.position = 'relative';
+    this.wrapper.style.overflow = 'hidden';
+    this.wrapper.style.width = '100%';
+    this.wrapper.style.height = this.size.Y + 'px';
+    this.wrapper.style.zIndex = this.options.wrapperZIndex;
     return this;
   }
 
@@ -173,34 +177,20 @@ class Wall {
     this.sections.forEach(section => {
       section.style.position = 'absolute';
       section.style.top = 0;
-      section.style.overflowX = 'hidden';
-      section.style.overflowY = 'auto';
       section.style.right = 0;
       section.style.bottom = 0;
       section.style.left = 0;
+      section.style.overflowX = 'hidden';
+      section.style.overflowY = 'auto';
     });
     return this;
   }
 
-  _cssSlides() {
-    const slides = toArray(this.wrapper.querySelectorAll('[data-wall-slide]'));
-    slides.forEach(slide => {
-      slide.style.position = 'absolute';
-      slide.style.top = 0;
-      slide.style.overflowX = 'hidden';
-      slide.style.overflowY = 'auto';
-      slide.style.right = 0;
-      slide.style.bottom = 0;
-      slide.style.left = 0;
-    });
-    return this;
-  }
+  _queue(screenList) {
+    screenList.reverse().forEach((section, index) => { section.style.zIndex = index + 1; });
+    screenList.reverse();
 
-  _queueSections() {
-    this.sections.reverse().forEach((section, index) => { section.style.zIndex = index + 1; });
-    this.sections.reverse();
-
-    this.sections.forEach(section => this._renderSectionPosition(section, 0));
+    screenList.forEach(section => this._renderSectionPosition(section, 0));
 
     return this;
   }
@@ -214,23 +204,22 @@ class Wall {
     return this;
   }
 
-  _animateCurrentSection() {
-
+  _animateScreen(currentScreen, screenList) {
     const now = Date.now();
     const delta = (now - this.lastTime) / 1000;
 
-    this.currentSection.style.zIndex = this.sections.length + 1;
+    currentScreen.style.zIndex = screenList.length + 1;
 
     this
       ._updateCurrentSectionPosition(delta)
-      ._renderSectionPosition(this.currentSection, this.currentSectionPosition);
+      ._renderSectionPosition(currentScreen, this.currentSectionPosition);
 
     if (this.currentSectionPosition >= 100 || (this.currentSectionPosition < 0.1 && this.isToBack)) {
-      return this._refresh()._queueSections();
+      return this._refresh()._queue(screenList);
     };
 
     if (this.isAnimating) {
-      return this.requestId = rAF(this._animateCurrentSection.bind(this));
+      return this.requestId = rAF(this._animateScreen.bind(this, currentScreen, screenList));
     };
   }
 
@@ -271,7 +260,7 @@ class Wall {
 
       this
         ._refreshAnimateStatus(true)
-        ._animateCurrentSection();
+        ._animateScreen(this.currentSection, this.sections);
     }
   }
 
@@ -286,7 +275,7 @@ class Wall {
 
       this
         ._refreshAnimateStatus(false)
-        ._animateCurrentSection();
+        ._animateScreen(this.currentSection, this.sections);
     }
   }
 
@@ -308,10 +297,10 @@ class Wall {
       if (this.isToBack) {
         this.currentSection = targetSection;
       } else {
-        this._queueSections();
+        this._queue(this.sections);
       }
 
-      this._animateCurrentSection();
+      this._animateScreen(this.currentSection, this.sections);
     }
   }
 
