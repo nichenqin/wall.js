@@ -124,12 +124,13 @@ var Wall = function () {
     this.sections = this.wrapper.children.length ? (0, _utils.toArray)(this.wrapper.children) : (0, _utils.throwNewError)(_templateObject2);
     this.currentSection = null;
     this.restSections = null;
-    // the position of current section, used to move currentSection
-    this.currentSectionPosition = 0;
 
     this.currentSlides = undefined;
     this.currentSlide = undefined;
     this.restSlides = undefined;
+
+    // the position of current section, used to move currentSection
+    this.currentScreenPosition = 0;
 
     // mark if use transform 3d for smooth animation
     this.translateZ = _dom.hasTransform3d ? 'translateZ(0)' : '';
@@ -359,7 +360,7 @@ var Wall = function () {
     value: function _refreshAnimateStatus(isToBack) {
       this.isToBack = isToBack;
       (0, _dom.cAF)(this.requestId);
-      this.currentSectionPosition = this.isToBack ? 100 : 0;
+      this.currentScreenPosition = this.isToBack ? 100 : 0;
       this.isAnimating = true;
       this.lastTime = Date.now();
       return this;
@@ -372,9 +373,9 @@ var Wall = function () {
 
       currentScreen.style.zIndex = screenList.length + 1;
 
-      this._updateCurrentSectionPosition(delta)._renderSectionPosition(currentScreen, this.currentSectionPosition);
+      this._updateCurrentScreenPosition(delta)._renderSectionPosition(currentScreen, this.currentScreenPosition);
 
-      if (this.currentSectionPosition >= 100 || this.currentSectionPosition < 0.1 && this.isToBack) {
+      if (this.currentScreenPosition >= 100 || this.currentScreenPosition < 0.1 && this.isToBack) {
         return this._refresh()._queue(screenList);
       };
 
@@ -383,12 +384,12 @@ var Wall = function () {
       };
     }
   }, {
-    key: '_updateCurrentSectionPosition',
-    value: function _updateCurrentSectionPosition(delta) {
+    key: '_updateCurrentScreenPosition',
+    value: function _updateCurrentScreenPosition(delta) {
       var duration = this.currentSection.getAttribute('data-wall-animate-duration') || this.options.sectionAnimateDuration;
       var target = this.isToBack ? 0 : 100;
 
-      this.currentSectionPosition = this.options.easeFunction(delta, this.currentSectionPosition, target - this.currentSectionPosition, duration);
+      this.currentScreenPosition = this.options.easeFunction(delta, this.currentScreenPosition, target - this.currentScreenPosition, duration);
 
       return this;
     }
@@ -423,7 +424,7 @@ var Wall = function () {
   }, {
     key: 'prevSection',
     value: function prevSection() {
-      if (!(this.currentSection.scrollTop === 0) || !this.options.loopToBottom && this.getCurrentSectionIndex() == 1) return;
+      if (!this.options.loopToBottom && this.getCurrentSectionIndex() == 1) return;
 
       if (!this.isAnimating) {
         var _sections$reverse = this.sections.reverse();
@@ -443,13 +444,7 @@ var Wall = function () {
   }, {
     key: 'nextSection',
     value: function nextSection() {
-      var _currentSection3 = this.currentSection,
-          scrollHeight = _currentSection3.scrollHeight,
-          scrollTop = _currentSection3.scrollTop,
-          clientHeight = _currentSection3.clientHeight;
-
-
-      if (!(scrollHeight - scrollTop === clientHeight) || !this.options.loopToTop && this.getCurrentSectionIndex() == this.sections.length) return;
+      if (!this.options.loopToTop && this.getCurrentSectionIndex() == this.sections.length) return;
 
       if (!this.isAnimating) {
         // move current section to last of the queue
@@ -491,8 +486,6 @@ var Wall = function () {
     value: function prevSlide() {
       if (!this.isAnimating) {
         var _currentSlides$revers = this.currentSlides.reverse();
-        // reverse the sections array and set the last section to be the current section
-
 
         var _currentSlides$revers2 = _toArray(_currentSlides$revers);
 
@@ -507,9 +500,7 @@ var Wall = function () {
   }, {
     key: 'nextSlide',
     value: function nextSlide() {
-
       if (!this.isAnimating) {
-
         this.currentSlides = [].concat(_toConsumableArray(this.restSlides), [this.currentSlide]);
 
         this._refreshAnimateStatus(false)._animateScreen(this.currentSlide, this.currentSlides);
