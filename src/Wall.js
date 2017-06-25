@@ -21,10 +21,12 @@ class Wall {
     this.wrapper = typeof wrapper === 'string' ? document.querySelector(wrapper) : wrapper;
     // get child sections, if no section contains, throw a new error
     this.sections = this.wrapper.children.length ? toArray(this.wrapper.children) : throwNewError`sections`;
-    // get first of array as current section, and others as rest sections
-    [this.currentSection, ...this.restSections] = this.sections;
+    this.currentSection = null;
+    this.restSections = null;
     // the position of current section, used to move currentSection
     this.currentSectionPosition = 0;
+
+    this.currentSectionSlides = undefined;
 
     // mark if use transform 3d for smooth animation
     this.translateZ = hasTransform3d ? 'translateZ(0)' : '';
@@ -57,31 +59,13 @@ class Wall {
     document.addEventListener('keydown', this._handleKeyDown.bind(this));
   }
 
-  _handleKeyDown(e) {
-    switch (e.keyCode) {
-      case 34: case 39: case 40:
-        break;
-
-      case 33: case 37: case 38:
-        break;
-
-      case 36:
-        this.goTo(1);
-
-      case 35:
-        this.goTo(this.sections.length);
-
-      default:
-        break;
-    }
-  }
-
   _refresh(force) {
     if (force)
       this
-        ._setupSize()._css()
-        ._setupSections()._setupNav()
-        ._queueSections();
+        ._setupSize()._cssBody()._cssWrapper()
+        ._setupSections()._cssSections()._queueSections()
+        ._setupSlides()._cssSlides()
+        ._setupNav();
 
     cAF(this.requestId);
     this.isAnimating = false;
@@ -107,10 +91,29 @@ class Wall {
     return this;
   }
 
+  _handleKeyDown(e) {
+    switch (e.keyCode) {
+      case 34: case 39: case 40:
+        break;
+
+      case 33: case 37: case 38:
+        break;
+
+      case 36:
+        this.goToSection(1);
+
+      case 35:
+        this.goToSection(this.sections.length);
+
+      default:
+        break;
+    }
+  }
+
   _handleWheelEvent(e) {
     const delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
-    if (delta === -1) this.next();
-    if (delta === 1) this.prev();
+    if (delta === -1) this.nextSection();
+    if (delta === 1) this.prevSection();
 
     return this;
   }
@@ -122,11 +125,28 @@ class Wall {
       this.navItems.forEach((item, index) => {
         item.setAttribute('data-wall-nav-index', index + 1);
         item.addEventListener('click', () => {
-          this.goTo(item.getAttribute('data-wall-nav-index'));
+          this.goToSection(item.getAttribute('data-wall-nav-index'));
         });
       });
     }
 
+    return this;
+  }
+
+  _setupSlides() {
+    this.sections.forEach(section => {
+      const slides = toArray(section.querySelectorAll('[data-wall-slide]'));
+      slides.forEach(slide => {
+        slide.style.position = 'absolute';
+        slide.style.top = 0;
+        slide.style.overflowX = 'hidden';
+        slide.style.overflowY = 'auto';
+        slide.style.right = 0;
+        slide.style.bottom = 0;
+        slide.style.left = 0;
+      });
+      slides.reverse().forEach((slide, index) => slide.style.zIndex = index);
+    });
     return this;
   }
 
@@ -158,6 +178,20 @@ class Wall {
       section.style.right = 0;
       section.style.bottom = 0;
       section.style.left = 0;
+    });
+    return this;
+  }
+
+  _cssSlides() {
+    const slides = toArray(this.wrapper.querySelectorAll('[data-wall-slide]'));
+    slides.forEach(slide => {
+      slide.style.position = 'absolute';
+      slide.style.top = 0;
+      slide.style.overflowX = 'hidden';
+      slide.style.overflowY = 'auto';
+      slide.style.right = 0;
+      slide.style.bottom = 0;
+      slide.style.left = 0;
     });
     return this;
   }
@@ -227,7 +261,7 @@ class Wall {
     }
   }
 
-  prev() {
+  prevSection() {
     if (!(this.currentSection.scrollTop === 0) || !this.options.loopToBottom && this.getCurrentSectionIndex() == 1) return;
 
     if (!this.isAnimating) {
@@ -241,7 +275,7 @@ class Wall {
     }
   }
 
-  next() {
+  nextSection() {
     const { scrollHeight, scrollTop, clientHeight } = this.currentSection;
 
     if (!(scrollHeight - scrollTop === clientHeight) || !this.options.loopToTop && this.getCurrentSectionIndex() == this.sections.length) return;
@@ -256,7 +290,7 @@ class Wall {
     }
   }
 
-  goTo(index) {
+  goToSection(index) {
 
     if (index === this.getCurrentSectionIndex()) return;
 

@@ -122,14 +122,12 @@ var Wall = function () {
     this.wrapper = typeof wrapper === 'string' ? document.querySelector(wrapper) : wrapper;
     // get child sections, if no section contains, throw a new error
     this.sections = this.wrapper.children.length ? (0, _utils.toArray)(this.wrapper.children) : (0, _utils.throwNewError)(_templateObject2);
-    // get first of array as current section, and others as rest sections
-
+    this.currentSection = null;
+    this.restSections = null;
     // the position of current section, used to move currentSection
-    var _sections = _toArray(this.sections);
-
-    this.currentSection = _sections[0];
-    this.restSections = _sections.slice(1);
     this.currentSectionPosition = 0;
+
+    this.currentSectionSlides = undefined;
 
     // mark if use transform 3d for smooth animation
     this.translateZ = _dom.hasTransform3d ? 'translateZ(0)' : '';
@@ -168,37 +166,17 @@ var Wall = function () {
       document.addEventListener('keydown', this._handleKeyDown.bind(this));
     }
   }, {
-    key: '_handleKeyDown',
-    value: function _handleKeyDown(e) {
-      switch (e.keyCode) {
-        case 34:case 39:case 40:
-          break;
-
-        case 33:case 37:case 38:
-          break;
-
-        case 36:
-          this.goTo(1);
-
-        case 35:
-          this.goTo(this.sections.length);
-
-        default:
-          break;
-      }
-    }
-  }, {
     key: '_refresh',
     value: function _refresh(force) {
-      if (force) this._setupSize()._css()._setupSections()._setupNav()._queueSections();
+      if (force) this._setupSize()._cssBody()._cssWrapper()._setupSections()._cssSections()._queueSections()._setupSlides()._cssSlides()._setupNav();
 
       (0, _dom.cAF)(this.requestId);
       this.isAnimating = false;
 
-      var _sections2 = _toArray(this.sections);
+      var _sections = _toArray(this.sections);
 
-      this.currentSection = _sections2[0];
-      this.restSections = _sections2.slice(1);
+      this.currentSection = _sections[0];
+      this.restSections = _sections.slice(1);
 
 
       this._renderNavElement();
@@ -224,11 +202,31 @@ var Wall = function () {
       return this;
     }
   }, {
+    key: '_handleKeyDown',
+    value: function _handleKeyDown(e) {
+      switch (e.keyCode) {
+        case 34:case 39:case 40:
+          break;
+
+        case 33:case 37:case 38:
+          break;
+
+        case 36:
+          this.goToSection(1);
+
+        case 35:
+          this.goToSection(this.sections.length);
+
+        default:
+          break;
+      }
+    }
+  }, {
     key: '_handleWheelEvent',
     value: function _handleWheelEvent(e) {
       var delta = Math.max(-1, Math.min(1, e.wheelDelta || -e.detail));
-      if (delta === -1) this.next();
-      if (delta === 1) this.prev();
+      if (delta === -1) this.nextSection();
+      if (delta === 1) this.prevSection();
 
       return this;
     }
@@ -243,11 +241,31 @@ var Wall = function () {
         this.navItems.forEach(function (item, index) {
           item.setAttribute('data-wall-nav-index', index + 1);
           item.addEventListener('click', function () {
-            _this3.goTo(item.getAttribute('data-wall-nav-index'));
+            _this3.goToSection(item.getAttribute('data-wall-nav-index'));
           });
         });
       }
 
+      return this;
+    }
+  }, {
+    key: '_setupSlides',
+    value: function _setupSlides() {
+      this.sections.forEach(function (section) {
+        var slides = (0, _utils.toArray)(section.querySelectorAll('[data-wall-slide]'));
+        slides.forEach(function (slide) {
+          slide.style.position = 'absolute';
+          slide.style.top = 0;
+          slide.style.overflowX = 'hidden';
+          slide.style.overflowY = 'auto';
+          slide.style.right = 0;
+          slide.style.bottom = 0;
+          slide.style.left = 0;
+        });
+        slides.reverse().forEach(function (slide, index) {
+          return slide.style.zIndex = index;
+        });
+      });
       return this;
     }
   }, {
@@ -283,6 +301,21 @@ var Wall = function () {
         section.style.right = 0;
         section.style.bottom = 0;
         section.style.left = 0;
+      });
+      return this;
+    }
+  }, {
+    key: '_cssSlides',
+    value: function _cssSlides() {
+      var slides = (0, _utils.toArray)(this.wrapper.querySelectorAll('[data-wall-slide]'));
+      slides.forEach(function (slide) {
+        slide.style.position = 'absolute';
+        slide.style.top = 0;
+        slide.style.overflowX = 'hidden';
+        slide.style.overflowY = 'auto';
+        slide.style.right = 0;
+        slide.style.bottom = 0;
+        slide.style.left = 0;
       });
       return this;
     }
@@ -370,8 +403,8 @@ var Wall = function () {
       }
     }
   }, {
-    key: 'prev',
-    value: function prev() {
+    key: 'prevSection',
+    value: function prevSection() {
       if (!(this.currentSection.scrollTop === 0) || !this.options.loopToBottom && this.getCurrentSectionIndex() == 1) return;
 
       if (!this.isAnimating) {
@@ -390,8 +423,8 @@ var Wall = function () {
       }
     }
   }, {
-    key: 'next',
-    value: function next() {
+    key: 'nextSection',
+    value: function nextSection() {
       var _currentSection = this.currentSection,
           scrollHeight = _currentSection.scrollHeight,
           scrollTop = _currentSection.scrollTop,
@@ -408,8 +441,8 @@ var Wall = function () {
       }
     }
   }, {
-    key: 'goTo',
-    value: function goTo(index) {
+    key: 'goToSection',
+    value: function goToSection(index) {
 
       if (index === this.getCurrentSectionIndex()) return;
 
