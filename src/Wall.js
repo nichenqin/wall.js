@@ -27,6 +27,8 @@ class Wall {
     this.currentSectionPosition = 0;
 
     this.currentSlides = undefined;
+    this.currentSlide = undefined;
+    this.restSlides = undefined;
 
     // mark if use transform 3d for smooth animation
     this.translateZ = hasTransform3d ? 'translateZ(0)' : '';
@@ -71,7 +73,6 @@ class Wall {
     this.isAnimating = false;
 
     [this.currentSection, ...this.restSections] = this.sections;
-    this.currentSlides = toArray(this.currentSection.querySelectorAll('[data-wall-slide'));
     [this.currentSlide, ...this.restSlides] = this.currentSlides;
 
     this._renderNavElement();
@@ -86,6 +87,8 @@ class Wall {
   }
 
   _setupSections() {
+    [this.currentSection, ...this.restSections] = this.sections;
+
     this.sections.forEach((section, index) => {
       section.setAttribute('data-wall-section-index', index + 1);
       section.addEventListener(mousewheelEvent, this._handleWheelEvent.bind(this));
@@ -140,11 +143,13 @@ class Wall {
   }
 
   _setupSlides() {
+    this.currentSlides = toArray(this.currentSection.querySelectorAll('[data-wall-slide'));
+
     this.sections.forEach(section => {
       const slides = toArray(section.querySelectorAll('[data-wall-slide]'));
       const arrows = toArray(section.querySelectorAll('[data-wall-slide-arrow]'));
       if (slides.length) {
-        slides.forEach(slide => {
+        slides.forEach((slide, index) => {
           slide.style.position = 'absolute';
           slide.style.top = 0;
           slide.style.overflowX = 'hidden';
@@ -152,6 +157,8 @@ class Wall {
           slide.style.right = 0;
           slide.style.bottom = 0;
           slide.style.left = 0;
+
+          slide.setAttribute('data-wall-slide-index', index + 1);
         });
 
         slides.reverse().forEach((slide, index) => slide.style.zIndex = index + 1);
@@ -238,8 +245,8 @@ class Wall {
     return this;
   }
 
-  _renderSectionPosition(section, pos) {
-    section.style[transformProp] = `translate(0, -${pos}%) ${this.translateZ}`;
+  _renderSectionPosition(screen, pos) {
+    screen.style[transformProp] = `translate(0, -${pos}%) ${this.translateZ}`;
   }
 
   getCurrentSectionIndex() {
@@ -311,11 +318,27 @@ class Wall {
   }
 
   prevSlide() {
+    if (!this.isAnimating) {
+      // reverse the sections array and set the last section to be the current section
+      [this.currentSlide, ...this.restSlides] = this.currentSlides.reverse();
+      this.currentSlides = [this.currentSlide, ...this.restSlides.reverse()];
 
+      this
+        ._refreshAnimateStatus(true)
+        ._animateScreen(this.currentSlide, this.currentSlides);
+    }
   }
 
   nextSlide() {
 
+    if (!this.isAnimating) {
+
+      this.currentSlides = [...this.restSlides, this.currentSlide];
+
+      this
+        ._refreshAnimateStatus(false)
+        ._animateScreen(this.currentSlide, this.currentSlides);
+    }
   }
 
 }

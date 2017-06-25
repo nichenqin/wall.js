@@ -128,6 +128,8 @@ var Wall = function () {
     this.currentSectionPosition = 0;
 
     this.currentSlides = undefined;
+    this.currentSlide = undefined;
+    this.restSlides = undefined;
 
     // mark if use transform 3d for smooth animation
     this.translateZ = _dom.hasTransform3d ? 'translateZ(0)' : '';
@@ -178,8 +180,6 @@ var Wall = function () {
       this.currentSection = _sections[0];
       this.restSections = _sections.slice(1);
 
-      this.currentSlides = (0, _utils.toArray)(this.currentSection.querySelectorAll('[data-wall-slide'));
-
       var _currentSlides = _toArray(this.currentSlides);
 
       this.currentSlide = _currentSlides[0];
@@ -201,6 +201,12 @@ var Wall = function () {
     key: '_setupSections',
     value: function _setupSections() {
       var _this2 = this;
+
+      var _sections2 = _toArray(this.sections);
+
+      this.currentSection = _sections2[0];
+      this.restSections = _sections2.slice(1);
+
 
       this.sections.forEach(function (section, index) {
         section.setAttribute('data-wall-section-index', index + 1);
@@ -270,11 +276,13 @@ var Wall = function () {
   }, {
     key: '_setupSlides',
     value: function _setupSlides() {
+      this.currentSlides = (0, _utils.toArray)(this.currentSection.querySelectorAll('[data-wall-slide'));
+
       this.sections.forEach(function (section) {
         var slides = (0, _utils.toArray)(section.querySelectorAll('[data-wall-slide]'));
         var arrows = (0, _utils.toArray)(section.querySelectorAll('[data-wall-slide-arrow]'));
         if (slides.length) {
-          slides.forEach(function (slide) {
+          slides.forEach(function (slide, index) {
             slide.style.position = 'absolute';
             slide.style.top = 0;
             slide.style.overflowX = 'hidden';
@@ -282,6 +290,8 @@ var Wall = function () {
             slide.style.right = 0;
             slide.style.bottom = 0;
             slide.style.left = 0;
+
+            slide.setAttribute('data-wall-slide-index', index + 1);
           });
 
           slides.reverse().forEach(function (slide, index) {
@@ -384,8 +394,8 @@ var Wall = function () {
     }
   }, {
     key: '_renderSectionPosition',
-    value: function _renderSectionPosition(section, pos) {
-      section.style[_dom.transformProp] = 'translate(0, -' + pos + '%) ' + this.translateZ;
+    value: function _renderSectionPosition(screen, pos) {
+      screen.style[_dom.transformProp] = 'translate(0, -' + pos + '%) ' + this.translateZ;
     }
   }, {
     key: 'getCurrentSectionIndex',
@@ -478,10 +488,33 @@ var Wall = function () {
     }
   }, {
     key: 'prevSlide',
-    value: function prevSlide() {}
+    value: function prevSlide() {
+      if (!this.isAnimating) {
+        var _currentSlides$revers = this.currentSlides.reverse();
+        // reverse the sections array and set the last section to be the current section
+
+
+        var _currentSlides$revers2 = _toArray(_currentSlides$revers);
+
+        this.currentSlide = _currentSlides$revers2[0];
+        this.restSlides = _currentSlides$revers2.slice(1);
+
+        this.currentSlides = [this.currentSlide].concat(_toConsumableArray(this.restSlides.reverse()));
+
+        this._refreshAnimateStatus(true)._animateScreen(this.currentSlide, this.currentSlides);
+      }
+    }
   }, {
     key: 'nextSlide',
-    value: function nextSlide() {}
+    value: function nextSlide() {
+
+      if (!this.isAnimating) {
+
+        this.currentSlides = [].concat(_toConsumableArray(this.restSlides), [this.currentSlide]);
+
+        this._refreshAnimateStatus(false)._animateScreen(this.currentSlide, this.currentSlides);
+      }
+    }
   }]);
 
   return Wall;

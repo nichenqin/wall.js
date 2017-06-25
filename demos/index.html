@@ -120,10 +120,10 @@
 <body>
   <div class="wrapper">
     <section class="section-1">
-      <div style="background-color: #ffccbc" data-wall-slide>
+      <div class="section-1-slide-1" style="background-color: #ffccbc" data-wall-slide>
         <h1>First Screen Slide 1</h1>
       </div>
-      <div style="background-color: #ffecb3" data-wall-slide>
+      <div class="section-1-slide-2" style="background-color: #ffecb3" data-wall-slide>
         <h1>First Screen Slide 2</h1>
       </div>
       <button data-wall-slide-arrow class="prev-slide btn btn-secondary">Prev Slide</button>
@@ -139,6 +139,8 @@
       <div style="background-color: #fff8e1" data-wall-slide>
         <h1>Second Screen Slide 3</h1>
       </div>
+      <button data-wall-slide-arrow class="prev-slide btn btn-secondary">Prev Slide</button>
+      <button data-wall-slide-arrow class="next-slide btn btn-success">Next Slide</button>
     </section>
     <section class="section-3" data-wall-animate-duration=3>
       <h1>Third Screen</h1>
@@ -241,6 +243,26 @@
     document.getElementById('next')
       .addEventListener('click', function () {
         wall.nextSection();
+      })
+
+    document.querySelector('.prev-slide')
+      .addEventListener('click', function () {
+        wall.prevSlide();
+      })
+
+    document.querySelector('.next-slide')
+      .addEventListener('click', function () {
+        wall.nextSlide();
+      })
+
+    document.querySelector('.section-2 .prev-slide')
+      .addEventListener('click', function () {
+        wall.prevSlide();
+      })
+
+    document.querySelector('.section-2 .next-slide')
+      .addEventListener('click', function () {
+        wall.nextSlide();
       })
   </script>
 </body>
