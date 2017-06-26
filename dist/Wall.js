@@ -89,11 +89,11 @@ var _utils = __webpack_require__(1);
 
 var _easing = __webpack_require__(2);
 
-var _easing2 = _interopRequireDefault(_easing);
+var easing = _interopRequireWildcard(_easing);
 
 var _dom = __webpack_require__(3);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
@@ -106,12 +106,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var SECTION = 'section';
 var SLIDE = 'slide';
 
-console.log(_easing2.default);
-
 var defaultOptions = {
   wrapperZIndex: 1,
   sectionAnimateDuration: 1,
-  ease: 'easeInOut',
+  easeFunction: 'easeInOut',
   loopToBottom: false,
   loopToTop: false,
   sectionNavItemActiveClass: 'active',
@@ -152,8 +150,7 @@ var Wall = function () {
     // set up nav element
     this.navElements = (0, _utils.toArray)(document.querySelectorAll('[data-wall-section-nav]'));
 
-    this.easingFunction = typeof this.options.ease === 'string' ? _easing2.default[this.options.ease] : this.options.ease;
-    console.log(this.easingFunction);
+    this.easeFunction = typeof this.options.easeFunction === 'string' ? easing[this.options.easeFunction] : this.options.easeFunction;
 
     // animation time stamp, control speed
     this.lastTime = null;
@@ -447,7 +444,7 @@ var Wall = function () {
 
       this._updateCurrentScreenPosition(delta)._renderSectionPosition(currentScreen, this.currentScreenPosition);
 
-      if (this.currentScreenPosition >= 100 || this.currentScreenPosition < 0.1 && this.isToBack) {
+      if (this.currentScreenPosition > 99.9 && !this.isToBack || this.currentScreenPosition < 0.1 && this.isToBack) {
         this._refresh()._queue(screenList);
         if (this.screenType === SECTION) this._resetCurrent();
         return this;
@@ -460,11 +457,11 @@ var Wall = function () {
   }, {
     key: '_updateCurrentScreenPosition',
     value: function _updateCurrentScreenPosition(delta) {
-      var currentDuration = this.screenType === SECTION ? this.currentSection.getAttribute('data-wall-animate-duration') : this.currentSlide.getAttribute('data-wall-animate-duration');
+      var currentDuration = this.screenType === SECTION ? +this.currentSection.getAttribute('data-wall-animate-duration') : +this.currentSlide.getAttribute('data-wall-animate-duration');
       var duration = currentDuration || this.options.sectionAnimateDuration;
       var target = this.isToBack ? 0 : 100;
 
-      this.currentScreenPosition = this.easingFunction(delta, this.currentScreenPosition, target - this.currentScreenPosition, duration);
+      this.currentScreenPosition = this.easeFunction(delta, this.currentScreenPosition, target - this.currentScreenPosition, duration);
 
       return this;
     }
@@ -548,6 +545,7 @@ var Wall = function () {
   }, {
     key: 'goToSection',
     value: function goToSection(index) {
+
       if (index === this.getCurrentSectionIndex()) return;
 
       if (!this.isAnimating) {
@@ -654,30 +652,29 @@ var removeClass = exports.removeClass = function removeClass(el, className) {
 "use strict";
 
 
-var easing = {};
-
-easing.linear = function (t, b, c, d) {
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var linear = exports.linear = function linear(t, b, c, d) {
   return c * t / d + b;
 };
 
-easing.easeIn = function (t, b, c, d) {
+var easeIn = exports.easeIn = function easeIn(t, b, c, d) {
   t /= d;
   return c * t * t + b;
 };
 
-easing.easeOut = function (t, b, c, d) {
+var easeOut = exports.easeOut = function easeOut(t, b, c, d) {
   t /= d;
   return -c * t * (t - 2) + b;
 };
 
-easing.easeInOut = function (t, b, c, d) {
+var easeInOut = exports.easeInOut = function easeInOut(t, b, c, d) {
   t /= d / 2;
-  if (t < 1) return c / 2 * t * t + b;
-  t--;
-  return -c / 2 * (t * (t - 2) - 1) + b;
+  if (t < 1) return c / 2 * t * t * t * t + b;
+  t -= 2;
+  return -c / 2 * (t * t * t * t - 2) + b;
 };
-
-module.exports = easing;
 
 /***/ }),
 /* 3 */
