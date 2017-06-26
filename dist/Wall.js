@@ -180,6 +180,7 @@ var Wall = function () {
       this.isAnimating = false;
 
       (0, _utils.removeClass)(this.currentSection, this.options.animatingClass);
+      (0, _utils.removeClass)(this.currentSection, this.options.currentClass);
 
       var _sections = _toArray(this.sections);
 
@@ -188,7 +189,10 @@ var Wall = function () {
 
       (0, _utils.addClass)(this.currentSection, this.options.currentClass);
 
-      if (this.currentSlide) (0, _utils.removeClass)(this.currentSlide, this.options.animatingClass);
+      if (this.currentSlide) {
+        (0, _utils.removeClass)(this.currentSlide, this.options.animatingClass);
+        (0, _utils.removeClass)(this.currentSlide, this.options.currentClass);
+      }
 
       var _currentSlides = _toArray(this.currentSlides);
 
@@ -410,11 +414,9 @@ var Wall = function () {
       this.lastTime = Date.now();
 
       if (this.screenType === SECTION) {
-        (0, _utils.removeClass)(this.currentSection, this.options.currentClass);
         (0, _utils.addClass)(this.currentSection, this.options.animatingClass);
       }
       if (this.currentSlide && this.screenType === SLIDE) {
-        (0, _utils.removeClass)(this.currentSlide, this.options.currentClass);
         (0, _utils.addClass)(this.currentSlide, this.options.animatingClass);
       }
 

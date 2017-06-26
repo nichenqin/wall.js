@@ -77,10 +77,14 @@ class Wall {
     this.isAnimating = false;
 
     removeClass(this.currentSection, this.options.animatingClass);
+    removeClass(this.currentSection, this.options.currentClass);
     [this.currentSection, ...this.restSections] = this.sections;
     addClass(this.currentSection, this.options.currentClass);
 
-    if (this.currentSlide) removeClass(this.currentSlide, this.options.animatingClass);
+    if (this.currentSlide) {
+      removeClass(this.currentSlide, this.options.animatingClass);
+      removeClass(this.currentSlide, this.options.currentClass);
+    }
     [this.currentSlide, ...this.restSlides] = this.currentSlides;
     if (this.currentSlide) addClass(this.currentSlide, this.options.currentClass);
 
@@ -250,11 +254,9 @@ class Wall {
     this.lastTime = Date.now();
 
     if (this.screenType === SECTION) {
-      removeClass(this.currentSection, this.options.currentClass);
       addClass(this.currentSection, this.options.animatingClass);
     }
     if (this.currentSlide && this.screenType === SLIDE) {
-      removeClass(this.currentSlide, this.options.currentClass);
       addClass(this.currentSlide, this.options.animatingClass);
     }
 

@@ -35,10 +35,17 @@
       font-size: 100px;
       font-weight: 700;
       color: #fff;
+      opacity: 0;
+      transition: all .3s ease-in-out;
     }
 
     [data-wall-slide] h1 {
       color: #000;
+    }
+
+    .current>h1 {
+      opacity: 1;
+      top: 40%;
     }
 
     .section-1 {
@@ -155,16 +162,16 @@
   </ul>
   <div class="wrapper">
     <section class="section-1">
-      <div class="section-1-slide-1" style="background-color: #ce93d8" data-wall-slide>
+      <div class="section-1 slide slide-1" style="background-color: #ffecb3" data-wall-slide>
         <h1>First Screen <br /> Slide 1</h1>
       </div>
-      <div class="section-1-slide-2" style="background-color: #ffecb3" data-wall-slide>
+      <div class="section-1 slide slide-2" style="background-color: #e1bee7" data-wall-slide>
         <h1>First Screen <br /> Slide 2</h1>
       </div>
-      <div class="section-1-slide-3" style="background-color: #90caf9" data-wall-slide>
+      <div class="section-1 slide slide-3" style="background-color: #90caf9" data-wall-slide>
         <h1>First Screen <br /> Slide 3</h1>
       </div>
-      <div class="section-1-slide-4" style="background-color: #ffe082" data-wall-slide>
+      <div class="section-1 slide slide-4" style="background-color: #ffe082" data-wall-slide>
         <h1>First Screen <br /> Slide 4</h1>
       </div>
       <div data-wall-slide-arrow class="prev-slide"></div>
