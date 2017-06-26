@@ -102,6 +102,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var SECTION = 'section';
 var SLIDE = 'slide';
 
+var ANIMATING_CLASS = 'animating';
+var CURRENT_CLASS = 'current';
+
 var defaultOptions = {
   wrapperZIndex: 1,
   sectionAnimateDuration: 1,
@@ -124,8 +127,8 @@ var Wall = function () {
     this.wrapper = typeof wrapper === 'string' ? document.querySelector(wrapper) : wrapper;
     // get child sections, if no section contains, throw a new error
     this.sections = this.wrapper.children.length ? (0, _utils.toArray)(this.wrapper.children) : (0, _utils.throwNewError)(_templateObject2);
-    this.currentSection = null;
-    this.restSections = null;
+    this.currentSection = undefined;
+    this.restSections = undefined;
 
     this.currentSlides = undefined;
     this.currentSlide = undefined;
@@ -177,10 +180,14 @@ var Wall = function () {
       (0, _dom.cAF)(this.requestId);
       this.isAnimating = false;
 
+      (0, _utils.removeClass)(this.currentSection, ANIMATING_CLASS);
+
       var _sections = _toArray(this.sections);
 
       this.currentSection = _sections[0];
       this.restSections = _sections.slice(1);
+
+      (0, _utils.addClass)(this.currentSection, CURRENT_CLASS);
 
       var _currentSlides = _toArray(this.currentSlides);
 
@@ -368,6 +375,27 @@ var Wall = function () {
       return this;
     }
   }, {
+    key: '_resetCurrent',
+    value: function _resetCurrent() {
+      var _sections3 = _toArray(this.sections);
+
+      this.currentSection = _sections3[0];
+      this.restSections = _sections3.slice(1);
+
+
+      this.currentSlides = (0, _utils.toArray)(this.currentSection.querySelectorAll('[data-wall-slide]')).sort(function (a, b) {
+        return +b.style.zIndex - +a.style.zIndex;
+      });
+
+      var _currentSlides2 = _toArray(this.currentSlides);
+
+      this.currentSlide = _currentSlides2[0];
+      this.restSlides = _currentSlides2.slice(1);
+
+
+      return this;
+    }
+  }, {
     key: '_refreshAnimateStatus',
     value: function _refreshAnimateStatus(isToBack) {
       this.isToBack = isToBack;
@@ -375,6 +403,8 @@ var Wall = function () {
       this.currentScreenPosition = this.isToBack ? 100 : 0;
       this.isAnimating = true;
       this.lastTime = Date.now();
+      (0, _utils.removeClass)(this.currentSection, CURRENT_CLASS);
+      (0, _utils.addClass)(this.currentSection, ANIMATING_CLASS);
       return this;
     }
   }, {
@@ -389,22 +419,7 @@ var Wall = function () {
 
       if (this.currentScreenPosition >= 100 || this.currentScreenPosition < 0.1 && this.isToBack) {
         this._refresh()._queue(screenList);
-        if (this.screenType === SECTION) {
-          var _sections3 = _toArray(this.sections);
-
-          this.currentSection = _sections3[0];
-          this.restSections = _sections3.slice(1);
-
-
-          this.currentSlides = (0, _utils.toArray)(this.currentSection.querySelectorAll('[data-wall-slide]')).sort(function (a, b) {
-            return +b.style.zIndex - +a.style.zIndex;
-          });
-
-          var _currentSlides2 = _toArray(this.currentSlides);
-
-          this.currentSlide = _currentSlides2[0];
-          this.restSlides = _currentSlides2.slice(1);
-        }
+        if (this.screenType === SECTION) this._resetCurrent();
         return this;
       };
 

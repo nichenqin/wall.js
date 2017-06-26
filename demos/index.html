@@ -114,15 +114,32 @@
     .next-slide {
       position: absolute;
       top: 50%;
-      transform: translateY(-50%);
+      transform: translateY(-50%) rotate(-45deg);
+      height: 30px;
+      width: 30px;
+      cursor: pointer;
+      transition: all .2s ease-in-out;
     }
 
     .prev-slide {
-      left: 20px;
+      border-left: 3px solid #fff;
+      border-top: 3px solid #fff;
+      left: 50px;
     }
 
     .next-slide {
-      right: 20px;
+      border-right: 3px solid #fff;
+      border-top: 3px solid #fff;
+      transform: translateY(-50%) rotate(45deg);
+      right: 50px;
+    }
+
+    .prev-slide:hover {
+      transform: translateY(-50%) rotate(-45deg) scale(1.1);
+    }
+
+    .next-slide:hover {
+      transform: translateY(-50%) rotate(45deg) scale(1.1);
     }
   </style>
 </head>
@@ -150,8 +167,8 @@
       <div class="section-1-slide-4" style="background-color: #ffe082" data-wall-slide>
         <h1>First Screen <br /> Slide 4</h1>
       </div>
-      <button data-wall-slide-arrow class="prev-slide btn btn-secondary">Prev Slide</button>
-      <button data-wall-slide-arrow class="next-slide btn btn-success">Next Slide</button>
+      <div data-wall-slide-arrow class="prev-slide"></div>
+      <div data-wall-slide-arrow class="next-slide"></div>
     </section>
     <section class="section-2">
       <div class="section-2-slide-1" style="background-color: #e1f5fe" data-wall-slide>
@@ -163,8 +180,8 @@
       <div class="section-2-slide-3" style="background-color: #fff8e1" data-wall-slide>
         <h1>Second Screen <br /> Slide 3</h1>
       </div>
-      <button data-wall-slide-arrow class="prev-slide btn btn-secondary">Prev Slide</button>
-      <button data-wall-slide-arrow class="next-slide btn btn-success">Next Slide</button>
+      <div data-wall-slide-arrow class="prev-slide"></div>
+      <div data-wall-slide-arrow class="next-slide"></div>
     </section>
     <section class="section-3" data-wall-animate-duration=3>
       <h1>Third Screen</h1>

@@ -5,6 +5,9 @@ import { rAF, cAF, hasTransform3d, transformProp, mousewheelEvent, getScreenHeig
 const SECTION = 'section';
 const SLIDE = 'slide';
 
+const ANIMATING_CLASS = 'animating';
+const CURRENT_CLASS = 'current';
+
 const defaultOptions = {
   wrapperZIndex: 1,
   sectionAnimateDuration: 1,
@@ -23,8 +26,8 @@ class Wall {
     this.wrapper = typeof wrapper === 'string' ? document.querySelector(wrapper) : wrapper;
     // get child sections, if no section contains, throw a new error
     this.sections = this.wrapper.children.length ? toArray(this.wrapper.children) : throwNewError`sections`;
-    this.currentSection = null;
-    this.restSections = null;
+    this.currentSection = undefined;
+    this.restSections = undefined;
 
     this.currentSlides = undefined;
     this.currentSlide = undefined;
@@ -74,7 +77,9 @@ class Wall {
     cAF(this.requestId);
     this.isAnimating = false;
 
+    removeClass(this.currentSection, ANIMATING_CLASS);
     [this.currentSection, ...this.restSections] = this.sections;
+    addClass(this.currentSection, CURRENT_CLASS);
     [this.currentSlide, ...this.restSlides] = this.currentSlides;
 
     this._renderSectionNavs();
@@ -221,12 +226,26 @@ class Wall {
     return this;
   }
 
+  _resetCurrent() {
+    [this.currentSection, ...this.restSections] = this.sections;
+
+    this.currentSlides =
+      toArray(this.currentSection.querySelectorAll('[data-wall-slide]'))
+        .sort((a, b) => +b.style.zIndex - +a.style.zIndex);
+
+    [this.currentSlide, ...this.restSlides] = this.currentSlides;
+
+    return this;
+  }
+
   _refreshAnimateStatus(isToBack) {
     this.isToBack = isToBack;
     cAF(this.requestId);
     this.currentScreenPosition = this.isToBack ? 100 : 0;
     this.isAnimating = true;
     this.lastTime = Date.now();
+    removeClass(this.currentSection, CURRENT_CLASS);
+    addClass(this.currentSection, ANIMATING_CLASS);
     return this;
   }
 
@@ -242,15 +261,7 @@ class Wall {
 
     if (this.currentScreenPosition >= 100 || (this.currentScreenPosition < 0.1 && this.isToBack)) {
       this._refresh()._queue(screenList);
-      if (this.screenType === SECTION) {
-        [this.currentSection, ...this.restSections] = this.sections;
-
-        this.currentSlides =
-          toArray(this.currentSection.querySelectorAll('[data-wall-slide]'))
-            .sort((a, b) => +b.style.zIndex - +a.style.zIndex);
-
-        [this.currentSlide, ...this.restSlides] = this.currentSlides;
-      }
+      if (this.screenType === SECTION) this._resetCurrent();
       return this;
     };
 
