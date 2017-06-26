@@ -233,6 +233,14 @@ var Wall = function () {
           if (scrollTop === 0) this.prevSection();
           break;
 
+        case 37:
+          if (this.currentSlide) this.prevSlide();
+          break;
+
+        case 39:
+          if (this.currentSlide) this.nextSlide();
+          break;
+
         case 36:
           this.goToSection(1);
 

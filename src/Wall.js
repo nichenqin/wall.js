@@ -109,6 +109,14 @@ class Wall {
         if (scrollTop === 0) this.prevSection();
         break;
 
+      case 37:
+        if (this.currentSlide) this.prevSlide();
+        break;
+
+      case 39:
+        if (this.currentSlide) this.nextSlide();
+        break;
+
       case 36:
         this.goToSection(1);
 
@@ -235,7 +243,6 @@ class Wall {
     if (this.currentScreenPosition >= 100 || (this.currentScreenPosition < 0.1 && this.isToBack)) {
       this._refresh()._queue(screenList);
       if (this.screenType === SECTION) {
-
         [this.currentSection, ...this.restSections] = this.sections;
 
         this.currentSlides =
