@@ -87,11 +87,13 @@ var _templateObject = _taggedTemplateLiteral(['wrapper'], ['wrapper']),
 
 var _utils = __webpack_require__(1);
 
-var _easing = __webpack_require__(2);
+var _dom = __webpack_require__(2);
+
+var _easing = __webpack_require__(3);
 
 var easing = _interopRequireWildcard(_easing);
 
-var _dom = __webpack_require__(3);
+__webpack_require__(4);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -103,8 +105,20 @@ function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defi
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var SECTION = 'section';
-var SLIDE = 'slide';
+var SCREEN_SECTION = 'section';
+var SCREEN_SLIDE = 'slide';
+var DATA_PRE = 'data-wall';
+
+var ANIMATE_DURATION = DATA_PRE + '-animate-duration';
+
+var SECTION_NAV = DATA_PRE + '-section-nav';
+var SECTION_INDEX = DATA_PRE + '-section-index';
+
+var NAV_INDEX = DATA_PRE + '-nav-index';
+
+var SLIDE = DATA_PRE + '-slide';
+var SLIDE_INDEX = DATA_PRE + '-slide-index';
+var SLIDE_ARROW = DATA_PRE + '-slide-arrow';
 
 var defaultOptions = {
   wrapperZIndex: 1,
@@ -148,7 +162,7 @@ var Wall = function () {
     // merge default options and custom options
     this.options = (0, _utils.merge)(defaultOptions, options);
     // set up nav element
-    this.navElements = (0, _utils.toArray)(document.querySelectorAll('[data-wall-section-nav]'));
+    this.navElements = (0, _utils.toArray)(document.querySelectorAll('[' + SECTION_NAV + ']'));
 
     this.easeFunction = typeof this.options.easeFunction === 'string' ? easing[this.options.easeFunction] : this.options.easeFunction;
 
@@ -160,7 +174,7 @@ var Wall = function () {
     this.isAnimating = false;
     // mark if the screen is ready to back
     this.isToBack = false;
-    this.screenType = SECTION;
+    this.screenType = SCREEN_SECTION;
 
     this._init();
   }
@@ -236,7 +250,7 @@ var Wall = function () {
 
 
       this.sections.forEach(function (section, index) {
-        section.setAttribute('data-wall-section-index', index + 1);
+        section.setAttribute(SECTION_INDEX, index + 1);
         section.addEventListener(_dom.mousewheelEvent, _this3._handleWheelEvent.bind(_this3));
       });
       return this;
@@ -301,9 +315,9 @@ var Wall = function () {
 
           var navItems = (0, _utils.toArray)(navElement.children);
           navItems.forEach(function (item, index) {
-            item.setAttribute('data-wall-nav-index', index + 1);
+            item.setAttribute(NAV_INDEX, index + 1);
             item.addEventListener('click', function () {
-              _this4.goToSection(item.getAttribute('data-wall-nav-index'));
+              _this4.goToSection(item.getAttribute(NAV_INDEX));
             });
           });
         });
@@ -314,11 +328,11 @@ var Wall = function () {
   }, {
     key: '_setupSlides',
     value: function _setupSlides() {
-      this.currentSlides = (0, _utils.toArray)(this.currentSection.querySelectorAll('[data-wall-slide'));
+      this.currentSlides = (0, _utils.toArray)(this.currentSection.querySelectorAll('[' + SLIDE + ']'));
 
       this.sections.forEach(function (section) {
-        var slides = (0, _utils.toArray)(section.querySelectorAll('[data-wall-slide]'));
-        var arrows = (0, _utils.toArray)(section.querySelectorAll('[data-wall-slide-arrow]'));
+        var slides = (0, _utils.toArray)(section.querySelectorAll('[' + SLIDE + ']'));
+        var arrows = (0, _utils.toArray)(section.querySelectorAll('[' + SLIDE_ARROW + ']'));
         if (slides.length) {
           slides.forEach(function (slide, index) {
             slide.style.position = 'absolute';
@@ -329,7 +343,7 @@ var Wall = function () {
             slide.style.bottom = 0;
             slide.style.left = 0;
 
-            slide.setAttribute('data-wall-slide-index', index + 1);
+            slide.setAttribute(SLIDE_INDEX, index + 1);
           });
 
           slides.reverse().forEach(function (slide, index) {
@@ -393,15 +407,15 @@ var Wall = function () {
       return this;
     }
   }, {
-    key: '_resetCurrent',
-    value: function _resetCurrent() {
+    key: '_resetCurrentSlides',
+    value: function _resetCurrentSlides() {
       var _sections3 = _toArray(this.sections);
 
       this.currentSection = _sections3[0];
       this.restSections = _sections3.slice(1);
 
 
-      this.currentSlides = (0, _utils.toArray)(this.currentSection.querySelectorAll('[data-wall-slide]')).sort(function (a, b) {
+      this.currentSlides = (0, _utils.toArray)(this.currentSection.querySelectorAll('[' + SLIDE + ']')).sort(function (a, b) {
         return +b.style.zIndex - +a.style.zIndex;
       });
 
@@ -425,10 +439,10 @@ var Wall = function () {
       this.isAnimating = true;
       this.lastTime = Date.now();
 
-      if (this.screenType === SECTION) {
+      if (this.screenType === SCREEN_SECTION) {
         (0, _utils.addClass)(this.currentSection, this.options.animatingClass);
       }
-      if (this.currentSlide && this.screenType === SLIDE) {
+      if (this.currentSlide && this.screenType === SCREEN_SLIDE) {
         (0, _utils.addClass)(this.currentSlide, this.options.animatingClass);
       }
 
@@ -446,7 +460,7 @@ var Wall = function () {
 
       if (this.currentScreenPosition > 99.9 && !this.isToBack || this.currentScreenPosition < 0.1 && this.isToBack) {
         this._refresh()._queue(screenList);
-        if (this.screenType === SECTION) this._resetCurrent();
+        if (this.screenType === SCREEN_SECTION) this._resetCurrentSlides();
         return this;
       };
 
@@ -457,7 +471,7 @@ var Wall = function () {
   }, {
     key: '_updateCurrentScreenPosition',
     value: function _updateCurrentScreenPosition(delta) {
-      var currentDuration = this.screenType === SECTION ? +this.currentSection.getAttribute('data-wall-animate-duration') : +this.currentSlide.getAttribute('data-wall-animate-duration');
+      var currentDuration = this.screenType === SCREEN_SECTION ? +this.currentSection.getAttribute(ANIMATE_DURATION) : +this.currentSlide.getAttribute(ANIMATE_DURATION);
       var duration = currentDuration || this.options.sectionAnimateDuration;
       var target = this.isToBack ? 0 : 100;
 
@@ -469,10 +483,10 @@ var Wall = function () {
     key: '_renderSectionPosition',
     value: function _renderSectionPosition(screen, pos) {
       switch (this.screenType) {
-        case SECTION:
+        case SCREEN_SECTION:
           screen.style[_dom.transformProp] = 'translate(0, -' + pos + '%) ' + this.translateZ;
           break;
-        case SLIDE:
+        case SCREEN_SLIDE:
           screen.style[_dom.transformProp] = 'translate(-' + pos + '%, 0) ' + this.translateZ;
           break;
 
@@ -484,7 +498,7 @@ var Wall = function () {
   }, {
     key: 'getCurrentSectionIndex',
     value: function getCurrentSectionIndex() {
-      return this.currentSection.getAttribute('data-wall-section-index');
+      return this.currentSection.getAttribute(SECTION_INDEX);
     }
   }, {
     key: '_renderSectionNavs',
@@ -502,7 +516,7 @@ var Wall = function () {
           });
 
           var currentNav = navItems.find(function (item) {
-            return item.getAttribute('data-wall-nav-index') === _this6.getCurrentSectionIndex();
+            return item.getAttribute(NAV_INDEX) === _this6.getCurrentSectionIndex();
           });
           (0, _utils.addClass)(currentNav, sectionNavItemActiveClass);
         });
@@ -524,7 +538,7 @@ var Wall = function () {
         this.restSections = _sections$reverse2.slice(1);
 
         this.sections = [this.currentSection].concat(_toConsumableArray(this.restSections.reverse()));
-        this.screenType = SECTION;
+        this.screenType = SCREEN_SECTION;
 
         this._refreshAnimateStatus(true)._animateScreen(this.currentSection, this.sections);
       }
@@ -537,7 +551,7 @@ var Wall = function () {
       if (!this.isAnimating) {
         // move current section to last of the queue
         this.sections = [].concat(_toConsumableArray(this.restSections), [this.currentSection]);
-        this.screenType = SECTION;
+        this.screenType = SCREEN_SECTION;
 
         this._refreshAnimateStatus(false)._animateScreen(this.currentSection, this.sections);
       }
@@ -551,7 +565,7 @@ var Wall = function () {
       if (!this.isAnimating) {
         this.sections = (0, _utils.toArray)(this.wrapper.children);
         var targetSection = this.sections.find(function (section) {
-          return section.getAttribute('data-wall-section-index') == index;
+          return section.getAttribute(SECTION_INDEX) == index;
         });
 
         var prevSections = this.sections.slice(0, index - 1);
@@ -567,7 +581,7 @@ var Wall = function () {
           this._queue(this.sections);
         }
 
-        this.screenType = SECTION;
+        this.screenType = SCREEN_SECTION;
         this._animateScreen(this.currentSection, this.sections);
       }
     }
@@ -583,7 +597,7 @@ var Wall = function () {
         this.restSlides = _currentSlides$revers2.slice(1);
 
         this.currentSlides = [this.currentSlide].concat(_toConsumableArray(this.restSlides.reverse()));
-        this.screenType = SLIDE;
+        this.screenType = SCREEN_SLIDE;
 
         this._refreshAnimateStatus(true)._animateScreen(this.currentSlide, this.currentSlides);
       }
@@ -593,7 +607,7 @@ var Wall = function () {
     value: function nextSlide() {
       if (!this.isAnimating) {
         this.currentSlides = [].concat(_toConsumableArray(this.restSlides), [this.currentSlide]);
-        this.screenType = SLIDE;
+        this.screenType = SCREEN_SLIDE;
 
         this._refreshAnimateStatus(false)._animateScreen(this.currentSlide, this.currentSlides);
       }
@@ -655,37 +669,6 @@ var removeClass = exports.removeClass = function removeClass(el, className) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-var linear = exports.linear = function linear(t, b, c, d) {
-  return c * t / d + b;
-};
-
-var easeIn = exports.easeIn = function easeIn(t, b, c, d) {
-  t /= d;
-  return c * t * t + b;
-};
-
-var easeOut = exports.easeOut = function easeOut(t, b, c, d) {
-  t /= d;
-  return -c * t * (t - 2) + b;
-};
-
-var easeInOut = exports.easeInOut = function easeInOut(t, b, c, d) {
-  t /= d / 2;
-  if (t < 1) return c / 2 * t * t * t * t + b;
-  t -= 2;
-  return -c / 2 * (t * t * t * t - 2) + b;
-};
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 var testElement = document.createElement('div');
 
 var hasTransform3d = exports.hasTransform3d = 'WebkitPerspective' in testElement.style || 'MozPerspective' in testElement.style || 'msPerspective' in testElement.style || 'OPerspective' in testElement.style || 'perspective' in testElement.style;
@@ -721,6 +704,69 @@ var getScreenWidth = exports.getScreenWidth = function getScreenWidth() {
 var getScreenHeight = exports.getScreenHeight = function getScreenHeight() {
   return window.innerHeight && document.documentElement.clientHeight ? Math.min(window.innerHeight, document.documentElement.clientHeight) : window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 };
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var linear = exports.linear = function linear(t, b, c, d) {
+  return c * t / d + b;
+};
+
+var easeIn = exports.easeIn = function easeIn(t, b, c, d) {
+  t /= d;
+  return c * t * t + b;
+};
+
+var easeOut = exports.easeOut = function easeOut(t, b, c, d) {
+  t /= d;
+  return -c * t * (t - 2) + b;
+};
+
+var easeInOut = exports.easeInOut = function easeInOut(t, b, c, d) {
+  t /= d / 2;
+  if (t < 1) return c / 2 * t * t * t * t + b;
+  t -= 2;
+  return -c / 2 * (t * t * t * t - 2) + b;
+};
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+if (!Array.prototype.find) {
+  Array.prototype.find = function (predicate) {
+    'use strict';
+
+    if (this == null) {
+      throw new TypeError('Array.prototype.find called on null or undefined');
+    }
+    if (typeof predicate !== 'function') {
+      throw new TypeError('predicate must be a function');
+    }
+    var list = Object(this);
+    var length = list.length >>> 0;
+    var thisArg = arguments[1];
+    var value;
+
+    for (var i = 0; i < length; i++) {
+      value = list[i];
+      if (predicate.call(thisArg, value, i, list)) {
+        return value;
+      }
+    }
+    return undefined;
+  };
+}
 
 /***/ })
 /******/ ]);

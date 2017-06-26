@@ -1,9 +1,22 @@
 import { toArray, throwNewError, merge, addClass, removeClass } from './utils';
-import * as easing from './easing';
 import { rAF, cAF, hasTransform3d, transformProp, mousewheelEvent, getScreenHeight, getScreenWidth } from './dom';
+import * as easing from './easing';
+import './polyfill';
 
-const SECTION = 'section';
-const SLIDE = 'slide';
+const SCREEN_SECTION = 'section';
+const SCREEN_SLIDE = 'slide';
+const DATA_PRE = 'data-wall';
+
+const ANIMATE_DURATION = `${DATA_PRE}-animate-duration`;
+
+const SECTION_NAV = `${DATA_PRE}-section-nav`;
+const SECTION_INDEX = `${DATA_PRE}-section-index`;
+
+const NAV_INDEX = `${DATA_PRE}-nav-index`;
+
+const SLIDE = `${DATA_PRE}-slide`;
+const SLIDE_INDEX = `${DATA_PRE}-slide-index`;
+const SLIDE_ARROW = `${DATA_PRE}-slide-arrow`;
 
 const defaultOptions = {
   wrapperZIndex: 1,
@@ -43,7 +56,7 @@ class Wall {
     // merge default options and custom options
     this.options = merge(defaultOptions, options);
     // set up nav element
-    this.navElements = toArray(document.querySelectorAll('[data-wall-section-nav]'));
+    this.navElements = toArray(document.querySelectorAll(`[${SECTION_NAV}]`));
 
     this.easeFunction = typeof this.options.easeFunction === 'string' ? easing[this.options.easeFunction] : this.options.easeFunction;
 
@@ -55,7 +68,7 @@ class Wall {
     this.isAnimating = false;
     // mark if the screen is ready to back
     this.isToBack = false;
-    this.screenType = SECTION;
+    this.screenType = SCREEN_SECTION;
 
     this._init();
   }
@@ -105,7 +118,7 @@ class Wall {
     [this.currentSection, ...this.restSections] = this.sections;
 
     this.sections.forEach((section, index) => {
-      section.setAttribute('data-wall-section-index', index + 1);
+      section.setAttribute(SECTION_INDEX, index + 1);
       section.addEventListener(mousewheelEvent, this._handleWheelEvent.bind(this));
     });
     return this;
@@ -157,9 +170,9 @@ class Wall {
 
         const navItems = toArray(navElement.children);
         navItems.forEach((item, index) => {
-          item.setAttribute('data-wall-nav-index', index + 1);
+          item.setAttribute(NAV_INDEX, index + 1);
           item.addEventListener('click', () => {
-            this.goToSection(item.getAttribute('data-wall-nav-index'));
+            this.goToSection(item.getAttribute(NAV_INDEX));
           });
         });
       });
@@ -169,11 +182,11 @@ class Wall {
   }
 
   _setupSlides() {
-    this.currentSlides = toArray(this.currentSection.querySelectorAll('[data-wall-slide'));
+    this.currentSlides = toArray(this.currentSection.querySelectorAll(`[${SLIDE}]`));
 
     this.sections.forEach(section => {
-      const slides = toArray(section.querySelectorAll('[data-wall-slide]'));
-      const arrows = toArray(section.querySelectorAll('[data-wall-slide-arrow]'));
+      const slides = toArray(section.querySelectorAll(`[${SLIDE}]`));
+      const arrows = toArray(section.querySelectorAll(`[${SLIDE_ARROW}]`));
       if (slides.length) {
         slides.forEach((slide, index) => {
           slide.style.position = 'absolute';
@@ -184,7 +197,7 @@ class Wall {
           slide.style.bottom = 0;
           slide.style.left = 0;
 
-          slide.setAttribute('data-wall-slide-index', index + 1);
+          slide.setAttribute(SLIDE_INDEX, index + 1);
         });
 
         slides.reverse().forEach((slide, index) => slide.style.zIndex = index + 1);
@@ -234,11 +247,11 @@ class Wall {
     return this;
   }
 
-  _resetCurrent() {
+  _resetCurrentSlides() {
     [this.currentSection, ...this.restSections] = this.sections;
 
     this.currentSlides =
-      toArray(this.currentSection.querySelectorAll('[data-wall-slide]'))
+      toArray(this.currentSection.querySelectorAll(`[${SLIDE}]`))
         .sort((a, b) => +b.style.zIndex - +a.style.zIndex);
 
     if (this.currentSlide) removeClass(this.currentSlide, this.options.currentClass);
@@ -255,10 +268,10 @@ class Wall {
     this.isAnimating = true;
     this.lastTime = Date.now();
 
-    if (this.screenType === SECTION) {
+    if (this.screenType === SCREEN_SECTION) {
       addClass(this.currentSection, this.options.animatingClass);
     }
-    if (this.currentSlide && this.screenType === SLIDE) {
+    if (this.currentSlide && this.screenType === SCREEN_SLIDE) {
       addClass(this.currentSlide, this.options.animatingClass);
     }
 
@@ -271,13 +284,12 @@ class Wall {
 
     currentScreen.style.zIndex = screenList.length + 1;
 
-    this
-      ._updateCurrentScreenPosition(delta)
+    this._updateCurrentScreenPosition(delta)
       ._renderSectionPosition(currentScreen, this.currentScreenPosition);
 
     if ((this.currentScreenPosition > 99.9 && !this.isToBack) || (this.currentScreenPosition < 0.1 && this.isToBack)) {
       this._refresh()._queue(screenList);
-      if (this.screenType === SECTION) this._resetCurrent();
+      if (this.screenType === SCREEN_SECTION) this._resetCurrentSlides();
       return this;
     };
 
@@ -287,7 +299,7 @@ class Wall {
   }
 
   _updateCurrentScreenPosition(delta) {
-    const currentDuration = this.screenType === SECTION ? +this.currentSection.getAttribute('data-wall-animate-duration') : +this.currentSlide.getAttribute('data-wall-animate-duration');
+    const currentDuration = this.screenType === SCREEN_SECTION ? +this.currentSection.getAttribute(ANIMATE_DURATION) : +this.currentSlide.getAttribute(ANIMATE_DURATION);
     const duration = currentDuration || this.options.sectionAnimateDuration;
     const target = this.isToBack ? 0 : 100;
 
@@ -298,10 +310,10 @@ class Wall {
 
   _renderSectionPosition(screen, pos) {
     switch (this.screenType) {
-      case SECTION:
+      case SCREEN_SECTION:
         screen.style[transformProp] = `translate(0, -${pos}%) ${this.translateZ}`;
         break;
-      case SLIDE:
+      case SCREEN_SLIDE:
         screen.style[transformProp] = `translate(-${pos}%, 0) ${this.translateZ}`;
         break;
 
@@ -312,7 +324,7 @@ class Wall {
   }
 
   getCurrentSectionIndex() {
-    return this.currentSection.getAttribute('data-wall-section-index');
+    return this.currentSection.getAttribute(SECTION_INDEX);
   }
 
   _renderSectionNavs() {
@@ -323,7 +335,7 @@ class Wall {
         const navItems = toArray(navElement.children);
         navItems.forEach(item => removeClass(item, sectionNavItemActiveClass));
 
-        const currentNav = navItems.find(item => item.getAttribute('data-wall-nav-index') === this.getCurrentSectionIndex());
+        const currentNav = navItems.find(item => item.getAttribute(NAV_INDEX) === this.getCurrentSectionIndex());
         addClass(currentNav, sectionNavItemActiveClass);
       });
 
@@ -337,10 +349,9 @@ class Wall {
       // reverse the sections array and set the last section to be the current section
       [this.currentSection, ...this.restSections] = this.sections.reverse();
       this.sections = [this.currentSection, ...this.restSections.reverse()];
-      this.screenType = SECTION;
+      this.screenType = SCREEN_SECTION;
 
-      this
-        ._refreshAnimateStatus(true)
+      this._refreshAnimateStatus(true)
         ._animateScreen(this.currentSection, this.sections);
     }
   }
@@ -351,10 +362,9 @@ class Wall {
     if (!this.isAnimating) {
       // move current section to last of the queue
       this.sections = [...this.restSections, this.currentSection];
-      this.screenType = SECTION;
+      this.screenType = SCREEN_SECTION;
 
-      this
-        ._refreshAnimateStatus(false)
+      this._refreshAnimateStatus(false)
         ._animateScreen(this.currentSection, this.sections);
     }
   }
@@ -365,7 +375,7 @@ class Wall {
 
     if (!this.isAnimating) {
       this.sections = toArray(this.wrapper.children);
-      const targetSection = this.sections.find(section => section.getAttribute('data-wall-section-index') == index);
+      const targetSection = this.sections.find(section => section.getAttribute(SECTION_INDEX) == index);
 
       const prevSections = this.sections.slice(0, index - 1);
       const nextSections = this.sections.slice(index);
@@ -380,7 +390,7 @@ class Wall {
         this._queue(this.sections);
       }
 
-      this.screenType = SECTION;
+      this.screenType = SCREEN_SECTION;
       this._animateScreen(this.currentSection, this.sections);
     }
   }
@@ -389,10 +399,9 @@ class Wall {
     if (!this.isAnimating) {
       [this.currentSlide, ...this.restSlides] = this.currentSlides.reverse();
       this.currentSlides = [this.currentSlide, ...this.restSlides.reverse()];
-      this.screenType = SLIDE;
+      this.screenType = SCREEN_SLIDE;
 
-      this
-        ._refreshAnimateStatus(true)
+      this._refreshAnimateStatus(true)
         ._animateScreen(this.currentSlide, this.currentSlides);
     }
   }
@@ -400,14 +409,12 @@ class Wall {
   nextSlide() {
     if (!this.isAnimating) {
       this.currentSlides = [...this.restSlides, this.currentSlide];
-      this.screenType = SLIDE;
+      this.screenType = SCREEN_SLIDE;
 
-      this
-        ._refreshAnimateStatus(false)
+      this._refreshAnimateStatus(false)
         ._animateScreen(this.currentSlide, this.currentSlides);
     }
   }
-
 }
 
 module.exports = Wall;
