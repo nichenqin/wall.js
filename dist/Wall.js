@@ -376,7 +376,24 @@ var Wall = function () {
       this._updateCurrentScreenPosition(delta)._renderSectionPosition(currentScreen, this.currentScreenPosition);
 
       if (this.currentScreenPosition >= 100 || this.currentScreenPosition < 0.1 && this.isToBack) {
-        return this._refresh()._queue(screenList);
+        this._refresh()._queue(screenList);
+        if (screenList == this.sections) {
+          var _sections3 = _toArray(this.sections);
+
+          this.currentSection = _sections3[0];
+          this.restSections = _sections3.slice(1);
+
+
+          this.currentSlides = (0, _utils.toArray)(this.currentSection.querySelectorAll('[data-wall-slide]')).sort(function (a, b) {
+            return +b.style.zIndex - +a.style.zIndex;
+          });
+
+          var _currentSlides2 = _toArray(this.currentSlides);
+
+          this.currentSlide = _currentSlides2[0];
+          this.restSlides = _currentSlides2.slice(1);
+        }
+        return this;
       };
 
       if (this.isAnimating) {

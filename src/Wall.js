@@ -229,7 +229,18 @@ class Wall {
       ._renderSectionPosition(currentScreen, this.currentScreenPosition);
 
     if (this.currentScreenPosition >= 100 || (this.currentScreenPosition < 0.1 && this.isToBack)) {
-      return this._refresh()._queue(screenList);
+      this._refresh()._queue(screenList);
+      if (screenList == this.sections) {
+
+        [this.currentSection, ...this.restSections] = this.sections;
+
+        this.currentSlides =
+          toArray(this.currentSection.querySelectorAll('[data-wall-slide]'))
+            .sort((a, b) => +b.style.zIndex - +a.style.zIndex);
+
+        [this.currentSlide, ...this.restSlides] = this.currentSlides;
+      }
+      return this;
     };
 
     if (this.isAnimating) {
