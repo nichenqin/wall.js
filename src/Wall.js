@@ -77,13 +77,13 @@ class Wall {
     this.isAnimating = false;
 
     removeClass(this.currentSection, this.options.animatingClass);
-    removeClass(this.currentSection, this.options.currentClass);
+    this.sections.forEach(section => removeClass(section, this.options.currentClass));
     [this.currentSection, ...this.restSections] = this.sections;
     addClass(this.currentSection, this.options.currentClass);
 
-    if (this.currentSlide) {
+    if (this.currentSlides.length && this.currentSlide) {
       removeClass(this.currentSlide, this.options.animatingClass);
-      removeClass(this.currentSlide, this.options.currentClass);
+      this.currentSlides.forEach(slide => removeClass(slide, this.options.currentClass));
     }
     [this.currentSlide, ...this.restSlides] = this.currentSlides;
     if (this.currentSlide) addClass(this.currentSlide, this.options.currentClass);

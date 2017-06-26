@@ -174,13 +174,17 @@ var Wall = function () {
   }, {
     key: '_refresh',
     value: function _refresh(force) {
+      var _this2 = this;
+
       if (force) this._setupSize()._cssBody()._cssWrapper()._setupSections()._cssSections()._queue(this.sections)._setupSlides()._setupSectionNav();
 
       (0, _dom.cAF)(this.requestId);
       this.isAnimating = false;
 
       (0, _utils.removeClass)(this.currentSection, this.options.animatingClass);
-      (0, _utils.removeClass)(this.currentSection, this.options.currentClass);
+      this.sections.forEach(function (section) {
+        return (0, _utils.removeClass)(section, _this2.options.currentClass);
+      });
 
       var _sections = _toArray(this.sections);
 
@@ -189,9 +193,11 @@ var Wall = function () {
 
       (0, _utils.addClass)(this.currentSection, this.options.currentClass);
 
-      if (this.currentSlide) {
+      if (this.currentSlides.length && this.currentSlide) {
         (0, _utils.removeClass)(this.currentSlide, this.options.animatingClass);
-        (0, _utils.removeClass)(this.currentSlide, this.options.currentClass);
+        this.currentSlides.forEach(function (slide) {
+          return (0, _utils.removeClass)(slide, _this2.options.currentClass);
+        });
       }
 
       var _currentSlides = _toArray(this.currentSlides);
@@ -215,7 +221,7 @@ var Wall = function () {
   }, {
     key: '_setupSections',
     value: function _setupSections() {
-      var _this2 = this;
+      var _this3 = this;
 
       var _sections2 = _toArray(this.sections);
 
@@ -225,7 +231,7 @@ var Wall = function () {
 
       this.sections.forEach(function (section, index) {
         section.setAttribute('data-wall-section-index', index + 1);
-        section.addEventListener(_dom.mousewheelEvent, _this2._handleWheelEvent.bind(_this2));
+        section.addEventListener(_dom.mousewheelEvent, _this3._handleWheelEvent.bind(_this3));
       });
       return this;
     }
@@ -281,17 +287,17 @@ var Wall = function () {
   }, {
     key: '_setupSectionNav',
     value: function _setupSectionNav() {
-      var _this3 = this;
+      var _this4 = this;
 
       if (this.navElements && this.navElements.length) {
         this.navElements.forEach(function (navElement) {
-          navElement.style.zIndex = _this3.options.wrapperZIndex + 1;
+          navElement.style.zIndex = _this4.options.wrapperZIndex + 1;
 
           var navItems = (0, _utils.toArray)(navElement.children);
           navItems.forEach(function (item, index) {
             item.setAttribute('data-wall-nav-index', index + 1);
             item.addEventListener('click', function () {
-              _this3.goToSection(item.getAttribute('data-wall-nav-index'));
+              _this4.goToSection(item.getAttribute('data-wall-nav-index'));
             });
           });
         });
@@ -367,7 +373,7 @@ var Wall = function () {
   }, {
     key: '_queue',
     value: function _queue(screenList) {
-      var _this4 = this;
+      var _this5 = this;
 
       screenList.reverse().forEach(function (section, index) {
         section.style.zIndex = index + 1;
@@ -375,7 +381,7 @@ var Wall = function () {
       screenList.reverse();
 
       screenList.forEach(function (section) {
-        return _this4._renderSectionPosition(section, 0);
+        return _this5._renderSectionPosition(section, 0);
       });
 
       return this;
@@ -476,7 +482,7 @@ var Wall = function () {
   }, {
     key: '_renderSectionNavs',
     value: function _renderSectionNavs() {
-      var _this5 = this;
+      var _this6 = this;
 
       if (this.navElements && this.navElements.length) {
         var sectionNavItemActiveClass = this.options.sectionNavItemActiveClass;
@@ -489,7 +495,7 @@ var Wall = function () {
           });
 
           var currentNav = navItems.find(function (item) {
-            return item.getAttribute('data-wall-nav-index') === _this5.getCurrentSectionIndex();
+            return item.getAttribute('data-wall-nav-index') === _this6.getCurrentSectionIndex();
           });
           (0, _utils.addClass)(currentNav, sectionNavItemActiveClass);
         });
