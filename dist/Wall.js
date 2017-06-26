@@ -389,14 +389,14 @@ var Wall = function () {
         return +b.style.zIndex - +a.style.zIndex;
       });
 
-      (0, _utils.removeClass)(this.currentSlide, this.options.currentClass);
+      if (this.currentSlide) (0, _utils.removeClass)(this.currentSlide, this.options.currentClass);
 
       var _currentSlides2 = _toArray(this.currentSlides);
 
       this.currentSlide = _currentSlides2[0];
       this.restSlides = _currentSlides2.slice(1);
 
-      (0, _utils.addClass)(this.currentSlide, this.options.currentClass);
+      if (this.currentSlide) (0, _utils.addClass)(this.currentSlide, this.options.currentClass);
 
       return this;
     }

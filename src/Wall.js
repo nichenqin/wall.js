@@ -235,9 +235,9 @@ class Wall {
       toArray(this.currentSection.querySelectorAll('[data-wall-slide]'))
         .sort((a, b) => +b.style.zIndex - +a.style.zIndex);
 
-    removeClass(this.currentSlide, this.options.currentClass);
+    if (this.currentSlide) removeClass(this.currentSlide, this.options.currentClass);
     [this.currentSlide, ...this.restSlides] = this.currentSlides;
-    addClass(this.currentSlide, this.options.currentClass);
+    if (this.currentSlide) addClass(this.currentSlide, this.options.currentClass);
 
     return this;
   }
