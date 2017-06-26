@@ -2,14 +2,16 @@ import { toArray, throwNewError, merge, addClass, removeClass } from './utils';
 import { easeInOutExpo } from './easing';
 import { rAF, cAF, hasTransform3d, transformProp, mousewheelEvent, getScreenHeight, getScreenWidth } from './dom';
 
+const SECTION = 'section';
+const SLIDE = 'slide';
+
 const defaultOptions = {
   wrapperZIndex: 1,
   sectionAnimateDuration: 1,
   easeFunction: easeInOutExpo,
   loopToBottom: false,
   loopToTop: false,
-  navElement: '.wall-nav',
-  sectionNavItemActiveClass: 'active',
+  sectionNavItemActiveClass: 'active'
 };
 
 const body = document.getElementsByTagName('body')[0];
@@ -49,6 +51,7 @@ class Wall {
     this.isAnimating = false;
     // mark if the screen is ready to back
     this.isToBack = false;
+    this.screenType = SECTION;
 
     this._init();
   }
@@ -66,7 +69,7 @@ class Wall {
         ._setupSize()._cssBody()._cssWrapper()
         ._setupSections()._cssSections()._queue(this.sections)
         ._setupSlides()
-        ._setupNav();
+        ._setupSectionNav();
 
     cAF(this.requestId);
     this.isAnimating = false;
@@ -74,7 +77,7 @@ class Wall {
     [this.currentSection, ...this.restSections] = this.sections;
     [this.currentSlide, ...this.restSlides] = this.currentSlides;
 
-    this._renderNavElement();
+    this._renderSectionNavs();
 
     return this;
   }
@@ -126,7 +129,7 @@ class Wall {
     return this;
   }
 
-  _setupNav() {
+  _setupSectionNav() {
     if (this.navElements && this.navElements.length) {
       this.navElements.forEach(navElement => {
         navElement.style.zIndex = this.options.wrapperZIndex + 1;
@@ -231,7 +234,7 @@ class Wall {
 
     if (this.currentScreenPosition >= 100 || (this.currentScreenPosition < 0.1 && this.isToBack)) {
       this._refresh()._queue(screenList);
-      if (screenList == this.sections) {
+      if (this.screenType === SECTION) {
 
         [this.currentSection, ...this.restSections] = this.sections;
 
@@ -259,14 +262,25 @@ class Wall {
   }
 
   _renderSectionPosition(screen, pos) {
-    screen.style[transformProp] = `translate(0, -${pos}%) ${this.translateZ}`;
+    switch (this.screenType) {
+      case SECTION:
+        screen.style[transformProp] = `translate(0, -${pos}%) ${this.translateZ}`;
+        break;
+      case SLIDE:
+        screen.style[transformProp] = `translate(-${pos}%, 0) ${this.translateZ}`;
+        break;
+
+      default:
+        screen.style[transformProp] = `translate(0, -${pos}%) ${this.translateZ}`;
+        break;
+    }
   }
 
   getCurrentSectionIndex() {
     return this.currentSection.getAttribute('data-wall-section-index');
   }
 
-  _renderNavElement() {
+  _renderSectionNavs() {
     if (this.navElements && this.navElements.length) {
       const { sectionNavItemActiveClass } = this.options;
       this.navElements.forEach(navElement => {
@@ -286,6 +300,7 @@ class Wall {
       // reverse the sections array and set the last section to be the current section
       [this.currentSection, ...this.restSections] = this.sections.reverse();
       this.sections = [this.currentSection, ...this.restSections.reverse()];
+      this.screenType = SECTION;
 
       this
         ._refreshAnimateStatus(true)
@@ -299,6 +314,7 @@ class Wall {
     if (!this.isAnimating) {
       // move current section to last of the queue
       this.sections = [...this.restSections, this.currentSection];
+      this.screenType = SECTION;
 
       this
         ._refreshAnimateStatus(false)
@@ -327,6 +343,7 @@ class Wall {
         this._queue(this.sections);
       }
 
+      this.screenType = SECTION;
       this._animateScreen(this.currentSection, this.sections);
     }
   }
@@ -335,6 +352,7 @@ class Wall {
     if (!this.isAnimating) {
       [this.currentSlide, ...this.restSlides] = this.currentSlides.reverse();
       this.currentSlides = [this.currentSlide, ...this.restSlides.reverse()];
+      this.screenType = SLIDE;
 
       this
         ._refreshAnimateStatus(true)
@@ -345,6 +363,7 @@ class Wall {
   nextSlide() {
     if (!this.isAnimating) {
       this.currentSlides = [...this.restSlides, this.currentSlide];
+      this.screenType = SLIDE;
 
       this
         ._refreshAnimateStatus(false)

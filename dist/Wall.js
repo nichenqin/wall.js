@@ -99,13 +99,15 @@ function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defi
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var SECTION = 'section';
+var SLIDE = 'slide';
+
 var defaultOptions = {
   wrapperZIndex: 1,
   sectionAnimateDuration: 1,
   easeFunction: _easing.easeInOutExpo,
   loopToBottom: false,
   loopToTop: false,
-  navElement: '.wall-nav',
   sectionNavItemActiveClass: 'active'
 };
 
@@ -150,6 +152,7 @@ var Wall = function () {
     this.isAnimating = false;
     // mark if the screen is ready to back
     this.isToBack = false;
+    this.screenType = SECTION;
 
     this._init();
   }
@@ -169,7 +172,7 @@ var Wall = function () {
   }, {
     key: '_refresh',
     value: function _refresh(force) {
-      if (force) this._setupSize()._cssBody()._cssWrapper()._setupSections()._cssSections()._queue(this.sections)._setupSlides()._setupNav();
+      if (force) this._setupSize()._cssBody()._cssWrapper()._setupSections()._cssSections()._queue(this.sections)._setupSlides()._setupSectionNav();
 
       (0, _dom.cAF)(this.requestId);
       this.isAnimating = false;
@@ -185,7 +188,7 @@ var Wall = function () {
       this.restSlides = _currentSlides.slice(1);
 
 
-      this._renderNavElement();
+      this._renderSectionNavs();
 
       return this;
     }
@@ -255,8 +258,8 @@ var Wall = function () {
       return this;
     }
   }, {
-    key: '_setupNav',
-    value: function _setupNav() {
+    key: '_setupSectionNav',
+    value: function _setupSectionNav() {
       var _this3 = this;
 
       if (this.navElements && this.navElements.length) {
@@ -378,7 +381,7 @@ var Wall = function () {
 
       if (this.currentScreenPosition >= 100 || this.currentScreenPosition < 0.1 && this.isToBack) {
         this._refresh()._queue(screenList);
-        if (screenList == this.sections) {
+        if (this.screenType === SECTION) {
           var _sections3 = _toArray(this.sections);
 
           this.currentSection = _sections3[0];
@@ -414,7 +417,18 @@ var Wall = function () {
   }, {
     key: '_renderSectionPosition',
     value: function _renderSectionPosition(screen, pos) {
-      screen.style[_dom.transformProp] = 'translate(0, -' + pos + '%) ' + this.translateZ;
+      switch (this.screenType) {
+        case SECTION:
+          screen.style[_dom.transformProp] = 'translate(0, -' + pos + '%) ' + this.translateZ;
+          break;
+        case SLIDE:
+          screen.style[_dom.transformProp] = 'translate(-' + pos + '%, 0) ' + this.translateZ;
+          break;
+
+        default:
+          screen.style[_dom.transformProp] = 'translate(0, -' + pos + '%) ' + this.translateZ;
+          break;
+      }
     }
   }, {
     key: 'getCurrentSectionIndex',
@@ -422,8 +436,8 @@ var Wall = function () {
       return this.currentSection.getAttribute('data-wall-section-index');
     }
   }, {
-    key: '_renderNavElement',
-    value: function _renderNavElement() {
+    key: '_renderSectionNavs',
+    value: function _renderSectionNavs() {
       var _this5 = this;
 
       if (this.navElements && this.navElements.length) {
@@ -457,6 +471,7 @@ var Wall = function () {
         this.restSections = _sections$reverse2.slice(1);
 
         this.sections = [this.currentSection].concat(_toConsumableArray(this.restSections.reverse()));
+        this.screenType = SECTION;
 
         this._refreshAnimateStatus(true)._animateScreen(this.currentSection, this.sections);
       }
@@ -469,6 +484,7 @@ var Wall = function () {
       if (!this.isAnimating) {
         // move current section to last of the queue
         this.sections = [].concat(_toConsumableArray(this.restSections), [this.currentSection]);
+        this.screenType = SECTION;
 
         this._refreshAnimateStatus(false)._animateScreen(this.currentSection, this.sections);
       }
@@ -498,6 +514,7 @@ var Wall = function () {
           this._queue(this.sections);
         }
 
+        this.screenType = SECTION;
         this._animateScreen(this.currentSection, this.sections);
       }
     }
@@ -513,6 +530,7 @@ var Wall = function () {
         this.restSlides = _currentSlides$revers2.slice(1);
 
         this.currentSlides = [this.currentSlide].concat(_toConsumableArray(this.restSlides.reverse()));
+        this.screenType = SLIDE;
 
         this._refreshAnimateStatus(true)._animateScreen(this.currentSlide, this.currentSlides);
       }
@@ -522,6 +540,7 @@ var Wall = function () {
     value: function nextSlide() {
       if (!this.isAnimating) {
         this.currentSlides = [].concat(_toConsumableArray(this.restSlides), [this.currentSlide]);
+        this.screenType = SLIDE;
 
         this._refreshAnimateStatus(false)._animateScreen(this.currentSlide, this.currentSlides);
       }
