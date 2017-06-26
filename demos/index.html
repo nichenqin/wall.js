@@ -15,6 +15,16 @@
       font-family: 'Spectral', serif;
     }
 
+    .nav-link {
+      cursor: pointer;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      color: #fff;
+      background: #5c6bc0;
+    }
+
     section h1 {
       position: absolute;
       top: 50%;
@@ -73,7 +83,7 @@
       cursor: pointer;
     }
 
-    .wall-nav {
+    .dot {
       position: absolute;
       left: 0;
       right: 0;
@@ -83,7 +93,7 @@
       margin: 0;
     }
 
-    .wall-nav>li {
+    .dot>li {
       display: inline-block;
       width: 16px;
       height: 16px;
@@ -95,8 +105,8 @@
       cursor: pointer;
     }
 
-    .wall-nav>li.active,
-    .wall-nav>li:hover {
+    .dot>li.active,
+    .dot>li:hover {
       background-color: #fff;
     }
 
@@ -118,18 +128,26 @@
 </head>
 
 <body>
+  <ul class="nav" data-wall-section-nav>
+    <li class="nav-link">First</li>
+    <li class="nav-link">Second</li>
+    <li class="nav-link">Third</li>
+    <li class="nav-link">Forth</li>
+    <li class="nav-link">Fifth</li>
+    <li class="nav-link">Sixth</li>
+  </ul>
   <div class="wrapper">
     <section class="section-1">
-      <div class="section-1-slide-1" style="background-color: #ffccbc" data-wall-slide>
+      <div class="section-1-slide-1" style="background-color: #ce93d8" data-wall-slide>
         <h1>First Screen <br /> Slide 1</h1>
       </div>
       <div class="section-1-slide-2" style="background-color: #ffecb3" data-wall-slide>
         <h1>First Screen <br /> Slide 2</h1>
       </div>
-      <div class="section-1-slide-3" style="background-color: #ffecb3" data-wall-slide>
+      <div class="section-1-slide-3" style="background-color: #90caf9" data-wall-slide>
         <h1>First Screen <br /> Slide 3</h1>
       </div>
-      <div class="section-1-slide-4" style="background-color: #ffecb3" data-wall-slide>
+      <div class="section-1-slide-4" style="background-color: #ffe082" data-wall-slide>
         <h1>First Screen <br /> Slide 4</h1>
       </div>
       <button data-wall-slide-arrow class="prev-slide btn btn-secondary">Prev Slide</button>
@@ -228,7 +246,7 @@
   </div>
   <div id="prev" class="btn btn-secondary">prev</div>
   <div id="next" class="btn btn-primary">next</div>
-  <ul class="wall-nav">
+  <ul class="dot" data-wall-section-nav>
     <li></li>
     <li></li>
     <li></li>

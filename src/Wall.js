@@ -9,7 +9,7 @@ const defaultOptions = {
   loopToBottom: false,
   loopToTop: false,
   navElement: '.wall-nav',
-  navItemActiveClass: 'active',
+  sectionNavItemActiveClass: 'active',
 };
 
 const body = document.getElementsByTagName('body')[0];
@@ -39,9 +39,7 @@ class Wall {
     // merge default options and custom options
     this.options = merge(defaultOptions, options);
     // set up nav element
-    this.navElement = typeof this.options.navElement === 'string' ? document.querySelector(this.options.navElement) : this.options.navElement;
-    // if nav element exists, set nav items
-    this.navItems = this.navElement && toArray(this.navElement.children);
+    this.navElements = toArray(document.querySelectorAll('[data-wall-section-nav]'));
 
     // animation time stamp, control speed
     this.lastTime = null;
@@ -129,13 +127,16 @@ class Wall {
   }
 
   _setupNav() {
-    if (this.navElement) {
-      this.navElement.style.zIndex = this.options.wrapperZIndex + 1;
+    if (this.navElements && this.navElements.length) {
+      this.navElements.forEach(navElement => {
+        navElement.style.zIndex = this.options.wrapperZIndex + 1;
 
-      this.navItems.forEach((item, index) => {
-        item.setAttribute('data-wall-nav-index', index + 1);
-        item.addEventListener('click', () => {
-          this.goToSection(item.getAttribute('data-wall-nav-index'));
+        const navItems = toArray(navElement.children);
+        navItems.forEach((item, index) => {
+          item.setAttribute('data-wall-nav-index', index + 1);
+          item.addEventListener('click', () => {
+            this.goToSection(item.getAttribute('data-wall-nav-index'));
+          });
         });
       });
     }
@@ -266,12 +267,15 @@ class Wall {
   }
 
   _renderNavElement() {
-    if (this.navElement) {
-      const { navItemActiveClass } = this.options;
-      this.navItems.forEach(item => { removeClass(item, navItemActiveClass); });
+    if (this.navElements && this.navElements.length) {
+      const { sectionNavItemActiveClass } = this.options;
+      this.navElements.forEach(navElement => {
+        const navItems = toArray(navElement.children);
+        navItems.forEach(item => removeClass(item, sectionNavItemActiveClass));
+        const currentNav = navItems.find(item => item.getAttribute('data-wall-nav-index') === this.getCurrentSectionIndex());
+        addClass(currentNav, sectionNavItemActiveClass);
+      });
 
-      const currentNav = this.navItems.find(item => item.getAttribute('data-wall-nav-index') === this.getCurrentSectionIndex());
-      addClass(currentNav, navItemActiveClass);
     }
   }
 

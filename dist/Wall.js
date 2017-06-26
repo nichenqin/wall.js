@@ -106,7 +106,7 @@ var defaultOptions = {
   loopToBottom: false,
   loopToTop: false,
   navElement: '.wall-nav',
-  navItemActiveClass: 'active'
+  sectionNavItemActiveClass: 'active'
 };
 
 var body = document.getElementsByTagName('body')[0];
@@ -140,9 +140,7 @@ var Wall = function () {
     // merge default options and custom options
     this.options = (0, _utils.merge)(defaultOptions, options);
     // set up nav element
-    this.navElement = typeof this.options.navElement === 'string' ? document.querySelector(this.options.navElement) : this.options.navElement;
-    // if nav element exists, set nav items
-    this.navItems = this.navElement && (0, _utils.toArray)(this.navElement.children);
+    this.navElements = (0, _utils.toArray)(document.querySelectorAll('[data-wall-section-nav]'));
 
     // animation time stamp, control speed
     this.lastTime = null;
@@ -261,13 +259,16 @@ var Wall = function () {
     value: function _setupNav() {
       var _this3 = this;
 
-      if (this.navElement) {
-        this.navElement.style.zIndex = this.options.wrapperZIndex + 1;
+      if (this.navElements && this.navElements.length) {
+        this.navElements.forEach(function (navElement) {
+          navElement.style.zIndex = _this3.options.wrapperZIndex + 1;
 
-        this.navItems.forEach(function (item, index) {
-          item.setAttribute('data-wall-nav-index', index + 1);
-          item.addEventListener('click', function () {
-            _this3.goToSection(item.getAttribute('data-wall-nav-index'));
+          var navItems = (0, _utils.toArray)(navElement.children);
+          navItems.forEach(function (item, index) {
+            item.setAttribute('data-wall-nav-index', index + 1);
+            item.addEventListener('click', function () {
+              _this3.goToSection(item.getAttribute('data-wall-nav-index'));
+            });
           });
         });
       }
@@ -425,17 +426,19 @@ var Wall = function () {
     value: function _renderNavElement() {
       var _this5 = this;
 
-      if (this.navElement) {
-        var navItemActiveClass = this.options.navItemActiveClass;
+      if (this.navElements && this.navElements.length) {
+        var sectionNavItemActiveClass = this.options.sectionNavItemActiveClass;
 
-        this.navItems.forEach(function (item) {
-          (0, _utils.removeClass)(item, navItemActiveClass);
+        this.navElements.forEach(function (navElement) {
+          var navItems = (0, _utils.toArray)(navElement.children);
+          navItems.forEach(function (item) {
+            return (0, _utils.removeClass)(item, sectionNavItemActiveClass);
+          });
+          var currentNav = navItems.find(function (item) {
+            return item.getAttribute('data-wall-nav-index') === _this5.getCurrentSectionIndex();
+          });
+          (0, _utils.addClass)(currentNav, sectionNavItemActiveClass);
         });
-
-        var currentNav = this.navItems.find(function (item) {
-          return item.getAttribute('data-wall-nav-index') === _this5.getCurrentSectionIndex();
-        });
-        (0, _utils.addClass)(currentNav, navItemActiveClass);
       }
     }
   }, {
