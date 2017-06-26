@@ -5,16 +5,15 @@ import { rAF, cAF, hasTransform3d, transformProp, mousewheelEvent, getScreenHeig
 const SECTION = 'section';
 const SLIDE = 'slide';
 
-const ANIMATING_CLASS = 'animating';
-const CURRENT_CLASS = 'current';
-
 const defaultOptions = {
   wrapperZIndex: 1,
   sectionAnimateDuration: 1,
   easeFunction: easeInOutExpo,
   loopToBottom: false,
   loopToTop: false,
-  sectionNavItemActiveClass: 'active'
+  sectionNavItemActiveClass: 'active',
+  animatingClass: 'animating',
+  currentClass: 'current'
 };
 
 const body = document.getElementsByTagName('body')[0];
@@ -77,10 +76,13 @@ class Wall {
     cAF(this.requestId);
     this.isAnimating = false;
 
-    removeClass(this.currentSection, ANIMATING_CLASS);
+    removeClass(this.currentSection, this.options.animatingClass);
     [this.currentSection, ...this.restSections] = this.sections;
-    addClass(this.currentSection, CURRENT_CLASS);
+    addClass(this.currentSection, this.options.currentClass);
+
+    if (this.currentSlide) removeClass(this.currentSlide, this.options.animatingClass);
     [this.currentSlide, ...this.restSlides] = this.currentSlides;
+    if (this.currentSlide) addClass(this.currentSlide, this.options.currentClass);
 
     this._renderSectionNavs();
 
@@ -233,7 +235,9 @@ class Wall {
       toArray(this.currentSection.querySelectorAll('[data-wall-slide]'))
         .sort((a, b) => +b.style.zIndex - +a.style.zIndex);
 
+    removeClass(this.currentSlide, this.options.currentClass);
     [this.currentSlide, ...this.restSlides] = this.currentSlides;
+    addClass(this.currentSlide, this.options.currentClass);
 
     return this;
   }
@@ -244,8 +248,16 @@ class Wall {
     this.currentScreenPosition = this.isToBack ? 100 : 0;
     this.isAnimating = true;
     this.lastTime = Date.now();
-    removeClass(this.currentSection, CURRENT_CLASS);
-    addClass(this.currentSection, ANIMATING_CLASS);
+
+    if (this.screenType === SECTION) {
+      removeClass(this.currentSection, this.options.currentClass);
+      addClass(this.currentSection, this.options.animatingClass);
+    }
+    if (this.currentSlide && this.screenType === SLIDE) {
+      removeClass(this.currentSlide, this.options.currentClass);
+      addClass(this.currentSlide, this.options.animatingClass);
+    }
+
     return this;
   }
 
@@ -301,9 +313,11 @@ class Wall {
   _renderSectionNavs() {
     if (this.navElements && this.navElements.length) {
       const { sectionNavItemActiveClass } = this.options;
+
       this.navElements.forEach(navElement => {
         const navItems = toArray(navElement.children);
         navItems.forEach(item => removeClass(item, sectionNavItemActiveClass));
+
         const currentNav = navItems.find(item => item.getAttribute('data-wall-nav-index') === this.getCurrentSectionIndex());
         addClass(currentNav, sectionNavItemActiveClass);
       });

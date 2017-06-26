@@ -102,16 +102,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var SECTION = 'section';
 var SLIDE = 'slide';
 
-var ANIMATING_CLASS = 'animating';
-var CURRENT_CLASS = 'current';
-
 var defaultOptions = {
   wrapperZIndex: 1,
   sectionAnimateDuration: 1,
   easeFunction: _easing.easeInOutExpo,
   loopToBottom: false,
   loopToTop: false,
-  sectionNavItemActiveClass: 'active'
+  sectionNavItemActiveClass: 'active',
+  animatingClass: 'animating',
+  currentClass: 'current'
 };
 
 var body = document.getElementsByTagName('body')[0];
@@ -180,20 +179,23 @@ var Wall = function () {
       (0, _dom.cAF)(this.requestId);
       this.isAnimating = false;
 
-      (0, _utils.removeClass)(this.currentSection, ANIMATING_CLASS);
+      (0, _utils.removeClass)(this.currentSection, this.options.animatingClass);
 
       var _sections = _toArray(this.sections);
 
       this.currentSection = _sections[0];
       this.restSections = _sections.slice(1);
 
-      (0, _utils.addClass)(this.currentSection, CURRENT_CLASS);
+      (0, _utils.addClass)(this.currentSection, this.options.currentClass);
+
+      if (this.currentSlide) (0, _utils.removeClass)(this.currentSlide, this.options.animatingClass);
 
       var _currentSlides = _toArray(this.currentSlides);
 
       this.currentSlide = _currentSlides[0];
       this.restSlides = _currentSlides.slice(1);
 
+      if (this.currentSlide) (0, _utils.addClass)(this.currentSlide, this.options.currentClass);
 
       this._renderSectionNavs();
 
@@ -387,11 +389,14 @@ var Wall = function () {
         return +b.style.zIndex - +a.style.zIndex;
       });
 
+      (0, _utils.removeClass)(this.currentSlide, this.options.currentClass);
+
       var _currentSlides2 = _toArray(this.currentSlides);
 
       this.currentSlide = _currentSlides2[0];
       this.restSlides = _currentSlides2.slice(1);
 
+      (0, _utils.addClass)(this.currentSlide, this.options.currentClass);
 
       return this;
     }
@@ -403,8 +408,16 @@ var Wall = function () {
       this.currentScreenPosition = this.isToBack ? 100 : 0;
       this.isAnimating = true;
       this.lastTime = Date.now();
-      (0, _utils.removeClass)(this.currentSection, CURRENT_CLASS);
-      (0, _utils.addClass)(this.currentSection, ANIMATING_CLASS);
+
+      if (this.screenType === SECTION) {
+        (0, _utils.removeClass)(this.currentSection, this.options.currentClass);
+        (0, _utils.addClass)(this.currentSection, this.options.animatingClass);
+      }
+      if (this.currentSlide && this.screenType === SLIDE) {
+        (0, _utils.removeClass)(this.currentSlide, this.options.currentClass);
+        (0, _utils.addClass)(this.currentSlide, this.options.animatingClass);
+      }
+
       return this;
     }
   }, {
@@ -466,11 +479,13 @@ var Wall = function () {
       if (this.navElements && this.navElements.length) {
         var sectionNavItemActiveClass = this.options.sectionNavItemActiveClass;
 
+
         this.navElements.forEach(function (navElement) {
           var navItems = (0, _utils.toArray)(navElement.children);
           navItems.forEach(function (item) {
             return (0, _utils.removeClass)(item, sectionNavItemActiveClass);
           });
+
           var currentNav = navItems.find(function (item) {
             return item.getAttribute('data-wall-nav-index') === _this5.getCurrentSectionIndex();
           });
