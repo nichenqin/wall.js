@@ -89,7 +89,11 @@ var _utils = __webpack_require__(1);
 
 var _easing = __webpack_require__(2);
 
+var _easing2 = _interopRequireDefault(_easing);
+
 var _dom = __webpack_require__(3);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
@@ -102,10 +106,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var SECTION = 'section';
 var SLIDE = 'slide';
 
+console.log(_easing2.default);
+
 var defaultOptions = {
   wrapperZIndex: 1,
   sectionAnimateDuration: 1,
-  easeFunction: _easing.easeInOutExpo,
+  ease: 'easeInOut',
   loopToBottom: false,
   loopToTop: false,
   sectionNavItemActiveClass: 'active',
@@ -145,6 +151,9 @@ var Wall = function () {
     this.options = (0, _utils.merge)(defaultOptions, options);
     // set up nav element
     this.navElements = (0, _utils.toArray)(document.querySelectorAll('[data-wall-section-nav]'));
+
+    this.easingFunction = typeof this.options.ease === 'string' ? _easing2.default[this.options.ease] : this.options.ease;
+    console.log(this.easingFunction);
 
     // animation time stamp, control speed
     this.lastTime = null;
@@ -451,10 +460,11 @@ var Wall = function () {
   }, {
     key: '_updateCurrentScreenPosition',
     value: function _updateCurrentScreenPosition(delta) {
-      var duration = this.currentSection.getAttribute('data-wall-animate-duration') || this.options.sectionAnimateDuration;
+      var currentDuration = this.screenType === SECTION ? this.currentSection.getAttribute('data-wall-animate-duration') : this.currentSlide.getAttribute('data-wall-animate-duration');
+      var duration = currentDuration || this.options.sectionAnimateDuration;
       var target = this.isToBack ? 0 : 100;
 
-      this.currentScreenPosition = this.options.easeFunction(delta, this.currentScreenPosition, target - this.currentScreenPosition, duration);
+      this.currentScreenPosition = this.easingFunction(delta, this.currentScreenPosition, target - this.currentScreenPosition, duration);
 
       return this;
     }
@@ -538,7 +548,6 @@ var Wall = function () {
   }, {
     key: 'goToSection',
     value: function goToSection(index) {
-
       if (index === this.getCurrentSectionIndex()) return;
 
       if (!this.isAnimating) {
@@ -645,19 +654,30 @@ var removeClass = exports.removeClass = function removeClass(el, className) {
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-var easeInOutExpo = exports.easeInOutExpo = function easeInOutExpo(t, b, c, d) {
-  t /= d / 2;
-  if (t < 1) return c / 2 * Math.pow(2, 10 * (t - 1)) + b;
-  t--;
-  return c / 2 * (-Math.pow(2, -10 * t) + 2) + b;
+var easing = {};
+
+easing.linear = function (t, b, c, d) {
+  return c * t / d + b;
 };
 
-var easeInOutSine = exports.easeInOutSine = function easeInOutSine(t, b, c, d) {
-  return -c / 2 * (Math.cos(Math.PI * t / d) - 1) + b;
+easing.easeIn = function (t, b, c, d) {
+  t /= d;
+  return c * t * t + b;
 };
+
+easing.easeOut = function (t, b, c, d) {
+  t /= d;
+  return -c * t * (t - 2) + b;
+};
+
+easing.easeInOut = function (t, b, c, d) {
+  t /= d / 2;
+  if (t < 1) return c / 2 * t * t + b;
+  t--;
+  return -c / 2 * (t * (t - 2) - 1) + b;
+};
+
+module.exports = easing;
 
 /***/ }),
 /* 3 */
