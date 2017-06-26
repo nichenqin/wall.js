@@ -1,0 +1,139 @@
+html,
+body {
+  font-family: 'Spectral', serif;
+}
+
+.nav-link {
+  display: inline-block;
+  cursor: pointer;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: #fff;
+  background: #5c6bc0;
+}
+
+section h1 {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  text-align: center;
+  font-size: 100px;
+  font-weight: 700;
+  color: #fff;
+  opacity: 0;
+  transition: all .3s ease-in-out;
+}
+
+[data-wall-slide] h1 {
+  color: #000;
+}
+
+.current>h1 {
+  opacity: 1;
+  top: 40%;
+}
+
+.section-1 {
+  background-color: #ab47bc;
+}
+
+.section-2 {
+  background-color: #ffa000;
+}
+
+.section-3 {
+  background-color: #651fff;
+}
+
+.section-4 {
+  background-color: #ff7043
+}
+
+.section-5 {
+  background-color: #4caf50;
+}
+
+.section-6 {
+  background-color: #6d4c41;
+}
+
+#prev {
+  position: absolute;
+  font-size: 20px;
+  left: 100px;
+  bottom: 50px;
+  z-index: 3;
+  cursor: pointer;
+}
+
+#next {
+  position: absolute;
+  font-size: 20px;
+  right: 100px;
+  bottom: 50px;
+  z-index: 3;
+  cursor: pointer;
+}
+
+.dot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 50px;
+  text-align: center;
+  padding: 0;
+  margin: 0;
+}
+
+.dot>li {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background-color: transparent;
+  box-sizing: border-box;
+  list-style: none;
+  cursor: pointer;
+}
+
+.dot>li.active,
+.dot>li:hover {
+  background-color: #fff;
+}
+
+.prev-slide,
+.next-slide {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%) rotate(-45deg);
+  height: 30px;
+  width: 30px;
+  cursor: pointer;
+  transition: all .2s ease-in-out;
+}
+
+.prev-slide {
+  border-left: 3px solid #fff;
+  border-top: 3px solid #fff;
+  left: 50px;
+}
+
+.next-slide {
+  border-right: 3px solid #fff;
+  border-top: 3px solid #fff;
+  transform: translateY(-50%) rotate(45deg);
+  right: 50px;
+}
+
+.prev-slide:hover {
+  transform: translateY(-50%) rotate(-45deg) scale(1.1);
+}
+
+.next-slide:hover {
+  transform: translateY(-50%) rotate(45deg) scale(1.1);
+}
