@@ -1,6 +1,35 @@
 html,
 body {
-  font-family: 'Spectral', serif;
+  font-family: 'Merriweather', serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+p {
+  color: #f5f5f5;
+}
+
+p {
+  font-size: 20px;
+}
+
+span.hl {
+  color: #ffee58;
+  border-bottom: 1px dotted #ffee58;
+}
+
+.sub-header {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.wrapper {
+  max-width: 960px;
+  width: 98%;
+  margin: 0 auto;
 }
 
 .nav-link {
@@ -14,27 +43,24 @@ body {
   background: #5c6bc0;
 }
 
-section h1 {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
+.section {
+  padding: 40px 20px;
+}
+
+.section h1 {
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 5px #333;
   text-align: center;
   font-size: 100px;
   font-weight: 700;
-  color: #fff;
   opacity: 0;
+  transform: translateY(20px);
   transition: all .3s ease-in-out;
 }
 
-[data-wall-slide] h1 {
-  color: #000;
-}
-
-.current>h1 {
+.current h1 {
   opacity: 1;
-  top: 40%;
+  transform: translateY(0);
 }
 
 .section-1 {
@@ -42,7 +68,7 @@ section h1 {
 }
 
 .section-2 {
-  background-color: #ffa000;
+  background-color: #f57f17;
 }
 
 .section-3 {
@@ -59,6 +85,10 @@ section h1 {
 
 .section-6 {
   background-color: #6d4c41;
+}
+
+.slide {
+  padding: 40px 20px;
 }
 
 #prev {
@@ -81,18 +111,18 @@ section h1 {
 
 .dot {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 50px;
+  top: 50%;
+  right: 50px;
+  transform: translateY(-50%);
   text-align: center;
   padding: 0;
-  margin: 0;
+  margin: auto;
 }
 
 .dot>li {
-  display: inline-block;
   width: 16px;
   height: 16px;
+  margin-bottom: 10px;
   border: 2px solid #fff;
   border-radius: 50%;
   background-color: transparent;
@@ -120,14 +150,14 @@ section h1 {
 .prev-slide {
   border-left: 3px solid #fff;
   border-top: 3px solid #fff;
-  left: 50px;
+  left: 80px;
 }
 
 .next-slide {
   border-right: 3px solid #fff;
   border-top: 3px solid #fff;
   transform: translateY(-50%) rotate(45deg);
-  right: 50px;
+  right: 80px;
 }
 
 .prev-slide:hover {
