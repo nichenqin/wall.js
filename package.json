@@ -1,14 +1,24 @@
 {
     "name": "wall.js",
-    "version": "0.6.0",
-    "description": "",
-    "main": "index.js",
+    "version": "0.7.0",
+    "description": "fullpage",
+    "main": ".dist/wall.min.js",
+    "keywords": [
+        "fullpage",
+        "fullscreen",
+        "scrolling",
+        "scroll"
+    ],
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
         "build": "cross-env WEBPACK_ENV=build webpack",
         "dev": "cross-env WEBPACK_ENV=dev webpack --colors --watch"
     },
-    "author": "",
+    "author": "nichenqin",
+    "homepage": "https://github.com/nichenqin1001/wall.js",
+    "bugs": {
+        "url": "https://github.com/nichenqin1001/wall.js/issues",
+        "email": "nichenqin@hotmail.com"
+    },
     "license": "MIT",
     "devDependencies": {
         "babel-core": "^6.25.0",
