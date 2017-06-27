@@ -1,5 +1,7 @@
 # wall.js
 
+![wall.js](https://raw.githubusercontent.com/nichenqin1001/wall.js/master/asserts/wall.png)
+
 ## Demo And Documentation
 
 [Live Demo & Documentation](http://nichenqin.com/wall.js)
