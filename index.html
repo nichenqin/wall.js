@@ -31,7 +31,6 @@
         <h1>wall.js</h1>
         <h5 class="sub-header">Fullpage Piling, vanilla javascript, no dependency</h5>
         <h3 class="step">>> Get Started</h3>
-        <p>You should style your sections with background-color.</p>
         <pre class="html">
           <code>
             &lt;body&gt;
@@ -46,9 +45,9 @@
             &lt;script&gt;
               var wall = new Wall('#wrapper'); 
             &lt;/script&gt;
-
           </code>
-          </pre>
+        </pre>
+        <p>You should style your sections with background-color.</p>
       </div>
     </section>
     <section class="section section-2">
@@ -60,7 +59,7 @@
         <pre class="html">
           <code>
             &lt; !-- DON'T ADD THE NAV ELEMENT INSIDE THE WRAPPER -- &gt;
-            &lt;ul data-wall-section-nav&gt;
+            &lt;ul class="nav" data-wall-section-nav&gt;
               &lt;li&gt;First&lt;/li&gt;
               &lt;li&gt;Second&lt;/li&gt;
             &lt;/ul&gt;
@@ -68,6 +67,38 @@
               &lt;section&gt;First Section&lt;/section&gt;
               &lt;section&gt;Second Section&lt;/section&gt;
             &lt;/div&gt;
+            &lt;ul class="dot" data-wall-section-nav&gt;
+              &lt;li&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;/li&gt;
+            &lt;/ul&gt;
+          </code>
+        </pre>
+        <p>Style the nav element by yourself, here is an example of dot nav</p>
+        <pre class="css">
+          <code>
+            .dot {
+              position: absolute;
+              top: 50%;
+              right: 50px;
+              transform: translateY(-50%);
+            }
+
+            .dot>li {
+              width: 16px;
+              height: 16px;
+              margin-bottom: 10px;
+              border: 2px solid #fff;
+              border-radius: 50%;
+              background-color: transparent;
+              box-sizing: border-box;
+              list-style: none;
+              cursor: pointer;
+            }
+
+            .dot>li.active,
+            .dot>li:hover {
+              background-color: #fff;
+            }
           </code>
         </pre>
         <h3 class="step">>> Custom Config </h3>
@@ -130,7 +161,12 @@
         <pre class="html">
           <code>
             ...
-            &lt;section data-wall-animate-duration=3 &gt;
+            &lt;section class="section-1"&gt;
+            &lt;section class="section-2"&gt;
+            &lt;section class="section-3"&gt;
+            &lt;section class="section-4" data-wall-animate-duration=3&gt;
+            &lt;section class="section-5"&gt;
+            &lt;section class="section-6"&gt;
             ...
           </code>
         </pre>

@@ -64,7 +64,8 @@ span.hl {
 }
 
 .section-1 {
-  background-color: #ab47bc;
+  background-color: #ff6434;
+  background: linear-gradient( #ff6434 15%, #ffab00 0, #ffab00 30%, #ffff56 0, #ffff56 45%, #64dd17 0, #64dd17 60%, #00b8d4 0, #00b8d4 75%, #2962ff 0, #2962ff 90%, #6200ea 0, #6200ea 100%);
 }
 
 .section-2 {
