@@ -21,16 +21,17 @@
     <li class="nav-link">First-Intro</li>
     <li class="nav-link">Second-Navs</li>
     <li class="nav-link">Third-Slides</li>
-    <li class="nav-link">Forth</li>
-    <li class="nav-link">Fifth</li>
-    <li class="nav-link">Sixth</li>
+    <li class="nav-link">Forth-Duration</li>
+    <li class="nav-link">Fifth-Class</li>
+    <li class="nav-link">Sixth-Configs</li>
   </ul>
   <div id="wall">
     <section class="section section-1">
       <div class="wrapper">
         <h1>wall.js</h1>
         <h5 class="sub-header">Fullpage Piling, vanilla javascript, no dependency</h5>
-        <h3>>> Get Started</h3>
+        <h3 class="step">>> Get Started</h3>
+        <p>You should style your sections with background-color.</p>
         <pre class="html">
           <code>
             &lt;body&gt;
@@ -54,34 +55,46 @@
       <div class="wrapper">
         <h1>Config Navs</h1>
         <h5 class="sub-header">Do you see the nav at top and dots at right?</h5>
-        <h3>>> add <span class="hl">data-wall-section-nav</span> attribute to your HTMLElement</h3>
+        <h3 class="step">>> add <span class="hl">data-wall-section-nav</span> attribute to your own nav element</h3>
+        <p>Note: wall.js will not create them directly, what wall.js does is to toggle the active class</p>
         <pre class="html">
           <code>
             &lt; !-- DON'T ADD THE NAV ELEMENT INSIDE THE WRAPPER -- &gt;
-            &lt;ul class="nav" data-wall-section-nav&gt;
-              &lt;li class="nav-link"&gt;First&lt;/li&gt;
-              &lt;li class="nav-link"&gt;Second&lt;/li&gt;
+            &lt;ul data-wall-section-nav&gt;
+              &lt;li&gt;First&lt;/li&gt;
+              &lt;li&gt;Second&lt;/li&gt;
             &lt;/ul&gt;
-            &lt;div id="wall"&gt;
+            &lt;div id="wall"&gt; &lt;!-- wrapper --&gt;
               &lt;section&gt;First Section&lt;/section&gt;
               &lt;section&gt;Second Section&lt;/section&gt;
             &lt;/div&gt;
           </code>
         </pre>
-        <p>Note: wall.js will not create them directly, what wall.js does is to toggle the active class</p>
+        <h3 class="step">>> Custom Config </h3>
+        <p>wall.js will add 'active' class to the nav item when you move into new section.</p>
+        <p>You can set your own active class with config object when you init Wall.</p>
+        <pre class="javascript">
+          <code>
+            var config = {
+              sectionNavItemActiveClass: 'my-active-class'
+            }
+
+            var wall = new Wall('#wall',config);
+          </code>
+        </pre>
       </div>
     </section>
-    <section class="section section-3" data-wall-animate-duration=3>
+    <section class="section section-3">
       <div class="slide" style="background-color: #0277bd" data-wall-slide>
         <div class="wrapper">
-          <h1>Slides</h1>
-          <h3>>> add <span class="hl">data-wall-slide</span> attribute to your HTMLElement</h3>
+          <h1>Slides-1: Init Slide</h1>
+          <h3 class="step">>> add <span class="hl">data-wall-slide</span> attribute to your HTMLElement</h3>
           <pre class="html">
             <code>
               ...
-              &lt;section class="section-1"&gt;
-                &lt;div class="slide" data-wall-slide&gt; &lt;!-- wall.js will create horizontal move slides --&gt;
-                &lt;div class="slide" data-wall-slide&gt;
+              &lt;section&gt;
+                &lt;div data-wall-slide&gt; &lt;!-- wall.js will create horizontal move slides --&gt;
+                &lt;div data-wall-slide&gt;
               &lt;/section&gt;
               ...
             </code>
@@ -89,23 +102,108 @@
           <p>try to click arrow to toggle slide</p>
         </div>
       </div>
-      <div class="slide" style="background-color: #ef6c00" data-wall-slide>
-        <h1>Second Screen <br /> Slide 2</h1>
-      </div>
-      <div class="slide" style="background-color: #c2185b" data-wall-slide>
-        <h1>Second Screen <br /> Slide 3</h1>
+      <div class="slide" style="background-color: #ffa000" data-wall-slide>
+        <div class="wrapper">
+          <h1>Slides-2: Arrows</h1>
+          <h3 class="step">>> add <span class="hl">data-wall-slide-arrow</span> attribute to your arrows</h3>
+          <pre class="html">
+            <code>
+              &lt;section&gt;
+                &lt;div data-wall-slide&gt; &lt;!-- wall.js will create horizontal move slides --&gt;
+                &lt;div data-wall-slide&gt;
+                &lt;div data-wall-slide-arrow class="prev-slide"&gt;&lt;/div&gt;
+                &lt;div data-wall-slide-arrow class="next-slide"&gt;&lt;/div&gt;
+              &lt;/section&gt;
+            </code>
+          </pre>
+          <p>Your should create and style the arrow yourself, wall.js helps arraw show above the slides</p>
+        </div>
       </div>
       <div data-wall-slide-arrow class="prev-slide"></div>
       <div data-wall-slide-arrow class="next-slide"></div>
     </section>
-    <section class="section section-4">
-      <h1>Fourth Screen</h1>
+    <section class="section section-4" data-wall-animate-duration=3>
+      <div class="wrapper">
+        <h1>Animation Duration</h1>
+        <h3 class="step">>>add <span class="hl">data-wall-animate-duration</span> attribute to section</h3>
+        <p>This Section will take 3 seconds of animation.</p>
+        <pre class="html">
+          <code>
+            ...
+            &lt;section data-wall-animate-duration=3 &gt;
+            ...
+          </code>
+        </pre>
+      </div>
     </section>
-    <section class="section section-5" data-wall-animate-duration=0.5>
-      <h1>Fifth Screen</h1>
+    <section class="section section-5">
+      <div class="wrapper">
+        <h1>Class of Current</h1>
+        <h3 class="step">>> current section will be added <span class="hl">current</span> class</h3>
+        <p>Open your develop tool to check it!</p>
+        <pre class="html">
+          <code>
+            &lt;section class="section-1"&gt;&lt;!--content--&gt;&lt;/section&gt;
+            &lt;section class="section-2"&gt;&lt;!--content--&gt;&lt;/section&gt;
+            &lt;section class="section-3"&gt;&lt;!--content--&gt;&lt;/section&gt;
+            &lt;section class="section-4"&gt;&lt;!--content--&gt;&lt;/section&gt;
+            &lt;section class="section-5 current"&gt;&lt;!--content--&gt;&lt;/section&gt;&lt;!--current section--&gt;
+          </code>
+        </pre>
+        <h3 class="step">>> animating section will be added <span class="hl">animating</span> class</h3>
+        <p>Open your develop tool to check it!</p>
+        <pre class="html">
+          <code>
+            &lt;section class="section-1"&gt;&lt;!--content--&gt;&lt;/section&gt;
+            &lt;section class="section-2"&gt;&lt;!--content--&gt;&lt;/section&gt;
+            &lt;section class="section-3"&gt;&lt;!--content--&gt;&lt;/section&gt;
+            &lt;section class="section-4"&gt;&lt;!--content--&gt;&lt;/section&gt;
+            &lt;section class="section-5 animating current"&gt;&lt;!--content--&gt;&lt;/section&gt;&lt;!--if you animate this section--&gt;
+          </code>
+        </pre>
+        <h3 class="step">>> You can control animation like this:</h3>
+        <pre class="css">
+          <code>
+            h1 {
+              opacity: 0;
+              transition: opacity .3s ease;
+            }
+
+            .current h1 {
+              opacity: 1;
+            }
+          </code>
+        </pre>
+        <p>Bring it into full play!</p>
+      </div>
     </section>
     <section class="section section-6">
-      <h1>Sixth Screen</h1>
+      <div class="wrapper">
+        <h1>All Default Configs</h1>
+        <pre class="javascript">
+          <code>
+            const defaultOptions = {
+              // control the wrapper z-index style,
+              //other element you want to show should above greater than this
+              wrapperZIndex: 1, 
+              // global animation duration,
+              // change it will change all section animate duration
+              sectionAnimateDuration: 1,
+              // take both string and function,
+              // the string show be inside 'linear', 'easeIn', 'easeOut', 'easeInOut'
+              easeFunction: 'easeIn',
+              // whether loop to bottom in first section
+              loopToBottom: false,
+              // whether loop to top in last section
+              loopToTop: false,
+              sectionNavItemActiveClass: 'active',
+              // set current section class name
+              animatingClass: 'animating',
+              currentClass: 'current'
+            };
+          </code>
+        </pre>
+      </div>
     </section>
   </div>
   <div id="prev" class="btn btn-secondary">prev</div>
