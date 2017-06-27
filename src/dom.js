@@ -17,7 +17,6 @@ export const transformProp = (() => {
       }
     }
   }
-
   return 'transform';
 })();
 
@@ -38,17 +37,17 @@ export const cAF = window.cancelAnimationFrame ||
   function (id) { clearTimeout(id); };
 
 export const getScreenWidth = () => {
-  return window.innerWidth && document.documentElement.clientWidth ?
-    Math.min(window.innerWidth, document.documentElement.clientWidth) :
-    window.innerWidth ||
-    document.documentElement.clientWidth ||
-    document.body.clientWidth;
+  return window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 };
 
 export const getScreenHeight = () => {
-  return window.innerHeight && document.documentElement.clientHeight ?
-    Math.min(window.innerHeight, document.documentElement.clientHeight) :
-    window.innerHeight ||
-    document.documentElement.clientHeight ||
-    document.body.clientHeight;
+  return window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+};
+
+export const maxScreen = el => {
+  el.style.position = 'absolute';
+  el.style.top = 0;
+  el.style.right = 0;
+  el.style.bottom = 0;
+  el.style.left = 0;
 };

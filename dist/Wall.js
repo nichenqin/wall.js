@@ -114,7 +114,7 @@ var ANIMATE_DURATION = DATA_PRE + '-animate-duration';
 var SECTION_NAV = DATA_PRE + '-section-nav';
 var SECTION_INDEX = DATA_PRE + '-section-index';
 
-var NAV_INDEX = DATA_PRE + '-nav-index';
+var SECTION_NAV_INDEX = DATA_PRE + '-section-nav-index';
 
 var SLIDE = DATA_PRE + '-slide';
 var SLIDE_INDEX = DATA_PRE + '-slide-index';
@@ -123,7 +123,7 @@ var SLIDE_ARROW = DATA_PRE + '-slide-arrow';
 var defaultOptions = {
   wrapperZIndex: 1,
   sectionAnimateDuration: 1,
-  easeFunction: 'easeInOut',
+  easeFunction: 'easeIn',
   loopToBottom: false,
   loopToTop: false,
   sectionNavItemActiveClass: 'active',
@@ -265,29 +265,17 @@ var Wall = function () {
 
       switch (e.keyCode) {
         case 34:case 40:
-          if (scrollHeight - scrollTop <= clientHeight) this.nextSection();
-          break;
-
+          if (scrollHeight - scrollTop <= clientHeight) this.nextSection();break;
         case 33:case 38:
-          if (scrollTop === 0) this.prevSection();
-          break;
-
+          if (scrollTop === 0) this.prevSection();break;
         case 37:
-          if (this.currentSlide) this.prevSlide();
-          break;
-
+          if (this.currentSlide) this.prevSlide();break;
         case 39:
-          if (this.currentSlide) this.nextSlide();
-          break;
-
+          if (this.currentSlide) this.nextSlide();break;
         case 36:
-          this.goToSection(1);
-
+          this.goToSection(1);break;
         case 35:
-          this.goToSection(this.sections.length);
-
-        default:
-          break;
+          this.goToSection(this.sections.length);break;
       }
     }
   }, {
@@ -299,6 +287,7 @@ var Wall = function () {
           clientHeight = _currentSection2.clientHeight;
 
       var delta = Math.max(-1, Math.min(1, e.wheelDelta || -e.detail));
+
       if (scrollHeight - scrollTop <= clientHeight && delta === -1) this.nextSection();
       if (scrollTop === 0 && delta === 1) this.prevSection();
 
@@ -315,9 +304,9 @@ var Wall = function () {
 
           var navItems = (0, _utils.toArray)(navElement.children);
           navItems.forEach(function (item, index) {
-            item.setAttribute(NAV_INDEX, index + 1);
+            item.setAttribute(SECTION_NAV_INDEX, index + 1);
             item.addEventListener('click', function () {
-              _this4.goToSection(item.getAttribute(NAV_INDEX));
+              _this4.goToSection(item.getAttribute(SECTION_NAV_INDEX));
             });
           });
         });
@@ -335,17 +324,12 @@ var Wall = function () {
         var arrows = (0, _utils.toArray)(section.querySelectorAll('[' + SLIDE_ARROW + ']'));
         if (slides.length) {
           slides.forEach(function (slide, index) {
-            slide.style.position = 'absolute';
-            slide.style.top = 0;
+            (0, _dom.maxScreen)(slide);
             slide.style.overflowX = 'hidden';
             slide.style.overflowY = 'auto';
-            slide.style.right = 0;
-            slide.style.bottom = 0;
-            slide.style.left = 0;
 
             slide.setAttribute(SLIDE_INDEX, index + 1);
           });
-
           slides.reverse().forEach(function (slide, index) {
             return slide.style.zIndex = index + 1;
           });
@@ -380,11 +364,7 @@ var Wall = function () {
     key: '_cssSections',
     value: function _cssSections() {
       this.sections.forEach(function (section) {
-        section.style.position = 'absolute';
-        section.style.top = 0;
-        section.style.right = 0;
-        section.style.bottom = 0;
-        section.style.left = 0;
+        (0, _dom.maxScreen)(section);
         section.style.overflowX = 'hidden';
         section.style.overflowY = 'auto';
       });
@@ -441,11 +421,9 @@ var Wall = function () {
 
       if (this.screenType === SCREEN_SECTION) {
         (0, _utils.addClass)(this.currentSection, this.options.animatingClass);
-      }
-      if (this.currentSlide && this.screenType === SCREEN_SLIDE) {
+      } else if (this.currentSlide && this.screenType === SCREEN_SLIDE) {
         (0, _utils.addClass)(this.currentSlide, this.options.animatingClass);
       }
-
       return this;
     }
   }, {
@@ -458,7 +436,9 @@ var Wall = function () {
 
       this._updateCurrentScreenPosition(delta)._renderSectionPosition(currentScreen, this.currentScreenPosition);
 
-      if (this.currentScreenPosition > 99.9 && !this.isToBack || this.currentScreenPosition < 0.1 && this.isToBack) {
+      var shouldStop = this.currentScreenPosition > 99.9 && !this.isToBack || this.currentScreenPosition < 0.1 && this.isToBack;
+
+      if (shouldStop) {
         this._refresh()._queue(screenList);
         if (this.screenType === SCREEN_SECTION) this._resetCurrentSlides();
         return this;
@@ -476,7 +456,6 @@ var Wall = function () {
       var target = this.isToBack ? 0 : 100;
 
       this.currentScreenPosition = this.easeFunction(delta, this.currentScreenPosition, target - this.currentScreenPosition, duration);
-
       return this;
     }
   }, {
@@ -489,15 +468,11 @@ var Wall = function () {
         case SCREEN_SLIDE:
           screen.style[_dom.transformProp] = 'translate(-' + pos + '%, 0) ' + this.translateZ;
           break;
-
-        default:
-          screen.style[_dom.transformProp] = 'translate(0, -' + pos + '%) ' + this.translateZ;
-          break;
       }
     }
   }, {
-    key: 'getCurrentSectionIndex',
-    value: function getCurrentSectionIndex() {
+    key: '_getCurrentSectionIndex',
+    value: function _getCurrentSectionIndex() {
       return this.currentSection.getAttribute(SECTION_INDEX);
     }
   }, {
@@ -516,16 +491,21 @@ var Wall = function () {
           });
 
           var currentNav = navItems.find(function (item) {
-            return item.getAttribute(NAV_INDEX) === _this6.getCurrentSectionIndex();
+            return item.getAttribute(SECTION_NAV_INDEX) === _this6._getCurrentSectionIndex();
           });
           (0, _utils.addClass)(currentNav, sectionNavItemActiveClass);
         });
       }
     }
   }, {
+    key: 'getWrapperZIndex',
+    value: function getWrapperZIndex() {
+      return this.wrapper.style.zIndex;
+    }
+  }, {
     key: 'prevSection',
     value: function prevSection() {
-      if (!this.options.loopToBottom && this.getCurrentSectionIndex() == 1) return;
+      if (!this.options.loopToBottom && this._getCurrentSectionIndex() == 1) return;
 
       if (!this.isAnimating) {
         var _sections$reverse = this.sections.reverse();
@@ -546,7 +526,7 @@ var Wall = function () {
   }, {
     key: 'nextSection',
     value: function nextSection() {
-      if (!this.options.loopToTop && this.getCurrentSectionIndex() == this.sections.length) return;
+      if (!this.options.loopToTop && this._getCurrentSectionIndex() == this.sections.length) return;
 
       if (!this.isAnimating) {
         // move current section to last of the queue
@@ -559,8 +539,7 @@ var Wall = function () {
   }, {
     key: 'goToSection',
     value: function goToSection(index) {
-
-      if (index === this.getCurrentSectionIndex()) return;
+      if (index === this._getCurrentSectionIndex()) return;
 
       if (!this.isAnimating) {
         this.sections = (0, _utils.toArray)(this.wrapper.children);
@@ -573,7 +552,7 @@ var Wall = function () {
 
         this.sections = [targetSection].concat(_toConsumableArray(nextSections), _toConsumableArray(prevSections));
 
-        this._refreshAnimateStatus(index < this.getCurrentSectionIndex());
+        this._refreshAnimateStatus(index < this._getCurrentSectionIndex());
 
         if (this.isToBack) {
           this.currentSection = targetSection;
@@ -683,7 +662,6 @@ var transformProp = exports.transformProp = function () {
       }
     }
   }
-
   return 'transform';
 }();
 
@@ -698,11 +676,19 @@ var cAF = exports.cAF = window.cancelAnimationFrame || window.webkitCancelAnimat
 };
 
 var getScreenWidth = exports.getScreenWidth = function getScreenWidth() {
-  return window.innerWidth && document.documentElement.clientWidth ? Math.min(window.innerWidth, document.documentElement.clientWidth) : window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+  return window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 };
 
 var getScreenHeight = exports.getScreenHeight = function getScreenHeight() {
-  return window.innerHeight && document.documentElement.clientHeight ? Math.min(window.innerHeight, document.documentElement.clientHeight) : window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+  return window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+};
+
+var maxScreen = exports.maxScreen = function maxScreen(el) {
+  el.style.position = 'absolute';
+  el.style.top = 0;
+  el.style.right = 0;
+  el.style.bottom = 0;
+  el.style.left = 0;
 };
 
 /***/ }),
@@ -720,20 +706,18 @@ var linear = exports.linear = function linear(t, b, c, d) {
 };
 
 var easeIn = exports.easeIn = function easeIn(t, b, c, d) {
-  t /= d;
-  return c * t * t + b;
+  return c * Math.pow(2, 10 * (t / d - 1)) + b;
 };
 
 var easeOut = exports.easeOut = function easeOut(t, b, c, d) {
-  t /= d;
-  return -c * t * (t - 2) + b;
+  return c * (-Math.pow(2, -10 * t / d) + 1) + b;
 };
 
 var easeInOut = exports.easeInOut = function easeInOut(t, b, c, d) {
   t /= d / 2;
-  if (t < 1) return c / 2 * t * t * t * t + b;
-  t -= 2;
-  return -c / 2 * (t * t * t * t - 2) + b;
+  if (t < 1) return c / 2 * Math.pow(2, 10 * (t - 1)) + b;
+  t--;
+  return c / 2 * (-Math.pow(2, -10 * t) + 2) + b;
 };
 
 /***/ }),

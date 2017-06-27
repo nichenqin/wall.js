@@ -3,18 +3,16 @@ export const linear = function (t, b, c, d) {
 };
 
 export const easeIn = function (t, b, c, d) {
-  t /= d;
-  return c * t * t + b;
+  return c * Math.pow(2, 10 * (t / d - 1)) + b;
 };
 
 export const easeOut = function (t, b, c, d) {
-  t /= d;
-  return -c * t * (t - 2) + b;
+  return c * (-Math.pow(2, -10 * t / d) + 1) + b;
 };
 
 export const easeInOut = function (t, b, c, d) {
   t /= d / 2;
-  if (t < 1) return c / 2 * t * t * t * t + b;
-  t -= 2;
-  return -c / 2 * (t * t * t * t - 2) + b;
+  if (t < 1) return c / 2 * Math.pow(2, 10 * (t - 1)) + b;
+  t--;
+  return c / 2 * (-Math.pow(2, -10 * t) + 2) + b;
 };

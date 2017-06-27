@@ -1,5 +1,5 @@
 import { toArray, throwNewError, merge, addClass, removeClass } from './utils';
-import { rAF, cAF, hasTransform3d, transformProp, mousewheelEvent, getScreenHeight, getScreenWidth } from './dom';
+import { rAF, cAF, hasTransform3d, transformProp, mousewheelEvent, getScreenHeight, getScreenWidth, maxScreen } from './dom';
 import * as easing from './easing';
 import './polyfill';
 
@@ -12,7 +12,7 @@ const ANIMATE_DURATION = `${DATA_PRE}-animate-duration`;
 const SECTION_NAV = `${DATA_PRE}-section-nav`;
 const SECTION_INDEX = `${DATA_PRE}-section-index`;
 
-const NAV_INDEX = `${DATA_PRE}-nav-index`;
+const SECTION_NAV_INDEX = `${DATA_PRE}-section-nav-index`;
 
 const SLIDE = `${DATA_PRE}-slide`;
 const SLIDE_INDEX = `${DATA_PRE}-slide-index`;
@@ -21,7 +21,7 @@ const SLIDE_ARROW = `${DATA_PRE}-slide-arrow`;
 const defaultOptions = {
   wrapperZIndex: 1,
   sectionAnimateDuration: 1,
-  easeFunction: 'easeInOut',
+  easeFunction: 'easeIn',
   loopToBottom: false,
   loopToTop: false,
   sectionNavItemActiveClass: 'active',
@@ -127,36 +127,19 @@ class Wall {
   _handleKeyDown(e) {
     const { scrollTop, scrollHeight, clientHeight } = this.currentSection;
     switch (e.keyCode) {
-      case 34: case 40:
-        if (scrollHeight - scrollTop <= clientHeight) this.nextSection();
-        break;
-
-      case 33: case 38:
-        if (scrollTop === 0) this.prevSection();
-        break;
-
-      case 37:
-        if (this.currentSlide) this.prevSlide();
-        break;
-
-      case 39:
-        if (this.currentSlide) this.nextSlide();
-        break;
-
-      case 36:
-        this.goToSection(1);
-
-      case 35:
-        this.goToSection(this.sections.length);
-
-      default:
-        break;
+      case 34: case 40: if (scrollHeight - scrollTop <= clientHeight) this.nextSection(); break;
+      case 33: case 38: if (scrollTop === 0) this.prevSection(); break;
+      case 37: if (this.currentSlide) this.prevSlide(); break;
+      case 39: if (this.currentSlide) this.nextSlide(); break;
+      case 36: this.goToSection(1); break;
+      case 35: this.goToSection(this.sections.length); break;
     }
   }
 
   _handleWheelEvent(e) {
     const { scrollTop, scrollHeight, clientHeight } = this.currentSection;
     const delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
+
     if (scrollHeight - scrollTop <= clientHeight && delta === -1) this.nextSection();
     if (scrollTop === 0 && delta === 1) this.prevSection();
 
@@ -170,9 +153,9 @@ class Wall {
 
         const navItems = toArray(navElement.children);
         navItems.forEach((item, index) => {
-          item.setAttribute(NAV_INDEX, index + 1);
+          item.setAttribute(SECTION_NAV_INDEX, index + 1);
           item.addEventListener('click', () => {
-            this.goToSection(item.getAttribute(NAV_INDEX));
+            this.goToSection(item.getAttribute(SECTION_NAV_INDEX));
           });
         });
       });
@@ -189,17 +172,12 @@ class Wall {
       const arrows = toArray(section.querySelectorAll(`[${SLIDE_ARROW}]`));
       if (slides.length) {
         slides.forEach((slide, index) => {
-          slide.style.position = 'absolute';
-          slide.style.top = 0;
+          maxScreen(slide);
           slide.style.overflowX = 'hidden';
           slide.style.overflowY = 'auto';
-          slide.style.right = 0;
-          slide.style.bottom = 0;
-          slide.style.left = 0;
 
           slide.setAttribute(SLIDE_INDEX, index + 1);
         });
-
         slides.reverse().forEach((slide, index) => slide.style.zIndex = index + 1);
 
         if (arrows.length) {
@@ -227,11 +205,7 @@ class Wall {
 
   _cssSections() {
     this.sections.forEach(section => {
-      section.style.position = 'absolute';
-      section.style.top = 0;
-      section.style.right = 0;
-      section.style.bottom = 0;
-      section.style.left = 0;
+      maxScreen(section);
       section.style.overflowX = 'hidden';
       section.style.overflowY = 'auto';
     });
@@ -250,9 +224,8 @@ class Wall {
   _resetCurrentSlides() {
     [this.currentSection, ...this.restSections] = this.sections;
 
-    this.currentSlides =
-      toArray(this.currentSection.querySelectorAll(`[${SLIDE}]`))
-        .sort((a, b) => +b.style.zIndex - +a.style.zIndex);
+    this.currentSlides = toArray(this.currentSection.querySelectorAll(`[${SLIDE}]`))
+      .sort((a, b) => +b.style.zIndex - +a.style.zIndex);
 
     if (this.currentSlide) removeClass(this.currentSlide, this.options.currentClass);
     [this.currentSlide, ...this.restSlides] = this.currentSlides;
@@ -270,11 +243,9 @@ class Wall {
 
     if (this.screenType === SCREEN_SECTION) {
       addClass(this.currentSection, this.options.animatingClass);
-    }
-    if (this.currentSlide && this.screenType === SCREEN_SLIDE) {
+    } else if (this.currentSlide && this.screenType === SCREEN_SLIDE) {
       addClass(this.currentSlide, this.options.animatingClass);
     }
-
     return this;
   }
 
@@ -284,10 +255,11 @@ class Wall {
 
     currentScreen.style.zIndex = screenList.length + 1;
 
-    this._updateCurrentScreenPosition(delta)
-      ._renderSectionPosition(currentScreen, this.currentScreenPosition);
+    this._updateCurrentScreenPosition(delta)._renderSectionPosition(currentScreen, this.currentScreenPosition);
 
-    if ((this.currentScreenPosition > 99.9 && !this.isToBack) || (this.currentScreenPosition < 0.1 && this.isToBack)) {
+    const shouldStop = (this.currentScreenPosition > 99.9 && !this.isToBack) || (this.currentScreenPosition < 0.1 && this.isToBack);
+
+    if (shouldStop) {
       this._refresh()._queue(screenList);
       if (this.screenType === SCREEN_SECTION) this._resetCurrentSlides();
       return this;
@@ -304,7 +276,6 @@ class Wall {
     const target = this.isToBack ? 0 : 100;
 
     this.currentScreenPosition = this.easeFunction(delta, this.currentScreenPosition, target - this.currentScreenPosition, duration);
-
     return this;
   }
 
@@ -316,14 +287,10 @@ class Wall {
       case SCREEN_SLIDE:
         screen.style[transformProp] = `translate(-${pos}%, 0) ${this.translateZ}`;
         break;
-
-      default:
-        screen.style[transformProp] = `translate(0, -${pos}%) ${this.translateZ}`;
-        break;
     }
   }
 
-  getCurrentSectionIndex() {
+  _getCurrentSectionIndex() {
     return this.currentSection.getAttribute(SECTION_INDEX);
   }
 
@@ -335,15 +302,19 @@ class Wall {
         const navItems = toArray(navElement.children);
         navItems.forEach(item => removeClass(item, sectionNavItemActiveClass));
 
-        const currentNav = navItems.find(item => item.getAttribute(NAV_INDEX) === this.getCurrentSectionIndex());
+        const currentNav = navItems.find(item => item.getAttribute(SECTION_NAV_INDEX) === this._getCurrentSectionIndex());
         addClass(currentNav, sectionNavItemActiveClass);
       });
 
     }
   }
 
+  getWrapperZIndex() {
+    return this.wrapper.style.zIndex;
+  }
+
   prevSection() {
-    if (!this.options.loopToBottom && this.getCurrentSectionIndex() == 1) return;
+    if (!this.options.loopToBottom && this._getCurrentSectionIndex() == 1) return;
 
     if (!this.isAnimating) {
       // reverse the sections array and set the last section to be the current section
@@ -357,21 +328,19 @@ class Wall {
   }
 
   nextSection() {
-    if (!this.options.loopToTop && this.getCurrentSectionIndex() == this.sections.length) return;
+    if (!this.options.loopToTop && this._getCurrentSectionIndex() == this.sections.length) return;
 
     if (!this.isAnimating) {
       // move current section to last of the queue
       this.sections = [...this.restSections, this.currentSection];
       this.screenType = SCREEN_SECTION;
 
-      this._refreshAnimateStatus(false)
-        ._animateScreen(this.currentSection, this.sections);
+      this._refreshAnimateStatus(false)._animateScreen(this.currentSection, this.sections);
     }
   }
 
   goToSection(index) {
-
-    if (index === this.getCurrentSectionIndex()) return;
+    if (index === this._getCurrentSectionIndex()) return;
 
     if (!this.isAnimating) {
       this.sections = toArray(this.wrapper.children);
@@ -382,7 +351,7 @@ class Wall {
 
       this.sections = [targetSection, ...nextSections, ...prevSections];
 
-      this._refreshAnimateStatus(index < this.getCurrentSectionIndex());
+      this._refreshAnimateStatus(index < this._getCurrentSectionIndex());
 
       if (this.isToBack) {
         this.currentSection = targetSection;
@@ -401,8 +370,7 @@ class Wall {
       this.currentSlides = [this.currentSlide, ...this.restSlides.reverse()];
       this.screenType = SCREEN_SLIDE;
 
-      this._refreshAnimateStatus(true)
-        ._animateScreen(this.currentSlide, this.currentSlides);
+      this._refreshAnimateStatus(true)._animateScreen(this.currentSlide, this.currentSlides);
     }
   }
 
@@ -411,10 +379,10 @@ class Wall {
       this.currentSlides = [...this.restSlides, this.currentSlide];
       this.screenType = SCREEN_SLIDE;
 
-      this._refreshAnimateStatus(false)
-        ._animateScreen(this.currentSlide, this.currentSlides);
+      this._refreshAnimateStatus(false)._animateScreen(this.currentSlide, this.currentSlides);
     }
   }
+
 }
 
 module.exports = Wall;
