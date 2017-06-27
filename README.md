@@ -1,8 +1,8 @@
 # wall.js
 
-## Demo
+## Demo And Documentation
 
-[Live Demo](http://nichenqin.com/wall.js)
+[Live Demo & Documentation](http://nichenqin.com/wall.js)
 
 ## Installation
 
@@ -31,3 +31,16 @@ yarn add wall.js
   var wall = new Wall('.wrapper');
 </script>
 ```
+
+## Custom Configs
+
+option | default | type | description
+------ | ------- | ---- | -----------
+wrapperZIndex | 1 | `number` | z-index style of wrapper
+sectionAnimateDuration | 1 | `number` | duration of animation
+easeFunction | 'easeIn' | `string` or `function` | ease function of animation
+loopToBottom | false | `boolean` | whether loop from top to bottom
+loopToTop | false | `boolean` | whether loop from  bottom to top
+sectionNavItemActiveClass | 'active' | `string` | active class of custom nav item
+currentClass | 'current' | `string` | class of current section or slide
+animatingClass | 'animating' | `string` | class of current section or slide while animating
