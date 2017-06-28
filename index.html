@@ -84,7 +84,7 @@
             &lt;/ul&gt;
           </code>
         </pre>
-        <h5 class="step">>>Style the nav element by yourself</h5>
+        <h5 class="step">>> Style the nav element by yourself</h5>
         <p>here is an example of dot nav</p>
         <pre class="css">
           <code>
@@ -134,12 +134,14 @@
           <h5 class="step">>> add <span class="hl">data-wall-slide</span> attribute to your HTMLElement</h5>
           <pre class="html">
             <code>
-              ...
-              &lt;section&gt;
-                &lt;div data-wall-slide&gt; &lt;!-- wall.js will create horizontal move slides --&gt;
-                &lt;div data-wall-slide&gt;
-              &lt;/section&gt;
-              ...
+              &lt;div id="wall"&gt;
+                &lt;!--other sections--&gt;
+                &lt;section&gt;
+                  &lt;div data-wall-slide&gt;&lt;!--slide content--&gt;&lt;/div&gt; &lt;!-- wall.js will create horizontal move slides --&gt;
+                  &lt;div data-wall-slide&gt;&lt;!--slide content--&gt;&lt;/div&gt;
+                &lt;/section&gt;
+                &lt;!--other sections--&gt;
+              &lt;/div&gt;
             </code>
           </pre>
           <p>try to click arrow to toggle slide</p>
@@ -151,12 +153,17 @@
           <h5 class="step">>> add <span class="hl">data-wall-slide-arrow</span> attribute to your arrows</h5>
           <pre class="html">
             <code>
-              &lt;section&gt;
-                &lt;div data-wall-slide&gt; &lt;!-- wall.js will create horizontal move slides --&gt;
-                &lt;div data-wall-slide&gt;
-                &lt;div data-wall-slide-arrow class="prev-slide"&gt;&lt;/div&gt;
-                &lt;div data-wall-slide-arrow class="next-slide"&gt;&lt;/div&gt;
-              &lt;/section&gt;
+              &lt;div id="wall"&gt;
+                &lt;!--other sections--&gt;
+                &lt;section&gt;
+                  &lt;div data-wall-slide&gt;&lt;!--slide content--&gt;&lt;/div&gt;
+                  &lt;div data-wall-slide&gt;&lt;!--slide content--&gt;&lt;/div&gt;
+                  &lt;div data-wall-slide-arrow class="prev-slide"&gt;&lt;/div&gt; &lt;!-- arrow element --&gt;
+                  &lt;div data-wall-slide-arrow class="next-slide"&gt;&lt;/div&gt; &lt;!-- arrow element --&gt;
+                &lt;/section&gt;
+                &lt;!--other sections--&gt;
+              &lt;/div&gt;
+            
             </code>
           </pre>
           <p>Your should create and style the arrow yourself, wall.js helps arraw show above the slides</p>
