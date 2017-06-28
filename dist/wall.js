@@ -131,6 +131,7 @@ var defaultOptions = {
   currentClass: 'current'
 };
 
+var html = document.getElementsByTagName('html')[0];
 var body = document.getElementsByTagName('body')[0];
 
 var Wall = function () {
@@ -196,7 +197,7 @@ var Wall = function () {
     value: function _refresh(force) {
       var _this2 = this;
 
-      if (force) this._setupSize()._cssBody()._cssWrapper()._setupSections()._cssSections()._queue(this.sections)._setupSlides()._setupSectionNav();
+      if (force) this._setupSize()._cssHtmlAndBody()._cssWrapper()._setupSections()._cssSections()._queue(this.sections)._setupSlides()._setupSectionNav();
 
       (0, _dom.cAF)(this.requestId);
       this.isAnimating = false;
@@ -344,8 +345,12 @@ var Wall = function () {
       return this;
     }
   }, {
-    key: '_cssBody',
-    value: function _cssBody() {
+    key: '_cssHtmlAndBody',
+    value: function _cssHtmlAndBody() {
+      html.style.height = '100%';
+      html.style.overflow = 'hidden';
+      body.style.height = '100%';
+      body.style.position = 'relative';
       body.style.margin = 0;
       body.style.overflow = 'hidden';
       return this;

@@ -29,6 +29,7 @@ const defaultOptions = {
   currentClass: 'current'
 };
 
+const html = document.getElementsByTagName('html')[0];
 const body = document.getElementsByTagName('body')[0];
 
 class Wall {
@@ -83,7 +84,7 @@ class Wall {
   _refresh(force) {
     if (force)
       this
-        ._setupSize()._cssBody()._cssWrapper()
+        ._setupSize()._cssHtmlAndBody()._cssWrapper()
         ._setupSections()._cssSections()._queue(this.sections)
         ._setupSlides()
         ._setupSectionNav();
@@ -188,7 +189,11 @@ class Wall {
     return this;
   }
 
-  _cssBody() {
+  _cssHtmlAndBody() {
+    html.style.height = '100%';
+    html.style.overflow = 'hidden';
+    body.style.height = '100%';
+    body.style.position = 'relative';
     body.style.margin = 0;
     body.style.overflow = 'hidden';
     return this;
