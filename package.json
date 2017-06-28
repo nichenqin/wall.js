@@ -1,6 +1,6 @@
 {
     "name": "wall.js",
-    "version": "0.7.0",
+    "version": "0.8.0",
     "description": "fullpage",
     "main": ".dist/wall.min.js",
     "keywords": [
@@ -13,7 +13,11 @@
         "build": "cross-env WEBPACK_ENV=build webpack",
         "dev": "cross-env WEBPACK_ENV=dev webpack --colors --watch"
     },
-    "author": "nichenqin",
+    "author": {
+        "name": "nichenqin",
+        "email": "nichenqin@hotmail.com",
+        "url": "nichenqin.com"
+    },
     "homepage": "https://github.com/nichenqin1001/wall.js",
     "bugs": {
         "url": "https://github.com/nichenqin1001/wall.js/issues",
