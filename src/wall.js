@@ -1,6 +1,7 @@
 import { toArray, throwNewError, merge, addClass, removeClass } from './utils';
 import { rAF, cAF, hasTransform3d, transformProp, mousewheelEvent, getScreenHeight, getScreenWidth, maxScreen } from './dom';
 import * as easing from './easing';
+import { touch } from './events';
 import './polyfill';
 
 const SCREEN_SECTION = 'section';
@@ -121,6 +122,8 @@ class Wall {
     this.sections.forEach((section, index) => {
       section.setAttribute(SECTION_INDEX, index + 1);
       section.addEventListener(mousewheelEvent, this._handleWheelEvent.bind(this));
+      section.addEventListener('touchstart', touch.handleTouchStart, false);
+      section.addEventListener('touchend', touch.handleTouchEnd, false);
     });
     return this;
   }

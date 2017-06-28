@@ -37,8 +37,10 @@
     <section class="section section-1">
       <div class="wrapper">
         <h1>wall.js</h1>
-        <h5 class="sub-header">Fullpage Piling, vanilla javascript, no dependency</h5>
-        <h3 class="step">>> Get Started</h3>
+        <div class="sub-header">
+          <h5>Fullpage Piling, vanilla javascript, no dependency</h5>
+        </div>
+        <h5 class="step">>> Get Started</h5>
         <pre class="html">
           <code>
             &lt;body&gt;
@@ -55,14 +57,15 @@
             &lt;/script&gt;
           </code>
         </pre>
-        <p>You should style your sections with background-color.</p>
       </div>
     </section>
     <section class="section section-2">
       <div class="wrapper">
         <h1>Config Navs</h1>
-        <h5 class="sub-header">Do you see the nav at top and dots at right?</h5>
-        <h3 class="step">>> add <span class="hl">data-wall-section-nav</span> attribute to your own nav element</h3>
+        <div class="sub-header">
+          <h5>Do you see the nav at top and dots at right?</h5>
+        </div>
+        <h5 class="step">>> add <span class="hl">data-wall-section-nav</span> attribute to your own nav element</h5>
         <p>Note: wall.js will not create them directly, what wall.js does is to toggle the active class</p>
         <pre class="html">
           <code>
@@ -81,7 +84,8 @@
             &lt;/ul&gt;
           </code>
         </pre>
-        <p>Style the nav element by yourself, here is an example of dot nav</p>
+        <h5 class="step">>>Style the nav element by yourself</h5>
+        <p>here is an example of dot nav</p>
         <pre class="css">
           <code>
             .dot {
@@ -109,7 +113,7 @@
             }
           </code>
         </pre>
-        <h3 class="step">>> Custom Config </h3>
+        <h5 class="step">>> Custom Config </h5>
         <p>wall.js will add 'active' class to the nav item when you move into new section.</p>
         <p>You can set your own active class with config object when you init Wall.</p>
         <pre class="javascript">
@@ -127,7 +131,7 @@
       <div class="slide" style="background-color: #0277bd" data-wall-slide>
         <div class="wrapper">
           <h1>Slides-1: Init Slide</h1>
-          <h3 class="step">>> add <span class="hl">data-wall-slide</span> attribute to your HTMLElement</h3>
+          <h5 class="step">>> add <span class="hl">data-wall-slide</span> attribute to your HTMLElement</h5>
           <pre class="html">
             <code>
               ...
@@ -144,7 +148,7 @@
       <div class="slide" style="background-color: #ffa000" data-wall-slide>
         <div class="wrapper">
           <h1>Slides-2: Arrows</h1>
-          <h3 class="step">>> add <span class="hl">data-wall-slide-arrow</span> attribute to your arrows</h3>
+          <h5 class="step">>> add <span class="hl">data-wall-slide-arrow</span> attribute to your arrows</h5>
           <pre class="html">
             <code>
               &lt;section&gt;
@@ -164,7 +168,7 @@
     <section class="section section-4" data-wall-animate-duration=3>
       <div class="wrapper">
         <h1>Animation Duration</h1>
-        <h3 class="step">>>add <span class="hl">data-wall-animate-duration</span> attribute to section</h3>
+        <h5 class="step">>>add <span class="hl">data-wall-animate-duration</span> attribute to section</h5>
         <p>This Section will take 3 seconds of animation.</p>
         <pre class="html">
           <code>
@@ -183,7 +187,7 @@
     <section class="section section-5">
       <div class="wrapper">
         <h1>Class of Current</h1>
-        <h3 class="step">>> current section will be added <span class="hl">current</span> class</h3>
+        <h5 class="step">>> current section will be added <span class="hl">current</span> class</h5>
         <p>Open your develop tool to check it!</p>
         <pre class="html">
           <code>
@@ -194,7 +198,7 @@
             &lt;section class="section-5 current"&gt;&lt;!--content--&gt;&lt;/section&gt;&lt;!--current section--&gt;
           </code>
         </pre>
-        <h3 class="step">>> animating section will be added <span class="hl">animating</span> class</h3>
+        <h5 class="step">>> animating section will be added <span class="hl">animating</span> class</h5>
         <p>Open your develop tool to check it!</p>
         <pre class="html">
           <code>
@@ -205,7 +209,7 @@
             &lt;section class="section-5 animating current"&gt;&lt;!--content--&gt;&lt;/section&gt;&lt;!--if you animate this section--&gt;
           </code>
         </pre>
-        <h3 class="step">>> You can control animation like this:</h3>
+        <h5 class="step">>> You can control animation like this:</h5>
         <pre class="css">
           <code>
             h1 {

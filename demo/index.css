@@ -14,6 +14,7 @@ p {
 
 p {
   font-size: 20px;
+  margin: 0;
 }
 
 span.hl {
@@ -23,7 +24,17 @@ span.hl {
 
 .sub-header {
   text-align: center;
-  margin: 20px 0;
+  margin-bottom: 20px;
+}
+
+.sub-header>h5 {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #fff;
+  box-shadow: 2px 2px 2px #333;
+  color: #333;
+  text-align: center;
+  margin: 0 auto;
 }
 
 .wrapper {
@@ -36,6 +47,12 @@ span.hl {
   position: fixed;
   width: 100%;
   background: #fff;
+}
+
+@media (max-width: 650px) {
+  .nav {
+    display: none;
+  }
 }
 
 .nav-link {
@@ -53,15 +70,25 @@ span.hl {
   padding: 70px 20px 30px 20px;
 }
 
+@media (max-width: 650px) {
+  .section {
+    padding-top: 30px;
+  }
+}
+
 .section h1 {
   margin-bottom: 20px;
   text-shadow: 2px 2px 5px #333;
   text-align: center;
-  font-size: 100px;
+  font-size: 60px;
   font-weight: 700;
   opacity: 0;
   transform: translateY(20px);
   transition: all .3s ease-in-out;
+}
+
+.section:first-of-type h1 {
+  font-size: 100px;
 }
 
 .current h1 {
@@ -96,6 +123,12 @@ span.hl {
 
 .slide {
   padding: 70px 20px 40px 20px;
+}
+
+@media (max-width: 650px) {
+  .slide {
+    padding-top: 30px;
+  }
 }
 
 .step {

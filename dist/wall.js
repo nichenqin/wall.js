@@ -93,6 +93,8 @@ var _easing = __webpack_require__(3);
 
 var easing = _interopRequireWildcard(_easing);
 
+var _events = __webpack_require__(6);
+
 __webpack_require__(4);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
@@ -253,6 +255,8 @@ var Wall = function () {
       this.sections.forEach(function (section, index) {
         section.setAttribute(SECTION_INDEX, index + 1);
         section.addEventListener(_dom.mousewheelEvent, _this3._handleWheelEvent.bind(_this3));
+        section.addEventListener('touchstart', _events.touch.handleTouchStart, false);
+        section.addEventListener('touchend', _events.touch.handleTouchEnd, false);
       });
       return this;
     }
@@ -756,6 +760,50 @@ if (!Array.prototype.find) {
     return undefined;
   };
 }
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var start = { X: 0, Y: 0 };
+var touched = false;
+
+var handleTouchStart = exports.handleTouchStart = function handleTouchStart(e) {
+  touched = true;
+
+  e.preventDefault();
+  var touch = e.touches[0];
+  start.X = +touch.pageX;
+  start.Y = +touch.pageY;
+};
+
+var handleTouchMove = exports.handleTouchMove = function handleTouchMove(e) {};
+
+var handleTouchEnd = exports.handleTouchEnd = function handleTouchEnd(e) {
+  e.preventDefault();
+  touched = false;
+};
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _touch = __webpack_require__(5);
+
+var touch = _interopRequireWildcard(_touch);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+module.exports = { touch: touch };
 
 /***/ })
 /******/ ]);
