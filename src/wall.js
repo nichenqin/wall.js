@@ -1,7 +1,7 @@
 import { toArray, throwNewError, merge, addClass, removeClass } from './utils';
-import { rAF, cAF, hasTransform3d, transformProp, mousewheelEvent, getScreenHeight, getScreenWidth, maxScreen } from './dom';
+import { rAF, cAF, hasTransform3d, transformProp, mousewheelEvent, getScreenHeight, getScreenWidth, maxScreen, scrollTouchBottom, scrollTouchTop } from './dom';
+import { handleTouch } from './events';
 import * as easing from './easing';
-import { touch } from './events';
 import './polyfill';
 
 const SCREEN_SECTION = 'section';
@@ -83,6 +83,7 @@ class Wall {
   }
 
   _refresh(force) {
+    console.log('refresh');
     if (force)
       this
         ._setupSize()._cssHtmlAndBody()._cssWrapper()
@@ -95,6 +96,7 @@ class Wall {
 
     removeClass(this.currentSection, this.options.animatingClass);
     this.sections.forEach(section => removeClass(section, this.options.currentClass));
+
     [this.currentSection, ...this.restSections] = this.sections;
     addClass(this.currentSection, this.options.currentClass);
 
@@ -102,8 +104,11 @@ class Wall {
       removeClass(this.currentSlide, this.options.animatingClass);
       this.currentSlides.forEach(slide => removeClass(slide, this.options.currentClass));
     }
+
     [this.currentSlide, ...this.restSlides] = this.currentSlides;
-    if (this.currentSlide) addClass(this.currentSlide, this.options.currentClass);
+    if (this.currentSlides.length && this.currentSlide) {
+      addClass(this.currentSlide, this.options.currentClass);
+    }
 
     this._renderSectionNavs();
 
@@ -122,17 +127,15 @@ class Wall {
     this.sections.forEach((section, index) => {
       section.setAttribute(SECTION_INDEX, index + 1);
       section.addEventListener(mousewheelEvent, this._handleWheelEvent.bind(this));
-      section.addEventListener('touchstart', touch.handleTouchStart, false);
-      section.addEventListener('touchend', touch.handleTouchEnd, false);
+      handleTouch(section, this);
     });
     return this;
   }
 
   _handleKeyDown(e) {
-    const { scrollTop, scrollHeight, clientHeight } = this.currentSection;
     switch (e.keyCode) {
-      case 34: case 40: if (scrollHeight - scrollTop <= clientHeight) this.nextSection(); break;
-      case 33: case 38: if (scrollTop === 0) this.prevSection(); break;
+      case 34: case 40: if (scrollTouchBottom(this.currentSection)) this.nextSection(); break;
+      case 33: case 38: if (scrollTouchTop(this.currentSection)) this.prevSection(); break;
       case 37: if (this.currentSlide) this.prevSlide(); break;
       case 39: if (this.currentSlide) this.nextSlide(); break;
       case 36: this.goToSection(1); break;
@@ -141,11 +144,10 @@ class Wall {
   }
 
   _handleWheelEvent(e) {
-    const { scrollTop, scrollHeight, clientHeight } = this.currentSection;
     const delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
 
-    if (scrollHeight - scrollTop <= clientHeight && delta === -1) this.nextSection();
-    if (scrollTop === 0 && delta === 1) this.prevSection();
+    if (scrollTouchBottom(this.currentSection) && delta === -1) this.nextSection();
+    if (scrollTouchTop(this.currentSection) && delta === 1) this.prevSection();
 
     return this;
   }

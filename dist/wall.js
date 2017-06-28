@@ -89,11 +89,11 @@ var _utils = __webpack_require__(1);
 
 var _dom = __webpack_require__(2);
 
+var _events = __webpack_require__(6);
+
 var _easing = __webpack_require__(3);
 
 var easing = _interopRequireWildcard(_easing);
-
-var _events = __webpack_require__(6);
 
 __webpack_require__(4);
 
@@ -199,6 +199,7 @@ var Wall = function () {
     value: function _refresh(force) {
       var _this2 = this;
 
+      console.log('refresh');
       if (force) this._setupSize()._cssHtmlAndBody()._cssWrapper()._setupSections()._cssSections()._queue(this.sections)._setupSlides()._setupSectionNav();
 
       (0, _dom.cAF)(this.requestId);
@@ -228,7 +229,9 @@ var Wall = function () {
       this.currentSlide = _currentSlides[0];
       this.restSlides = _currentSlides.slice(1);
 
-      if (this.currentSlide) (0, _utils.addClass)(this.currentSlide, this.options.currentClass);
+      if (this.currentSlides.length && this.currentSlide) {
+        (0, _utils.addClass)(this.currentSlide, this.options.currentClass);
+      }
 
       this._renderSectionNavs();
 
@@ -255,24 +258,18 @@ var Wall = function () {
       this.sections.forEach(function (section, index) {
         section.setAttribute(SECTION_INDEX, index + 1);
         section.addEventListener(_dom.mousewheelEvent, _this3._handleWheelEvent.bind(_this3));
-        section.addEventListener('touchstart', _events.touch.handleTouchStart, false);
-        section.addEventListener('touchend', _events.touch.handleTouchEnd, false);
+        (0, _events.handleTouch)(section, _this3);
       });
       return this;
     }
   }, {
     key: '_handleKeyDown',
     value: function _handleKeyDown(e) {
-      var _currentSection = this.currentSection,
-          scrollTop = _currentSection.scrollTop,
-          scrollHeight = _currentSection.scrollHeight,
-          clientHeight = _currentSection.clientHeight;
-
       switch (e.keyCode) {
         case 34:case 40:
-          if (scrollHeight - scrollTop <= clientHeight) this.nextSection();break;
+          if ((0, _dom.scrollTouchBottom)(this.currentSection)) this.nextSection();break;
         case 33:case 38:
-          if (scrollTop === 0) this.prevSection();break;
+          if ((0, _dom.scrollTouchTop)(this.currentSection)) this.prevSection();break;
         case 37:
           if (this.currentSlide) this.prevSlide();break;
         case 39:
@@ -286,15 +283,10 @@ var Wall = function () {
   }, {
     key: '_handleWheelEvent',
     value: function _handleWheelEvent(e) {
-      var _currentSection2 = this.currentSection,
-          scrollTop = _currentSection2.scrollTop,
-          scrollHeight = _currentSection2.scrollHeight,
-          clientHeight = _currentSection2.clientHeight;
-
       var delta = Math.max(-1, Math.min(1, e.wheelDelta || -e.detail));
 
-      if (scrollHeight - scrollTop <= clientHeight && delta === -1) this.nextSection();
-      if (scrollTop === 0 && delta === 1) this.prevSection();
+      if ((0, _dom.scrollTouchBottom)(this.currentSection) && delta === -1) this.nextSection();
+      if ((0, _dom.scrollTouchTop)(this.currentSection) && delta === 1) this.prevSection();
 
       return this;
     }
@@ -700,6 +692,25 @@ var maxScreen = exports.maxScreen = function maxScreen(el) {
   el.style.left = 0;
 };
 
+var isScrollable = exports.isScrollable = function isScrollable(screen) {
+  var scrollHeight = screen.scrollHeight,
+      clientHeight = screen.clientHeight;
+
+  return clientHeight < scrollHeight;
+};
+
+var scrollTouchBottom = exports.scrollTouchBottom = function scrollTouchBottom(screen) {
+  var scrollTop = screen.scrollTop,
+      scrollHeight = screen.scrollHeight,
+      clientHeight = screen.clientHeight;
+
+  return scrollHeight - scrollTop <= clientHeight;
+};
+
+var scrollTouchTop = exports.scrollTouchTop = function scrollTouchTop(screen) {
+  return screen.scrollTop === 0;
+};
+
 /***/ }),
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -771,24 +782,47 @@ if (!Array.prototype.find) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-var start = { X: 0, Y: 0 };
-var touched = false;
 
-var handleTouchStart = exports.handleTouchStart = function handleTouchStart(e) {
-  touched = true;
+var _dom = __webpack_require__(2);
 
-  e.preventDefault();
-  var touch = e.touches[0];
-  start.X = +touch.pageX;
-  start.Y = +touch.pageY;
+var handleTouch = function handleTouch(el, context) {
+
+  var start = { X: 0, Y: 0 };
+  var end = { X: 0, Y: 0 };
+
+  var handleTouchStart = function handleTouchStart(e) {
+    var touch = e.touches[0];
+    start.X = touch.pageX;
+    start.Y = touch.pageY;
+  };
+
+  var handleTouchMove = function handleTouchMove(e) {
+    if (context.isAnimating) return;
+
+    var touch = e.touches[0];
+    end.X = touch.pageX;
+    end.Y = touch.pageY;
+    var diffX = start.X - end.X;
+    var diffY = start.Y - end.Y;
+
+    var isVertical = Math.abs(diffY) - Math.abs(diffX) > 0;
+
+    if (isVertical) {
+      if (diffY > 200 && (0, _dom.scrollTouchBottom)(el)) return context.nextSection();
+      if (diffY > -200 && diffY < 0 && (0, _dom.scrollTouchTop)(el)) return context.prevSection();
+    } else {
+      if (context.currentSlide) {
+        if (diffX > 200) return context.nextSlide();
+        if (diffX > -200 && diffX < 0) return context.prevSlide();
+      }
+    }
+  };
+
+  el.addEventListener('touchstart', handleTouchStart, false);
+  el.addEventListener('touchmove', handleTouchMove, false);
 };
 
-var handleTouchMove = exports.handleTouchMove = function handleTouchMove(e) {};
-
-var handleTouchEnd = exports.handleTouchEnd = function handleTouchEnd(e) {
-  e.preventDefault();
-  touched = false;
-};
+exports.default = handleTouch;
 
 /***/ }),
 /* 6 */
@@ -799,11 +833,11 @@ var handleTouchEnd = exports.handleTouchEnd = function handleTouchEnd(e) {
 
 var _touch = __webpack_require__(5);
 
-var touch = _interopRequireWildcard(_touch);
+var _touch2 = _interopRequireDefault(_touch);
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-module.exports = { touch: touch };
+module.exports = { handleTouch: _touch2.default };
 
 /***/ })
 /******/ ]);

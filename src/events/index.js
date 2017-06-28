@@ -1,3 +1,3 @@
-import * as touch from './touch';
+import handleTouch from './touch';
 
-module.exports = { touch };
+module.exports = { handleTouch };

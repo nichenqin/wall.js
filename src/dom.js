@@ -51,3 +51,17 @@ export const maxScreen = el => {
   el.style.bottom = 0;
   el.style.left = 0;
 };
+
+export const isScrollable = screen => {
+  const { scrollHeight, clientHeight } = screen;
+  return clientHeight < scrollHeight;
+};
+
+export const scrollTouchBottom = screen => {
+  const { scrollTop, scrollHeight, clientHeight } = screen;
+  return scrollHeight - scrollTop <= clientHeight;
+};
+
+export const scrollTouchTop = screen => {
+  return screen.scrollTop === 0;
+};
