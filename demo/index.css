@@ -32,6 +32,12 @@ span.hl {
   margin: 0 auto;
 }
 
+.nav {
+  position: fixed;
+  width: 100%;
+  background: #fff;
+}
+
 .nav-link {
   display: inline-block;
   cursor: pointer;
@@ -44,7 +50,7 @@ span.hl {
 }
 
 .section {
-  padding: 30px 20px;
+  padding: 70px 20px 30px 20px;
 }
 
 .section h1 {
@@ -89,7 +95,7 @@ span.hl {
 }
 
 .slide {
-  padding: 40px 20px;
+  padding: 70px 20px 40px 20px;
 }
 
 .step {
