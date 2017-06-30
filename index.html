@@ -31,7 +31,8 @@
     <li class="nav-link">Third-Slides</li>
     <li class="nav-link">Forth-Duration</li>
     <li class="nav-link">Fifth-Class</li>
-    <li class="nav-link">Sixth-Configs</li>
+    <li class="nav-link">Sixth-API</li>
+    <li class="nav-link">Seventh-Configs</li>
   </ul>
   <div id="wall">
     <section class="section section-1">
@@ -258,6 +259,23 @@
     </section>
     <section class="section section-6">
       <div class="wrapper">
+        <h1>API</h1>
+        <pre class="javascript">
+          <code>
+            var wall = new Wall('#wall');
+
+            wall.prevSection(); // go to prev section;
+            wall.nextSection(); // go to next section;
+            wall.goToSection(1); // go to paticular section, param type is number
+
+            wall.prevSlide(); // go to prev slide if slides exists in current section
+            wall.nextSlide(); // go to next slide if slides exists in current section
+          </code>
+        </pre>
+      </div>
+    </section>
+    <section class="section section-7">
+      <div class="wrapper">
         <h1>All Default Configs</h1>
         <pre class="javascript">
           <code>
@@ -288,6 +306,7 @@
   <div id="prev" class="btn btn-secondary">prev</div>
   <div id="next" class="btn btn-primary">next</div>
   <ul class="dot" data-wall-section-nav>
+    <li></li>
     <li></li>
     <li></li>
     <li></li>

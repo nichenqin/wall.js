@@ -46,7 +46,7 @@ span.hl {
 .nav {
   position: fixed;
   width: 100%;
-  background: #fff;
+  background: none;
 }
 
 @media (max-width: 650px) {
@@ -56,14 +56,27 @@ span.hl {
 }
 
 .nav-link {
+  position: relative;
   display: inline-block;
+  color: #fff;
   cursor: pointer;
 }
 
-.nav-link:hover,
-.nav-link.active {
-  color: #fff;
-  background: #5c6bc0;
+.nav-link::after {
+  content: '';
+  display: inline-block;
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  height: 3px;
+  width: 0;
+  background: #fff;
+  transition: width .2s ease;
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+  width: 100%;
 }
 
 .section {
@@ -118,6 +131,10 @@ span.hl {
 }
 
 .section-6 {
+  background-color: #0081cb;
+}
+
+.section-7 {
   background-color: #6d4c41;
 }
 
