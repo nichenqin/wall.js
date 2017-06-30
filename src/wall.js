@@ -205,9 +205,7 @@ class Wall {
 
   _cssWrapper() {
     this.wrapper.style.position = 'relative';
-    this.wrapper.style.overflow = 'hidden';
-    this.wrapper.style.width = '100%';
-    this.wrapper.style.height = this.size.Y + 'px';
+    this.wrapper.style.height = '100%';
     this.wrapper.style.zIndex = this.options.wrapperZIndex;
     return this;
   }
@@ -215,6 +213,7 @@ class Wall {
   _cssSections() {
     this.sections.forEach(section => {
       maxScreen(section);
+      section.style.height = this.size.Y + 'px';
       section.style.overflowX = 'hidden';
       section.style.overflowY = 'auto';
     });

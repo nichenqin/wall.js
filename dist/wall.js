@@ -426,17 +426,18 @@ var Wall = function () {
     key: '_cssWrapper',
     value: function _cssWrapper() {
       this.wrapper.style.position = 'relative';
-      this.wrapper.style.overflow = 'hidden';
-      this.wrapper.style.width = '100%';
-      this.wrapper.style.height = this.size.Y + 'px';
+      this.wrapper.style.height = '100%';
       this.wrapper.style.zIndex = this.options.wrapperZIndex;
       return this;
     }
   }, {
     key: '_cssSections',
     value: function _cssSections() {
+      var _this5 = this;
+
       this.sections.forEach(function (section) {
         (0, _dom.maxScreen)(section);
+        section.style.height = _this5.size.Y + 'px';
         section.style.overflowX = 'hidden';
         section.style.overflowY = 'auto';
       });
@@ -445,7 +446,7 @@ var Wall = function () {
   }, {
     key: '_queue',
     value: function _queue(screenList) {
-      var _this5 = this;
+      var _this6 = this;
 
       screenList.reverse().forEach(function (section, index) {
         section.style.zIndex = index + 1;
@@ -453,7 +454,7 @@ var Wall = function () {
       screenList.reverse();
 
       screenList.forEach(function (section) {
-        return _this5._renderSectionPosition(section, 0);
+        return _this6._renderSectionPosition(section, 0);
       });
 
       return this;
@@ -550,7 +551,7 @@ var Wall = function () {
   }, {
     key: '_renderSectionNavs',
     value: function _renderSectionNavs() {
-      var _this6 = this;
+      var _this7 = this;
 
       if (this.navElements && this.navElements.length) {
         var sectionNavItemActiveClass = this.options.sectionNavItemActiveClass;
@@ -563,7 +564,7 @@ var Wall = function () {
           });
 
           var currentNav = navItems.find(function (item) {
-            return item.getAttribute(SECTION_NAV_INDEX) === _this6._getCurrentSectionIndex();
+            return item.getAttribute(SECTION_NAV_INDEX) === _this7._getCurrentSectionIndex();
           });
           (0, _utils.addClass)(currentNav, sectionNavItemActiveClass);
         });
