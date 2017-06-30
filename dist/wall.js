@@ -70,11 +70,83 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = 1);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var testElement = document.createElement('div');
+
+var hasTransform3d = exports.hasTransform3d = 'WebkitPerspective' in testElement.style || 'MozPerspective' in testElement.style || 'msPerspective' in testElement.style || 'OPerspective' in testElement.style || 'perspective' in testElement.style;
+
+var transformProp = exports.transformProp = function () {
+  if (!('transform' in testElement.style)) {
+    var vendors = ['Webkit', 'Moz', 'ms'];
+    for (var vendor in vendors) {
+      console.log(vendors[vendor]);
+      if (vendors[vendor] + 'Transform' in testElement.style) {
+        return vendors[vendor] + 'Transform';
+      }
+    }
+  }
+  return 'transform';
+}();
+
+var mousewheelEvent = exports.mousewheelEvent = 'onmousewheel' in document ? 'mousewheel' : 'DOMMouseScroll';
+
+var rAF = exports.rAF = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.msRequestAnimationFrame || window.oRequestAnimationFrame || function (callback) {
+  setTimeout(callback, 1000 / 60);
+};
+
+var cAF = exports.cAF = window.cancelAnimationFrame || window.webkitCancelAnimationFrame || window.mozCancelAnimationFrame || window.oCancelAnimationFrame || window.msCancelAnimationFrame || function (id) {
+  clearTimeout(id);
+};
+
+var getScreenWidth = exports.getScreenWidth = function getScreenWidth() {
+  return window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+};
+
+var getScreenHeight = exports.getScreenHeight = function getScreenHeight() {
+  return window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+};
+
+var maxScreen = exports.maxScreen = function maxScreen(el) {
+  el.style.position = 'absolute';
+  el.style.top = 0;
+  el.style.right = 0;
+  el.style.bottom = 0;
+  el.style.left = 0;
+};
+
+var isScrollable = exports.isScrollable = function isScrollable(screen) {
+  var scrollHeight = screen.scrollHeight,
+      clientHeight = screen.clientHeight;
+
+  return clientHeight < scrollHeight;
+};
+
+var scrollTouchBottom = exports.scrollTouchBottom = function scrollTouchBottom(screen) {
+  var scrollTop = screen.scrollTop,
+      scrollHeight = screen.scrollHeight,
+      clientHeight = screen.clientHeight;
+
+  return scrollHeight - scrollTop <= clientHeight;
+};
+
+var scrollTouchTop = exports.scrollTouchTop = function scrollTouchTop(screen) {
+  return screen.scrollTop === 0;
+};
+
+/***/ }),
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -85,17 +157,17 @@ var _createClass = function () { function defineProperties(target, props) { for 
 var _templateObject = _taggedTemplateLiteral(['wrapper'], ['wrapper']),
     _templateObject2 = _taggedTemplateLiteral(['sections'], ['sections']);
 
-var _utils = __webpack_require__(1);
+var _utils = __webpack_require__(2);
 
-var _dom = __webpack_require__(2);
+var _dom = __webpack_require__(0);
 
-var _events = __webpack_require__(6);
+var _events = __webpack_require__(3);
 
-var _easing = __webpack_require__(3);
+var _easing = __webpack_require__(5);
 
 var easing = _interopRequireWildcard(_easing);
 
-__webpack_require__(4);
+__webpack_require__(6);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -199,7 +271,6 @@ var Wall = function () {
     value: function _refresh(force) {
       var _this2 = this;
 
-      console.log('refresh');
       if (force) this._setupSize()._cssHtmlAndBody()._cssWrapper()._setupSections()._cssSections()._queue(this.sections)._setupSlides()._setupSectionNav();
 
       (0, _dom.cAF)(this.requestId);
@@ -499,11 +570,6 @@ var Wall = function () {
       }
     }
   }, {
-    key: 'getWrapperZIndex',
-    value: function getWrapperZIndex() {
-      return this.wrapper.style.zIndex;
-    }
-  }, {
     key: 'prevSection',
     value: function prevSection() {
       if (!this.options.loopToBottom && this._getCurrentSectionIndex() == 1) return;
@@ -600,7 +666,7 @@ var Wall = function () {
 module.exports = Wall;
 
 /***/ }),
-/* 1 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -640,105 +706,19 @@ var removeClass = exports.removeClass = function removeClass(el, className) {
 };
 
 /***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-var testElement = document.createElement('div');
-
-var hasTransform3d = exports.hasTransform3d = 'WebkitPerspective' in testElement.style || 'MozPerspective' in testElement.style || 'msPerspective' in testElement.style || 'OPerspective' in testElement.style || 'perspective' in testElement.style;
-
-var transformProp = exports.transformProp = function () {
-  if (!('transform' in testElement.style)) {
-    var vendors = ['Webkit', 'Moz', 'ms'];
-    for (var vendor in vendors) {
-      console.log(vendors[vendor]);
-      if (vendors[vendor] + 'Transform' in testElement.style) {
-        return vendors[vendor] + 'Transform';
-      }
-    }
-  }
-  return 'transform';
-}();
-
-var mousewheelEvent = exports.mousewheelEvent = 'onmousewheel' in document ? 'mousewheel' : 'DOMMouseScroll';
-
-var rAF = exports.rAF = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.msRequestAnimationFrame || window.oRequestAnimationFrame || function (callback) {
-  setTimeout(callback, 1000 / 60);
-};
-
-var cAF = exports.cAF = window.cancelAnimationFrame || window.webkitCancelAnimationFrame || window.mozCancelAnimationFrame || window.oCancelAnimationFrame || window.msCancelAnimationFrame || function (id) {
-  clearTimeout(id);
-};
-
-var getScreenWidth = exports.getScreenWidth = function getScreenWidth() {
-  return window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-};
-
-var getScreenHeight = exports.getScreenHeight = function getScreenHeight() {
-  return window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-};
-
-var maxScreen = exports.maxScreen = function maxScreen(el) {
-  el.style.position = 'absolute';
-  el.style.top = 0;
-  el.style.right = 0;
-  el.style.bottom = 0;
-  el.style.left = 0;
-};
-
-var isScrollable = exports.isScrollable = function isScrollable(screen) {
-  var scrollHeight = screen.scrollHeight,
-      clientHeight = screen.clientHeight;
-
-  return clientHeight < scrollHeight;
-};
-
-var scrollTouchBottom = exports.scrollTouchBottom = function scrollTouchBottom(screen) {
-  var scrollTop = screen.scrollTop,
-      scrollHeight = screen.scrollHeight,
-      clientHeight = screen.clientHeight;
-
-  return scrollHeight - scrollTop <= clientHeight;
-};
-
-var scrollTouchTop = exports.scrollTouchTop = function scrollTouchTop(screen) {
-  return screen.scrollTop === 0;
-};
-
-/***/ }),
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-var linear = exports.linear = function linear(t, b, c, d) {
-  return c * t / d + b;
-};
+var _touch = __webpack_require__(4);
 
-var easeIn = exports.easeIn = function easeIn(t, b, c, d) {
-  return c * Math.pow(2, 10 * (t / d - 1)) + b;
-};
+var _touch2 = _interopRequireDefault(_touch);
 
-var easeOut = exports.easeOut = function easeOut(t, b, c, d) {
-  return c * (-Math.pow(2, -10 * t / d) + 1) + b;
-};
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var easeInOut = exports.easeInOut = function easeInOut(t, b, c, d) {
-  t /= d / 2;
-  if (t < 1) return c / 2 * Math.pow(2, 10 * (t - 1)) + b;
-  t--;
-  return c / 2 * (-Math.pow(2, -10 * t) + 2) + b;
-};
+module.exports = { handleTouch: _touch2.default };
 
 /***/ }),
 /* 4 */
@@ -747,43 +727,11 @@ var easeInOut = exports.easeInOut = function easeInOut(t, b, c, d) {
 "use strict";
 
 
-if (!Array.prototype.find) {
-  Array.prototype.find = function (predicate) {
-    'use strict';
-
-    if (this == null) {
-      throw new TypeError('Array.prototype.find called on null or undefined');
-    }
-    if (typeof predicate !== 'function') {
-      throw new TypeError('predicate must be a function');
-    }
-    var list = Object(this);
-    var length = list.length >>> 0;
-    var thisArg = arguments[1];
-    var value;
-
-    for (var i = 0; i < length; i++) {
-      value = list[i];
-      if (predicate.call(thisArg, value, i, list)) {
-        return value;
-      }
-    }
-    return undefined;
-  };
-}
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _dom = __webpack_require__(2);
+var _dom = __webpack_require__(0);
 
 var handleTouch = function handleTouch(el, context) {
 
@@ -825,19 +773,65 @@ var handleTouch = function handleTouch(el, context) {
 exports.default = handleTouch;
 
 /***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var linear = exports.linear = function linear(t, b, c, d) {
+  return c * t / d + b;
+};
+
+var easeIn = exports.easeIn = function easeIn(t, b, c, d) {
+  return c * Math.pow(2, 10 * (t / d - 1)) + b;
+};
+
+var easeOut = exports.easeOut = function easeOut(t, b, c, d) {
+  return c * (-Math.pow(2, -10 * t / d) + 1) + b;
+};
+
+var easeInOut = exports.easeInOut = function easeInOut(t, b, c, d) {
+  t /= d / 2;
+  if (t < 1) return c / 2 * Math.pow(2, 10 * (t - 1)) + b;
+  t--;
+  return c / 2 * (-Math.pow(2, -10 * t) + 2) + b;
+};
+
+/***/ }),
 /* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _touch = __webpack_require__(5);
+if (!Array.prototype.find) {
+  Array.prototype.find = function (predicate) {
+    'use strict';
 
-var _touch2 = _interopRequireDefault(_touch);
+    if (this == null) {
+      throw new TypeError('Array.prototype.find called on null or undefined');
+    }
+    if (typeof predicate !== 'function') {
+      throw new TypeError('predicate must be a function');
+    }
+    var list = Object(this);
+    var length = list.length >>> 0;
+    var thisArg = arguments[1];
+    var value;
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-module.exports = { handleTouch: _touch2.default };
+    for (var i = 0; i < length; i++) {
+      value = list[i];
+      if (predicate.call(thisArg, value, i, list)) {
+        return value;
+      }
+    }
+    return undefined;
+  };
+}
 
 /***/ })
 /******/ ]);

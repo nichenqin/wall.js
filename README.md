@@ -34,6 +34,19 @@ yarn add wall.js
 </script>
 ```
 
+## API
+
+```javascript
+var wall = new Wall('#wall');
+
+wall.prevSection(); // go to prev section;
+wall.nextSection(); // go to next section;
+wall.goToSection(1); // go to paticular section, param type is number
+
+wall.prevSlide(); // go to prev slide if slides exists in current section
+wall.nextSlide(); // go to next slide if slides exists in current section
+```
+
 ## Custom Navigation
 
 ### Add data-wall-section-nav attribute to your own nav element

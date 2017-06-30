@@ -83,7 +83,6 @@ class Wall {
   }
 
   _refresh(force) {
-    console.log('refresh');
     if (force)
       this
         ._setupSize()._cssHtmlAndBody()._cssWrapper()
@@ -317,10 +316,6 @@ class Wall {
       });
 
     }
-  }
-
-  getWrapperZIndex() {
-    return this.wrapper.style.zIndex;
   }
 
   prevSection() {
