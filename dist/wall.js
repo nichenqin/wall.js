@@ -610,17 +610,15 @@ var Wall = function () {
       if (index === this._getCurrentSectionIndex()) return;
 
       if (!this.isAnimating) {
+        this.isToBack = index < this._getCurrentSectionIndex();
+
         this.sections = (0, _utils.toArray)(this.wrapper.children);
         var targetSection = this.sections.find(function (section) {
           return section.getAttribute(SECTION_INDEX) == index;
         });
-
         var prevSections = this.sections.slice(0, index - 1);
         var nextSections = this.sections.slice(index);
-
         this.sections = [targetSection].concat(_toConsumableArray(nextSections), _toConsumableArray(prevSections));
-
-        this._refreshAnimateStatus(index < this._getCurrentSectionIndex());
 
         if (this.isToBack) {
           this.currentSection = targetSection;
@@ -629,7 +627,7 @@ var Wall = function () {
         }
 
         this.screenType = SCREEN_SECTION;
-        this._animateScreen(this.currentSection, this.sections);
+        this._refreshAnimateStatus(this.isToBack)._animateScreen(this.currentSection, this.sections);
       }
     }
   }, {

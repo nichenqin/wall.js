@@ -347,15 +347,13 @@ class Wall {
     if (index === this._getCurrentSectionIndex()) return;
 
     if (!this.isAnimating) {
+      this.isToBack = index < this._getCurrentSectionIndex();
+
       this.sections = toArray(this.wrapper.children);
       const targetSection = this.sections.find(section => section.getAttribute(SECTION_INDEX) == index);
-
       const prevSections = this.sections.slice(0, index - 1);
       const nextSections = this.sections.slice(index);
-
       this.sections = [targetSection, ...nextSections, ...prevSections];
-
-      this._refreshAnimateStatus(index < this._getCurrentSectionIndex());
 
       if (this.isToBack) {
         this.currentSection = targetSection;
@@ -364,7 +362,7 @@ class Wall {
       }
 
       this.screenType = SCREEN_SECTION;
-      this._animateScreen(this.currentSection, this.sections);
+      this._refreshAnimateStatus(this.isToBack)._animateScreen(this.currentSection, this.sections);
     }
   }
 
