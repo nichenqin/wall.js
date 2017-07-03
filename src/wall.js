@@ -326,8 +326,7 @@ class Wall {
       this.sections = [this.currentSection, ...this.restSections.reverse()];
       this.screenType = SCREEN_SECTION;
 
-      this._refreshAnimateStatus(true)
-        ._animateScreen(this.currentSection, this.sections);
+      this._refreshAnimateStatus(true)._animateScreen(this.currentSection, this.sections);
     }
   }
 

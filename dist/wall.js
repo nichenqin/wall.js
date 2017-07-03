@@ -145,6 +145,19 @@ var scrollTouchTop = exports.scrollTouchTop = function scrollTouchTop(screen) {
   return screen.scrollTop === 0;
 };
 
+var touchEvent = exports.touchEvent = {
+  touchStart: 'touchstart',
+  touchMove: 'touchmove'
+};
+
+if (window.navigator.msPointerEnabled) {
+  touchEvent.touchStart = 'MSPointerDown';
+  touchEvent.touchMove = 'MSPointerMove';
+} else if (window.navigator.pointerEnabled) {
+  touchEvent.touchStart = 'pointerdown';
+  touchEvent.touchMove = 'pointermove';
+}
+
 /***/ }),
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -738,7 +751,7 @@ var handleTouch = function handleTouch(el, context) {
   var end = { X: 0, Y: 0 };
 
   var handleTouchStart = function handleTouchStart(e) {
-    var touch = e.touches[0];
+    var touch = e.touches ? e.touches[0] : e;
     start.X = touch.pageX;
     start.Y = touch.pageY;
   };
@@ -746,7 +759,7 @@ var handleTouch = function handleTouch(el, context) {
   var handleTouchMove = function handleTouchMove(e) {
     if (context.isAnimating) return;
 
-    var touch = e.touches[0];
+    var touch = e.touches ? e.touches[0] : e;
     end.X = touch.pageX;
     end.Y = touch.pageY;
     var diffX = start.X - end.X;
@@ -765,8 +778,8 @@ var handleTouch = function handleTouch(el, context) {
     }
   };
 
-  el.addEventListener('touchstart', handleTouchStart, false);
-  el.addEventListener('touchmove', handleTouchMove, false);
+  el.addEventListener(_dom.touchEvent.touchStart, handleTouchStart, false);
+  el.addEventListener(_dom.touchEvent.touchMove, handleTouchMove, false);
 };
 
 exports.default = handleTouch;

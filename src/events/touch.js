@@ -1,4 +1,4 @@
-import { scrollTouchBottom, scrollTouchTop } from '../dom';
+import { scrollTouchBottom, scrollTouchTop, touchEvent } from '../dom';
 
 const handleTouch = (el, context) => {
 
@@ -6,7 +6,7 @@ const handleTouch = (el, context) => {
   const end = { X: 0, Y: 0 };
 
   const handleTouchStart = e => {
-    const touch = e.touches[0];
+    const touch = e.touches ? e.touches[0] : e;
     start.X = touch.pageX;
     start.Y = touch.pageY;
   };
@@ -14,7 +14,7 @@ const handleTouch = (el, context) => {
   const handleTouchMove = e => {
     if (context.isAnimating) return;
 
-    const touch = e.touches[0];
+    const touch = e.touches ? e.touches[0] : e;
     end.X = touch.pageX;
     end.Y = touch.pageY;
     const diffX = start.X - end.X;
@@ -33,8 +33,8 @@ const handleTouch = (el, context) => {
     }
   };
 
-  el.addEventListener('touchstart', handleTouchStart, false);
-  el.addEventListener('touchmove', handleTouchMove, false);
+  el.addEventListener(touchEvent.touchStart, handleTouchStart, false);
+  el.addEventListener(touchEvent.touchMove, handleTouchMove, false);
 };
 
 export default handleTouch;

@@ -65,3 +65,17 @@ export const scrollTouchBottom = screen => {
 export const scrollTouchTop = screen => {
   return screen.scrollTop === 0;
 };
+
+export const touchEvent = {
+  touchStart: 'touchstart',
+  touchMove: 'touchmove'
+};
+
+if (window.navigator.msPointerEnabled) {
+  touchEvent.touchStart = 'MSPointerDown';
+  touchEvent.touchMove = 'MSPointerMove';
+} else if (window.navigator.pointerEnabled) {
+  touchEvent.touchStart = 'pointerdown';
+  touchEvent.touchMove = 'pointermove';
+}
+
