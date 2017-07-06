@@ -10,6 +10,8 @@ const DATA_PRE = 'data-wall';
 
 const ANIMATE_DURATION = `${DATA_PRE}-animate-duration`;
 
+const CURRENT_INDEX = `${DATA_PRE}-current-section`;
+
 const SECTION_NAV = `${DATA_PRE}-section-nav`;
 const SECTION_INDEX = `${DATA_PRE}-section-index`;
 
@@ -19,6 +21,8 @@ const SLIDE = `${DATA_PRE}-slide`;
 const SLIDE_INDEX = `${DATA_PRE}-slide-index`;
 const SLIDE_ARROW = `${DATA_PRE}-slide-arrow`;
 
+const IMAGE_ORIGIN = `${DATA_PRE}-origin`;
+
 const defaultOptions = {
   wrapperZIndex: 1,
   sectionAnimateDuration: 1,
@@ -27,7 +31,7 @@ const defaultOptions = {
   loopToTop: false,
   sectionNavItemActiveClass: 'active',
   animatingClass: 'animating',
-  currentClass: 'current'
+  currentClass: 'current',
 };
 
 const html = document.getElementsByTagName('html')[0];
@@ -110,6 +114,8 @@ class Wall {
     }
 
     this._renderSectionNavs();
+    this._lazyload(this.currentSection);
+    this.wrapper.setAttribute(CURRENT_INDEX, this._getCurrentSectionIndex());
 
     return this;
   }
@@ -218,6 +224,11 @@ class Wall {
       section.style.overflowY = 'auto';
     });
     return this;
+  }
+
+  _lazyload(currentScreen) {
+    const images = toArray(currentScreen.querySelectorAll(`[${IMAGE_ORIGIN}]`));
+    images.forEach(image => image.setAttribute('src', image.getAttribute(IMAGE_ORIGIN)));
   }
 
   _queue(screenList) {

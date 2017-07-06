@@ -198,6 +198,8 @@ var DATA_PRE = 'data-wall';
 
 var ANIMATE_DURATION = DATA_PRE + '-animate-duration';
 
+var CURRENT_INDEX = DATA_PRE + '-current-section';
+
 var SECTION_NAV = DATA_PRE + '-section-nav';
 var SECTION_INDEX = DATA_PRE + '-section-index';
 
@@ -206,6 +208,8 @@ var SECTION_NAV_INDEX = DATA_PRE + '-section-nav-index';
 var SLIDE = DATA_PRE + '-slide';
 var SLIDE_INDEX = DATA_PRE + '-slide-index';
 var SLIDE_ARROW = DATA_PRE + '-slide-arrow';
+
+var IMAGE_ORIGIN = DATA_PRE + '-origin';
 
 var defaultOptions = {
   wrapperZIndex: 1,
@@ -318,6 +322,8 @@ var Wall = function () {
       }
 
       this._renderSectionNavs();
+      this._lazyload(this.currentSection);
+      this.wrapper.setAttribute(CURRENT_INDEX, this._getCurrentSectionIndex());
 
       return this;
     }
@@ -455,6 +461,14 @@ var Wall = function () {
         section.style.overflowY = 'auto';
       });
       return this;
+    }
+  }, {
+    key: '_lazyload',
+    value: function _lazyload(currentScreen) {
+      var images = (0, _utils.toArray)(currentScreen.querySelectorAll('[' + IMAGE_ORIGIN + ']'));
+      images.forEach(function (image) {
+        return image.setAttribute('src', image.getAttribute(IMAGE_ORIGIN));
+      });
     }
   }, {
     key: '_queue',
