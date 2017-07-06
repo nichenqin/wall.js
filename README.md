@@ -137,6 +137,20 @@ var wall = new Wall('#wall',config);
 
 Your should create and style the arrow yourself, wall.js helps arraw show above the slides
 
+## lazyload
+
+wall.js support lazy load images.
+
+Just set the true image source to `data-wall-origin` attribute of the `<img>` tag.
+
+```javascript
+<section>
+  <img src="./blank.png" alt="awesome" data-wall-origin="./awesome.png" />
+</section>
+```
+
+The picture will be replaced with the true picture.
+
 ## Custom Animation Duration
 
 ### Add data-wall-animate-duration attribute to section
