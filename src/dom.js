@@ -11,7 +11,6 @@ export const transformProp = (() => {
   if (!('transform' in testElement.style)) {
     const vendors = ['Webkit', 'Moz', 'ms'];
     for (let vendor in vendors) {
-      console.log(vendors[vendor]);
       if (vendors[vendor] + 'Transform' in testElement.style) {
         return vendors[vendor] + 'Transform';
       }
@@ -22,27 +21,28 @@ export const transformProp = (() => {
 
 export const mousewheelEvent = 'onmousewheel' in document ? 'mousewheel' : 'DOMMouseScroll';
 
-export const rAF = window.requestAnimationFrame ||
+export const rAF =
+  window.requestAnimationFrame ||
   window.webkitRequestAnimationFrame ||
   window.mozRequestAnimationFrame ||
   window.msRequestAnimationFrame ||
   window.oRequestAnimationFrame ||
   function (callback) { setTimeout(callback, 1000 / 60); };
 
-export const cAF = window.cancelAnimationFrame ||
+export const cAF =
+  window.cancelAnimationFrame ||
   window.webkitCancelAnimationFrame ||
   window.mozCancelAnimationFrame ||
   window.oCancelAnimationFrame ||
   window.msCancelAnimationFrame ||
   function (id) { clearTimeout(id); };
 
-export const getScreenWidth = () => {
-  return window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-};
+export const getScreenWidth = () =>
+  window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 
-export const getScreenHeight = () => {
-  return window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-};
+
+export const getScreenHeight = () =>
+  window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 
 export const maxScreen = el => {
   el.style.position = 'absolute';
@@ -52,19 +52,11 @@ export const maxScreen = el => {
   el.style.left = 0;
 };
 
-export const isScrollable = screen => {
-  const { scrollHeight, clientHeight } = screen;
-  return clientHeight < scrollHeight;
-};
+export const isScrollable = ({ scrollHeight, clientHeight }) => clientHeight < scrollHeight;
 
-export const scrollTouchBottom = screen => {
-  const { scrollTop, scrollHeight, clientHeight } = screen;
-  return scrollHeight - scrollTop <= clientHeight;
-};
+export const scrollTouchBottom = ({ scrollTop, scrollHeight, clientHeight }) => scrollHeight - scrollTop <= clientHeight;
 
-export const scrollTouchTop = screen => {
-  return screen.scrollTop === 0;
-};
+export const scrollTouchTop = screen => screen.scrollTop === 0;
 
 export const touchEvent = {
   touchStart: 'touchstart',

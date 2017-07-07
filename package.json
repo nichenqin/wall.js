@@ -1,7 +1,7 @@
 {
     "name": "wall.js",
-    "version": "0.8.0",
-    "description": "fullpage",
+    "version": "0.10.0",
+    "description": "fullpage piling",
     "main": ".dist/wall.min.js",
     "keywords": [
         "fullpage",

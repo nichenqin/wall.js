@@ -91,7 +91,6 @@ var transformProp = exports.transformProp = function () {
   if (!('transform' in testElement.style)) {
     var vendors = ['Webkit', 'Moz', 'ms'];
     for (var vendor in vendors) {
-      console.log(vendors[vendor]);
       if (vendors[vendor] + 'Transform' in testElement.style) {
         return vendors[vendor] + 'Transform';
       }
@@ -126,18 +125,16 @@ var maxScreen = exports.maxScreen = function maxScreen(el) {
   el.style.left = 0;
 };
 
-var isScrollable = exports.isScrollable = function isScrollable(screen) {
-  var scrollHeight = screen.scrollHeight,
-      clientHeight = screen.clientHeight;
-
+var isScrollable = exports.isScrollable = function isScrollable(_ref) {
+  var scrollHeight = _ref.scrollHeight,
+      clientHeight = _ref.clientHeight;
   return clientHeight < scrollHeight;
 };
 
-var scrollTouchBottom = exports.scrollTouchBottom = function scrollTouchBottom(screen) {
-  var scrollTop = screen.scrollTop,
-      scrollHeight = screen.scrollHeight,
-      clientHeight = screen.clientHeight;
-
+var scrollTouchBottom = exports.scrollTouchBottom = function scrollTouchBottom(_ref2) {
+  var scrollTop = _ref2.scrollTop,
+      scrollHeight = _ref2.scrollHeight,
+      clientHeight = _ref2.clientHeight;
   return scrollHeight - scrollTop <= clientHeight;
 };
 
@@ -236,12 +233,12 @@ var Wall = function () {
     this.wrapper = typeof wrapper === 'string' ? document.querySelector(wrapper) : wrapper;
     // get child sections, if no section contains, throw a new error
     this.sections = this.wrapper.children.length ? (0, _utils.toArray)(this.wrapper.children) : (0, _utils.throwNewError)(_templateObject2);
-    this.currentSection = undefined;
-    this.restSections = undefined;
+    this.currentSection = null;
+    this.restSections = null;
 
-    this.currentSlides = undefined;
-    this.currentSlide = undefined;
-    this.restSlides = undefined;
+    this.currentSlides = null;
+    this.currentSlide = null;
+    this.restSlides = null;
 
     // the position of current section, used to move currentSection
     this.currentScreenPosition = 0;
@@ -725,7 +722,9 @@ var addClass = exports.addClass = function addClass(el, className) {
 };
 
 var removeClass = exports.removeClass = function removeClass(el, className) {
-  if (el.classList) el.classList.remove(className);else if (hasClass(el, className)) {
+  if (el.classList) {
+    el.classList.remove(className);
+  } else if (hasClass(el, className)) {
     var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
     el.className = el.className.replace(reg, ' ');
   }

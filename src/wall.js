@@ -44,12 +44,12 @@ class Wall {
     this.wrapper = typeof wrapper === 'string' ? document.querySelector(wrapper) : wrapper;
     // get child sections, if no section contains, throw a new error
     this.sections = this.wrapper.children.length ? toArray(this.wrapper.children) : throwNewError`sections`;
-    this.currentSection = undefined;
-    this.restSections = undefined;
+    this.currentSection = null;
+    this.restSections = null;
 
-    this.currentSlides = undefined;
-    this.currentSlide = undefined;
-    this.restSlides = undefined;
+    this.currentSlides = null;
+    this.currentSlide = null;
+    this.restSlides = null;
 
     // the position of current section, used to move currentSection
     this.currentScreenPosition = 0;
