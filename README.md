@@ -13,6 +13,12 @@ npm install wall.js --save
 yarn add wall.js
 ```
 
+or
+
+```html
+<script src="https://unpkg.com/wall.js@0.10.1/dist/wall.min.js"></script>
+```
+
 ## Get Start
 
 ```html
@@ -27,10 +33,10 @@ yarn add wall.js
   </div>
 </body>
 
-<script src="path/to/Wall.min.js"></script>
+<script src="path/to/wall.min.js"></script>
 
 <script>
-  var wall = new Wall('.wrapper');
+  var wall = new Wall('#wall');
 </script>
 ```
 
