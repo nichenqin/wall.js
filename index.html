@@ -10,9 +10,8 @@
   <link href="https://fonts.googleapis.com/css?family=Merriweather" rel="stylesheet">
   <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.6/css/bootstrap.min.css'
   />
-
-  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/darcula.min.css' />
   <script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js'></script>
+  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/darcula.min.css' />
   <script>
     window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) }; ga.l = +new Date;
 
@@ -32,7 +31,8 @@
     <li class="nav-link">Forth-Duration</li>
     <li class="nav-link">Fifth-Class</li>
     <li class="nav-link">Sixth-API</li>
-    <li class="nav-link">Seventh-Configs</li>
+    <li class="nav-link">Seventh-Lazy Load</li>
+    <li class="nav-link">Eighth-Configs</li>
   </ul>
   <div id="wall">
     <section class="section section-1">
@@ -276,6 +276,21 @@
     </section>
     <section class="section section-7">
       <div class="wrapper">
+        <h1>Lazzy Load</h1>
+        <pre class="html">
+          <code>
+            &lt;img 
+              src="./assets/images/loading.png"  &lt;!-- load image path --&gt;
+              alt="Wall" 
+              data-wall-origin="./assets/images/wall.png" &lt;!-- true image path --&gt;
+            / &gt;
+          </code>
+        </pre>
+        <img src="./assets/images/loading.png" alt="Wall" data-wall-origin="./assets/images/wall.png" />
+      </div>
+    </section>
+    <section class="section section-8">
+      <div class="wrapper">
         <h1>All Default Configs</h1>
         <pre class="javascript">
           <code>
@@ -313,11 +328,12 @@
     <li></li>
     <li></li>
     <li></li>
+    <li></li>
   </ul>
   <script>
     hljs.initHighlightingOnLoad();
   </script>
-  <script src="./lib/wall.min.js"></script>
+  <script src="https://unpkg.com/wall.js/dist/wall.min.js"></script>
   <script src="./index.js"></script>
 </body>
 
