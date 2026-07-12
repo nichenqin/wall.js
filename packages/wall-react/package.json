@@ -1,0 +1,68 @@
+{
+  "name": "@wall.js/react",
+  "version": "2.0.0",
+  "description": "React bindings for wall.js — <Wall />, <Wall.Section />, <Wall.Slide />",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "pnpm build"
+  },
+  "keywords": [
+    "wall.js",
+    "fullpage",
+    "react",
+    "scrolling",
+    "fullscreen"
+  ],
+  "author": {
+    "name": "nichenqin",
+    "email": "nichenqin@hotmail.com",
+    "url": "https://github.com/nichenqin"
+  },
+  "homepage": "https://github.com/nichenqin/wall.js/tree/master/packages/wall-react",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nichenqin/wall.js.git",
+    "directory": "packages/wall-react"
+  },
+  "bugs": {
+    "url": "https://github.com/nichenqin/wall.js/issues"
+  },
+  "license": "MIT",
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18",
+    "wall.js": ">=2.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3",
+    "wall.js": "workspace:*"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

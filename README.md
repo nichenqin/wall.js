@@ -1,272 +1,123 @@
 # wall.js
 
-![wall.js](https://raw.githubusercontent.com/nichenqin1001/wall.js/master/asserts/wall.png)
+**Modern fullpage piling** — zero runtime dependency, TypeScript-first, destroyable.
 
-## Demo And Documentation
+Monorepo (Turborepo + pnpm):
 
-[Live Demo & Documentation](http://nichenqin.com/wall.js)
+| Package | Path | Description |
+| --- | --- | --- |
+| `wall.js` | `packages/wall` | Core library |
+| `@wall.js/react` | `packages/wall-react` | React — `<Wall />` |
+| `@wall.js/vue` | `packages/wall-vue` | Vue 3 — `<Wall>` |
+| `@wall.js/svelte` | `packages/wall-svelte` | Svelte 5 — `<Wall>` |
+| `@wall.js/site` | `apps/site` | Experience website (vanilla) |
 
-## Installation
+The site **is** a live wall.js demo — scroll, swipe, or use arrow keys.
 
 ```bash
-npm install wall.js --save
-yarn add wall.js
+pnpm install
+pnpm dev              # experience site
+pnpm build            # all packages + site
+pnpm build:packages   # core + framework bindings
+pnpm typecheck
 ```
 
-or
+## Install
 
-```html
-<script src="https://unpkg.com/wall.js@0.10.1/dist/wall.min.js"></script>
+```bash
+pnpm add wall.js
+
+# framework bindings
+pnpm add wall.js @wall.js/react
+pnpm add wall.js @wall.js/vue
+pnpm add wall.js @wall.js/svelte
 ```
 
-## Get Start
+CDN (core):
 
 ```html
-<body>
-  <div id="wall">
-    <section><!--content--></section>
-    <section><!--content--></section>
-    <section><!--content--></section>
-    <section><!--content--></section>
-    <section><!--content--></section>
-    <section><!--content--></section>
-  </div>
-</body>
+<script src="https://unpkg.com/wall.js@2/dist/wall.iife.js"></script>
+```
 
-<script src="path/to/wall.min.js"></script>
+## Core quick start
 
-<script>
-  var wall = new Wall('#wall');
+```js
+import { Wall } from 'wall.js'
+
+const wall = new Wall('#wall', { duration: 700 })
+wall.on('change', ({ from, to, direction }) => {
+  console.log(from, '→', to, direction)
+})
+```
+
+## React
+
+```tsx
+import { Wall } from '@wall.js/react'
+
+<Wall duration={700}>
+  <Wall.Section>One</Wall.Section>
+  <Wall.Section>
+    <Wall.Slide>A</Wall.Slide>
+    <Wall.Slide>B</Wall.Slide>
+  </Wall.Section>
+</Wall>
+```
+
+## Vue
+
+```vue
+<script setup>
+import { Wall, WallSection, WallSlide } from '@wall.js/vue'
 </script>
+
+<template>
+  <Wall :duration="700">
+    <WallSection>One</WallSection>
+    <WallSection>
+      <WallSlide>A</WallSlide>
+      <WallSlide>B</WallSlide>
+    </WallSection>
+  </Wall>
+</template>
 ```
 
-## API
+## Svelte
 
-```javascript
-var wall = new Wall('#wall');
+```svelte
+<script>
+  import { Wall, WallSection, WallSlide } from '@wall.js/svelte'
+</script>
 
-wall.prevSection(); // go to prev section;
-wall.nextSection(); // go to next section;
-wall.goToSection(1); // go to paticular section, param type is number
-
-wall.prevSlide(); // go to prev slide if slides exists in current section
-wall.nextSlide(); // go to next slide if slides exists in current section
+<Wall duration={700}>
+  <WallSection>One</WallSection>
+  <WallSection>
+    <WallSlide>A</WallSlide>
+    <WallSlide>B</WallSlide>
+  </WallSection>
+</Wall>
 ```
 
-## Custom Navigation
+## Docs
 
-### Add data-wall-section-nav attribute to your own nav element
+| Doc | |
+| --- | --- |
+| [API](./docs/API.md) | Core options, methods, events |
+| [React](./docs/REACT.md) | `@wall.js/react` |
+| [Vue](./docs/VUE.md) | `@wall.js/vue` |
+| [Svelte](./docs/SVELTE.md) | `@wall.js/svelte` |
+| [Migration](./docs/MIGRATION.md) | 0.x → 2.x |
+| [Site](./docs/SITE.md) | Experience website |
 
-wall.js will add event listener and toggle active class of the navs.
+## Scripts (root)
 
-```html
-< !-- DON'T ADD THE NAV ELEMENT INSIDE THE WRAPPER -- >
-<ul class="nav" data-wall-section-nav>
-  <li>First</li>
-  <li>Second</li>
-</ul>
-<div id="wall"> <!-- wrapper -->
-  <section>First Section</section>
-  <section>Second Section</section>
-</div>
-<ul class="dot" data-wall-section-nav>
-  <li></li>
-  <li></li>
-</ul>
-```
+| Command | Description |
+| --- | --- |
+| `pnpm dev` | Site (Turbo) |
+| `pnpm build` | All packages + site |
+| `pnpm build:packages` | Core + React / Vue / Svelte |
+| `pnpm typecheck` | `tsc` / `vue-tsc` / `svelte-check` |
 
-### style your nav elment in html and css file
+## License
 
-Here is an example:
-
-```css
-.dot {
-  position: absolute;
-  top: 50%;
-  right: 50px;
-  transform: translateY(-50%);
-}
-
-.dot>li {
-  width: 16px;
-  height: 16px;
-  margin-bottom: 10px;
-  border: 2px solid #fff;
-  border-radius: 50%;
-  background-color: transparent;
-  box-sizing: border-box;
-  list-style: none;
-  cursor: pointer;
-}
-
-.dot>li.active,
-.dot>li:hover {
-  background-color: #fff;
-}
-```
-
-### custom activc class
-
-```javascript
-var config = {
-  sectionNavItemActiveClass: 'my-active-class'
-}
-
-var wall = new Wall('#wall',config);
-```
-
-## Slides
-
-### Add data-wall-slide attribute to your HTMLElement
-
-```html
-<div id="wall">
-  <!--other sections-->
-  <section>
-    <div data-wall-slide><!--slide content--></div> <!-- wall.js will create horizontal move slides -->
-    <div data-wall-slide><!--slide content--></div>
-  </section>
-  <!--other sections-->
-</div>
-```
-
-### add data-wall-slide-arrow attribute to your arrows
-
-```html
-<section>
-  <div data-wall-slide><!--slide content--></div> <!-- wall.js will create horizontal move slides -->
-  <div data-wall-slide><!--slide content--></div>
-  <div data-wall-slide-arrow class="prev-slide"></div>
-  <div data-wall-slide-arrow class="next-slide"></div>
-</section>
-```
-
-Your should create and style the arrow yourself, wall.js helps arraw show above the slides
-
-## lazyload
-
-wall.js support lazy load images.
-
-Just set the true image source to `data-wall-origin` attribute of the `<img>` tag.
-
-```javascript
-<section>
-  <img src="./blank.png" alt="awesome" data-wall-origin="./awesome.png" />
-</section>
-```
-
-The picture will be replaced with the true picture.
-
-## Custom Animation Duration
-
-### Add data-wall-animate-duration attribute to section
-
-You can change animation duration to all secitons like this:
-
-```javascript
-var config = {
-  sectionAnimateDuration: 3 // every section now move 3 seconds
-}
-
-var wall = new Wall('#wall',config);
-```
-
-or just change one of them like this:
-
-```html
-<div id="wall">
-  <section><!--section content--></section>
-  <section><!--section content--></section>
-  <section><!--section content--></section>
-  <section data-wall-animate-duration=3><!--section content--></section> <!--this seciton will move 3 seconds-->
-  <section><!--section content--></section>
-  <section><!--section content--></section>
-</div>
-```
-
-of cause it works for slides
-
-```html
-<div id="wall">
-  <!--other sections-->
-  <section>
-    <!--other slides-->
-    <div data-wall-slide><!--slide content--></div>
-    <div data-wall-slide data-wall-animate-duration=3><!--slide content--></div>
-    <!--other slides-->
-  </section>
-  <!--other sections-->
-</div>
-```
-
-## Class of Current Section/Slide
-
-current section will be added current class
-
-```html
-<section class="section-1"><!--content--></section>
-<section class="section-2"><!--content--></section>
-<section class="section-3"><!--content--></section>
-<section class="section-4"><!--content--></section>
-<section class="section-5 current"><!--content--></section><!--current section-->
-```
-
-animating section will be added animating class
-
-```html
-<section class="section-1"><!--content--></section>
-<section class="section-2"><!--content--></section>
-<section class="section-3"><!--content--></section>
-<section class="section-4"><!--content--></section>
-<section class="section-5 animating current"><!--content--></section><!--if you animate this section-->
-```
-
-You can control animation like this:
-
-```css
-h1 {
-  opacity: 0;
-  transition: opacity .3s ease;
-}
-
-.current h1 {
-  opacity: 1;
-}
-```
-
-## Custom Configs
-
-option | default | type | description
------- | ------- | ---- | -----------
-wrapperZIndex | 1 | `number` | z-index style of wrapper
-sectionAnimateDuration | 1 | `number` | duration of animation
-easeFunction | 'easeIn' | `string` or `function` | ease function of animation
-loopToBottom | false | `boolean` | whether loop from top to bottom
-loopToTop | false | `boolean` | whether loop from  bottom to top
-sectionNavItemActiveClass | 'active' | `string` | active class of custom nav item
-currentClass | 'current' | `string` | class of current section or slide
-animatingClass | 'animating' | `string` | class of current section or slide while animating
-
-## LICENSE
-
-MIT License
-
-Copyright (c) 2017 倪晨钦
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+MIT © nichenqin

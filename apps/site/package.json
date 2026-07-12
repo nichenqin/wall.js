@@ -1,0 +1,21 @@
+{
+  "name": "@wall.js/site",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf site-dist"
+  },
+  "dependencies": {
+    "shiki": "^4.3.1",
+    "wall.js": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vite": "^8.1.4"
+  }
+}
