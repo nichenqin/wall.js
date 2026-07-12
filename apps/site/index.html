@@ -8,7 +8,7 @@
       content="wall.js — modern fullpage piling library. Zero dependency, TypeScript, destroyable."
     />
     <title>wall.js — Fullpage, zero dependency</title>
-    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="icon" type="image/png" href="./favicon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -20,7 +20,7 @@
   <body>
     <header class="topbar">
       <a class="logo" href="#top" aria-label="wall.js home">
-        <img src="/logo.png" alt="wall.js" width="140" height="48" />
+        <img src="./logo.svg" alt="wall.js" width="120" height="32" />
       </a>
       <nav class="top-nav" aria-label="Primary">
         <a href="#features">Features</a>
@@ -62,13 +62,9 @@
           <div class="grid-fade"></div>
         </div>
         <div class="hero-content">
-          <img
-            class="hero-logo"
-            src="/logo-banner.png"
-            alt="wall.js"
-            width="560"
-            height="280"
-          />
+          <div class="hero-logo" aria-hidden="true">
+            <span class="hero-logo-wall">wall</span><span class="hero-logo-js">.js</span>
+          </div>
           <p class="eyebrow">v2 · TypeScript · Zero dependency</p>
           <h1>
             Fullpage piling,<br />

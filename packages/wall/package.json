@@ -5,12 +5,12 @@
   "type": "module",
   "main": "./dist/wall.cjs",
   "module": "./dist/wall.js",
-  "types": "./dist/wall.d.ts",
+  "types": "./dist/index.d.ts",
   "unpkg": "./dist/wall.iife.js",
   "jsdelivr": "./dist/wall.iife.js",
   "exports": {
     ".": {
-      "types": "./dist/wall.d.ts",
+      "types": "./dist/index.d.ts",
       "import": "./dist/wall.js",
       "require": "./dist/wall.cjs",
       "default": "./dist/wall.js"
@@ -22,7 +22,7 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && tsc -p tsconfig.build.json",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist",
@@ -54,7 +54,7 @@
   "license": "MIT",
   "devDependencies": {
     "tsup": "^8.5.1",
-    "typescript": "^6.0.3"
+    "typescript": "^7.0.2"
   },
   "engines": {
     "node": ">=18"

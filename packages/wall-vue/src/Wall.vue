@@ -6,6 +6,8 @@ import {
   provide,
   ref,
   watch,
+  type PropType,
+  type StyleValue,
 } from 'vue';
 import {
   Wall as WallCore,
@@ -13,20 +15,43 @@ import {
   type WallOptions,
 } from 'wall.js';
 import { wallKey, type WallInstance } from './context';
-import { optionsFingerprint, pickWallOptions, type WallOptionProps } from './options';
+import { optionsFingerprint, pickWallOptions } from './options';
+import type {
+  WallChangePayload,
+  WallSlideChangePayload,
+} from './event-types';
 
-export type WallChangePayload = WallEventMap['change'];
-export type WallSlideChangePayload = WallEventMap['slideChange'];
-
-const props = withDefaults(
-  defineProps<
-    WallOptionProps & {
-      class?: string | Record<string, boolean> | Array<string | Record<string, boolean>>;
-      style?: string | Record<string, string>;
-    }
-  >(),
-  {},
-);
+// Runtime props — avoids Vue SFC type-import resolution issues under TypeScript 7
+const props = defineProps({
+  duration: Number,
+  easing: String,
+  loop: Boolean,
+  loopToBottom: Boolean,
+  loopToTop: Boolean,
+  lockDocumentScroll: Boolean,
+  currentClass: String,
+  animatingClass: String,
+  sectionNavItemActiveClass: String,
+  swipeThreshold: Number,
+  keyboard: Boolean,
+  wheel: Boolean,
+  touch: Boolean,
+  wrapperZIndex: Number,
+  wheelThreshold: Number,
+  wheelSkip: Boolean,
+  wheelSkipUnit: Number,
+  wheelSkipMax: Number,
+  wheelSkipWindow: Number,
+  skipDuration: Number,
+  swipeSkip: Boolean,
+  swipeSkipUnit: Number,
+  swipeSkipMax: Number,
+  remountKey: [String, Number] as PropType<string | number>,
+  class: [String, Object, Array] as PropType<
+    string | Record<string, boolean> | Array<string | Record<string, boolean>>
+  >,
+  style: [String, Object, Array] as PropType<StyleValue>,
+});
 
 const emit = defineEmits<{
   change: [payload: WallChangePayload];
@@ -39,7 +64,7 @@ const wall = ref<WallInstance | null>(null);
 const index = ref(0);
 const slideIndex = ref(0);
 
-const fingerprint = computed(() => optionsFingerprint(props));
+const fingerprint = computed(() => optionsFingerprint(props as WallOptions));
 
 function create(): void {
   if (!root.value) return;
@@ -49,7 +74,7 @@ function create(): void {
 
   let instance: WallCore;
   try {
-    instance = new WallCore(root.value, pickWallOptions(props) as WallOptions);
+    instance = new WallCore(root.value, pickWallOptions(props as WallOptions));
   } catch (err) {
     console.error('[ @wall.js/vue ] failed to create Wall', err);
     return;

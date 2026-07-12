@@ -2,10 +2,10 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "types": ["svelte"],
     "noEmit": true,
     "rootDir": ".",
     "verbatimModuleSyntax": true
   },
-  "include": ["src/**/*", "svelte.config.js"]
+  "include": ["src/**/*.ts", "src/**/*.d.ts"],
+  "exclude": ["dist", "src/**/*.svelte"]
 }

@@ -3,7 +3,8 @@ import { defineConfig } from 'tsup';
 export default defineConfig({
   entry: ['src/index.ts'],
   format: ['esm', 'cjs'],
-  dts: true,
+  // DTS via tsc (tsup rollup-plugin-dts is not TypeScript 7 compatible yet)
+  dts: false,
   sourcemap: true,
   clean: true,
   minify: false,
