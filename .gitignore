@@ -3,6 +3,7 @@ dist
 site-dist
 .turbo
 .svelte-kit
+.astro
 .DS_Store
 *.local
 .vite

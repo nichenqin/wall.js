@@ -1,10 +1,13 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
-    "rootDir": ".",
-    "noEmit": true,
-    "types": ["vite/client"]
+    "paths": {
+      "wall.js": ["../../packages/wall/src/index.ts"]
+    },
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "skipLibCheck": true
   },
-  "include": ["main.ts", "index.html"],
-  "exclude": ["site-dist", "vite.config.ts"]
+  "include": [".astro/types.d.ts", "**/*"],
+  "exclude": ["site-dist", "node_modules"]
 }

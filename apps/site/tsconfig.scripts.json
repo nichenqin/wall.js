@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "types": [],
+    "noEmit": true,
+    "paths": {
+      "wall.js": ["../../packages/wall/dist/index.d.ts"]
+    }
+  },
+  "include": ["src/scripts/**/*.ts"]
+}
