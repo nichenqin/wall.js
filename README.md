@@ -16,7 +16,7 @@ Monorepo (Turborepo + pnpm):
 | `@wall.js/react` | `packages/wall-react` | React — `<Wall />` |
 | `@wall.js/vue` | `packages/wall-vue` | Vue 3 — `<Wall>` |
 | `@wall.js/svelte` | `packages/wall-svelte` | Svelte 5 — `<Wall>` |
-| `@wall.js/site` | `apps/site` | Experience website (vanilla) |
+| `@wall.js/site` | `apps/site` | Experience website (Astro) |
 
 The site **is** a live wall.js demo — scroll, swipe, or use arrow keys.
 

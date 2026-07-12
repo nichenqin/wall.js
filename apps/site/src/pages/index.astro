@@ -1,3 +1,39 @@
+---
+import { Code } from 'astro:components';
+import '../styles/global.css';
+
+const apiCode = `import { Wall } from 'wall.js'
+
+const wall = new Wall('#wall')
+const hashes = ['top', 'features', 'api', 'slides', 'install']
+
+// App layer: bind page → URL (not core)
+wall.on('change', ({ to }) => {
+  history.replaceState(null, '', \`#\${hashes[to]}\`)
+})
+
+// Deep link: /#api → goTo section
+const i = hashes.indexOf(location.hash.slice(1))
+if (i >= 0) wall.goTo(i)`;
+
+const installBash = `pnpm add wall.js
+pnpm add wall.js @wall.js/react
+pnpm add wall.js @wall.js/vue
+pnpm add wall.js @wall.js/svelte`;
+
+const installFrameworks = `// React
+import { Wall } from '@wall.js/react'
+<Wall><Wall.Section /></Wall>
+
+// Vue
+import { Wall, WallSection } from '@wall.js/vue'
+<Wall><WallSection /></Wall>
+
+// Svelte
+import { Wall, WallSection } from '@wall.js/svelte'
+<Wall><WallSection /></Wall>`;
+---
+
 <!doctype html>
 <html lang="zh-CN">
   <head>
@@ -8,19 +44,18 @@
       content="wall.js — modern fullpage piling library. Zero dependency, TypeScript, destroyable."
     />
     <title>wall.js — Fullpage, zero dependency</title>
-    <link rel="icon" type="image/png" href="./favicon.png" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <header class="topbar">
       <a class="logo" href="#top" aria-label="wall.js home">
-        <img src="./logo.svg" alt="wall.js" width="120" height="32" />
+        <img src="/logo.svg" alt="wall.js" width="120" height="32" />
       </a>
       <nav class="top-nav" aria-label="Primary">
         <a href="#features">Features</a>
@@ -65,7 +100,7 @@
           <div class="hero-logo" aria-hidden="true">
             <span class="hero-logo-wall">wall</span><span class="hero-logo-js">.js</span>
           </div>
-          <p class="eyebrow">v2 · TypeScript · Zero dependency</p>
+          <p class="eyebrow">v2 · TypeScript · Zero dependency · Astro site</p>
           <h1>
             Fullpage piling,<br />
             <em>done right.</em>
@@ -155,23 +190,9 @@
               <li><code>destroy()</code></li>
             </ul>
           </div>
-          <pre
-            class="code-block"
-            tabindex="0"
-            data-lang="typescript"
-          ><code>import { Wall } from 'wall.js'
-
-const wall = new Wall('#wall')
-const hashes = ['top', 'features', 'api', 'slides', 'install']
-
-// App layer: bind page → URL (not core)
-wall.on('change', ({ to }) => {
-  history.replaceState(null, '', `#${hashes[to]}`)
-})
-
-// Deep link: /#api → goTo section
-const i = hashes.indexOf(location.hash.slice(1))
-if (i >= 0) wall.goTo(i)</code></pre>
+          <div class="code-wrap">
+            <Code code={apiCode} lang="ts" theme="catppuccin-mocha" />
+          </div>
         </div>
       </section>
 
@@ -246,40 +267,29 @@ if (i >= 0) wall.goTo(i)</code></pre>
           <p class="eyebrow">Get started</p>
           <h2>Install in one line.</h2>
           <div class="install-blocks">
-            <pre class="code-block" data-lang="bash"><code>pnpm add wall.js
-pnpm add wall.js @wall.js/react
-pnpm add wall.js @wall.js/vue
-pnpm add wall.js @wall.js/svelte</code></pre>
-            <pre class="code-block" data-lang="tsx"><code>// React
-import { Wall } from '@wall.js/react'
-&lt;Wall&gt;&lt;Wall.Section /&gt;&lt;/Wall&gt;
-
-// Vue
-import { Wall, WallSection } from '@wall.js/vue'
-&lt;Wall&gt;&lt;WallSection /&gt;&lt;/Wall&gt;
-
-// Svelte
-import { Wall, WallSection } from '@wall.js/svelte'
-&lt;Wall&gt;&lt;WallSection /&gt;&lt;/Wall&gt;</code></pre>
+            <div class="code-wrap">
+              <Code code={installBash} lang="bash" theme="catppuccin-mocha" />
+            </div>
+            <div class="code-wrap">
+              <Code code={installFrameworks} lang="tsx" theme="catppuccin-mocha" />
+            </div>
           </div>
           <div class="hero-cta">
             <a
               class="btn btn-primary"
               href="https://github.com/nichenqin/wall.js"
               target="_blank"
-              rel="noreferrer"
-              >Star on GitHub</a
+              rel="noreferrer">Star on GitHub</a
             >
             <a
               class="btn btn-ghost"
               href="https://github.com/nichenqin/wall.js/blob/master/docs/API.md"
               target="_blank"
-              rel="noreferrer"
-              >Read the API</a
+              rel="noreferrer">Read the API</a
             >
           </div>
           <p class="footer-note">
-            MIT License · This page <strong>is</strong> a wall.js instance.
+            MIT License · This page <strong>is</strong> a wall.js instance · site built with Astro.
           </p>
         </div>
       </section>
@@ -289,6 +299,34 @@ import { Wall, WallSection } from '@wall.js/svelte'
       <div class="progress-bar" id="progress-bar"></div>
     </div>
 
-    <script type="module" src="./main.ts"></script>
+    <script>
+      import '../scripts/client.ts';
+    </script>
   </body>
 </html>
+
+<style is:global>
+  .code-wrap {
+    min-width: 0;
+  }
+
+  .code-wrap .astro-code {
+    margin: 0;
+    padding: 1.25rem 1.35rem;
+    border-radius: 18px;
+    border: 1px solid rgba(244, 241, 234, 0.12);
+    overflow: auto;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+    font-size: 0.82rem;
+    line-height: 1.65;
+    tab-size: 2;
+  }
+
+  .code-wrap .astro-code code {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: inherit;
+    line-height: inherit;
+    white-space: pre;
+    background: transparent !important;
+  }
+</style>
