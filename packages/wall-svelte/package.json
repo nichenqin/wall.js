@@ -19,9 +19,9 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "svelte-package -i src -o dist",
-    "dev": "svelte-package -i src -o dist --watch",
-    "typecheck": "svelte-check --tsconfig ./tsconfig.json",
+    "build": "node ./scripts/build.mjs",
+    "dev": "node ./scripts/build.mjs",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
     "clean": "rm -rf dist",
     "prepublishOnly": "pnpm build"
   },
@@ -52,12 +52,8 @@
     "wall.js": ">=2.0.0"
   },
   "devDependencies": {
-    "@sveltejs/package": "^2.5.4",
-    "@sveltejs/vite-plugin-svelte": "^7.2.0",
     "svelte": "^5.56.4",
-    "svelte-check": "^4.4.6",
-    "typescript": "^6.0.3",
-    "vite": "^8.1.4",
+    "typescript": "^7.0.2",
     "wall.js": "workspace:*"
   },
   "engines": {

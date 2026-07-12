@@ -1,9 +1,5 @@
 import type { WallOptions } from 'wall.js';
 
-export type WallOptionProps = WallOptions & {
-  remountKey?: string | number;
-};
-
 const OPTION_KEYS: (keyof WallOptions)[] = [
   'duration',
   'easing',
@@ -30,7 +26,7 @@ const OPTION_KEYS: (keyof WallOptions)[] = [
   'swipeSkipMax',
 ];
 
-export function pickWallOptions(props: WallOptionProps): WallOptions {
+export function pickWallOptions(props: WallOptions): WallOptions {
   const out: WallOptions = {};
   for (const key of OPTION_KEYS) {
     const value = props[key];
@@ -42,6 +38,6 @@ export function pickWallOptions(props: WallOptionProps): WallOptions {
   return out;
 }
 
-export function optionsFingerprint(props: WallOptionProps): string {
+export function optionsFingerprint(props: WallOptions): string {
   return JSON.stringify(pickWallOptions(props));
 }

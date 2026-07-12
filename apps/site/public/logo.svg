@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 96" role="img" aria-label="wall.js">
+  <title>wall.js</title>
+  <!-- solid wordmark: white + lime, no transparency tricks -->
+  <text
+    x="8"
+    y="68"
+    font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif"
+    font-size="72"
+    font-weight="800"
+    letter-spacing="-0.04em"
+    fill="#ffffff"
+  >wall</text>
+  <text
+    x="198"
+    y="68"
+    font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif"
+    font-size="72"
+    font-weight="800"
+    letter-spacing="-0.05em"
+    fill="#e8ff6a"
+  >.js</text>
+</svg>
