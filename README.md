@@ -1,6 +1,12 @@
 # wall.js
 
-**Modern fullpage piling** — zero runtime dependency, TypeScript-first, destroyable.
+<p align="center">
+  <img src="assets/logo.png" alt="wall.js" width="360" />
+</p>
+
+<p align="center">
+  <strong>Modern fullpage piling</strong> — zero runtime dependency, TypeScript-first, destroyable.
+</p>
 
 Monorepo (Turborepo + pnpm):
 
